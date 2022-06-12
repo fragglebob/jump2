@@ -1,0 +1,23 @@
+{
+  "name": "jump2",
+  "version": "0.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest",
+    "build:grammer": "nearleyc src/parser/jump.ne -o src/parser/jumpGrammer.ts"
+  },
+  "author": "Rob Wells",
+  "license": "ISC",
+  "dependencies": {
+    "nearley": "^2.20.1"
+  },
+  "devDependencies": {
+    "@types/jest": "^28.1.1",
+    "@types/nearley": "^2.11.2",
+    "jest": "^28.1.1",
+    "ts-jest": "^28.0.4",
+    "ts-node": "^10.8.1",
+    "typescript": "^4.7.3"
+  }
+}
