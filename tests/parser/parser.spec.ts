@@ -15,7 +15,7 @@ describe("parser", () => {
             const result = parse(`foo = "super string"`);
             expect(result).toMatchSnapshot();
         });
-    })
+    });
 
     describe("variables", () => {
 
@@ -41,22 +41,22 @@ describe("parser", () => {
                 const result = parse(`foo = "bar"`);
                 expect(result).toMatchSnapshot();
             });
-            
+
             it("should build ast for key assignment of variable", () => {
                 const result = parse(`foo.bar = "baz"`);
                 expect(result).toMatchSnapshot();
             });
-    
+
             it("should build ast for square bracket assignment of variable", () => {
                 const result = parse(`foo["bar"] = "baz"`);
                 expect(result).toMatchSnapshot();
             });
-    
+
             it("should build ast for square bracket then key assignment of variable", () => {
                 const result = parse(`foo["bar"].foo = "baz"`);
                 expect(result).toMatchSnapshot();
             });
-    
+
             it("should build ast for key then square bracket assignment of variable", () => {
                 const result = parse(`foo.bar["foo"] = "baz"`);
                 expect(result).toMatchSnapshot();
@@ -87,6 +87,102 @@ describe("parser", () => {
 
         it("should build ast for a negative decimal", () => {
             const result = parse("foo = -13.37");
+            expect(result).toMatchSnapshot();
+        });
+    });
+
+    describe("arrays", () => {
+        it("build ast for an empty array", () => {
+            const result = parse(`
+                foo = []
+            `);
+            expect(result).toMatchSnapshot();
+        });
+        it("build ast for an array with one item", () => {
+            const result = parse(`
+                foo = [0]
+            `);
+            expect(result).toMatchSnapshot();
+        });
+        it("build ast for an array with three mixed item", () => {
+            const result = parse(`
+                foo = [0, "foo", sin(44)]
+            `);
+            expect(result).toMatchSnapshot();
+        });
+    });
+
+    describe("objects", () => {
+        it("build ast for an empty object", () => {
+            const result = parse(`
+                foo = {}
+            `);
+            expect(result).toMatchSnapshot();
+        });
+
+        it("build ast for an object with a name key", () => {
+            const result = parse(`
+                foo = {
+                    bar: "baz"
+                }
+            `);
+            expect(result).toMatchSnapshot();
+        });
+
+        it("build ast for an object with a string key", () => {
+            const result = parse(`
+                foo = {
+                    "bar-bar": "baz"
+                }
+            `);
+            expect(result).toMatchSnapshot();
+        });
+
+        it("build ast for an object with an expression key", () => {
+            const result = parse(`
+                foo = {
+                    [sin(5)]: "baz"
+                }
+            `);
+            expect(result).toMatchSnapshot();
+        });
+
+        it("build ast for an object with many named keys", () => {
+            const result = parse(`
+                foo = {
+                    bar: 1,
+                    baz: 2,
+                    baa: 3
+                }
+            `);
+            expect(result).toMatchSnapshot();
+        });
+
+        it("build ast for an object with mixed keys", () => {
+            const result = parse(`
+                foo = {
+                    bar: 1,
+                    "baz": 2,
+                    ["baa"]: 3,
+                    [sin(4)]: 4,
+                    something: "else"
+                }
+            `);
+            expect(result).toMatchSnapshot();
+        });
+
+        it("build ast for an object with nested objects", () => {
+            const result = parse(`
+                foo = {
+                    bar: {
+                        baz: {
+                            nested: {
+                                array: [  234, { "with-an-object": { "inside": "boo" } } ]
+                            }
+                        }
+                    }
+                }
+            `);
             expect(result).toMatchSnapshot();
         });
     })
@@ -164,7 +260,7 @@ describe("parser", () => {
             `);
             expect(result).toMatchSnapshot();
         });
-    })
+    });
 
     describe("expressions", () => {
 
@@ -227,13 +323,42 @@ describe("parser", () => {
         });
 
         it("should build ast for a combination of boolean logic", () => {
-            const result = parse(`foo = sin(224) && ( 0 != cos(0) || sin(0) >= 0)`);
+            const result = parse(`foo = sin(224) && (0 != cos(0) || sin(0) >= 0)`);
             expect(result).toMatchSnapshot();
-        })
+        });
 
         it("should build ast for brackets", () => {
             const result = parse(`foo = (234 * ((sin(5) - 8) / (988 + sin(592))))`);
             expect(result).toMatchSnapshot();
-        })
-    })
+        });
+    });
+
+    describe("loops", () => {
+        it("should build ast for a while statement", () => {
+            const result = parse(`
+                while 2 > 1 then
+                    sin(3)
+                endwhile
+            `);
+            expect(result).toMatchSnapshot();
+        });
+
+        it("should build ast for a loop statement", () => {
+            const result = parse(`
+                loop 800 times
+                    y = cos(3)
+                endloop
+            `);
+            expect(result).toMatchSnapshot();
+        });
+
+        it("should build ast for a setting loop statement", () => {
+            const result = parse(`
+                loop x <- 800 times
+                    y = cos(x)
+                endloop
+            `);
+            expect(result).toMatchSnapshot();
+        });
+    });
 })

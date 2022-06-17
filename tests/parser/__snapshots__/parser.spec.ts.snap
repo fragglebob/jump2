@@ -1,5 +1,98 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`parser arrays build ast for an array with one item 1`] = `
+Object {
+  "statements": Array [
+    Object {
+      "set": Object {
+        "name": Object {
+          "type": "name",
+          "value": "foo",
+        },
+        "type": "variable",
+      },
+      "to": Object {
+        "type": "array",
+        "value": Array [
+          Object {
+            "type": "number",
+            "value": "0",
+          },
+        ],
+      },
+      "type": "assignment",
+    },
+  ],
+  "type": "block",
+}
+`;
+
+exports[`parser arrays build ast for an array with three mixed item 1`] = `
+Object {
+  "statements": Array [
+    Object {
+      "set": Object {
+        "name": Object {
+          "type": "name",
+          "value": "foo",
+        },
+        "type": "variable",
+      },
+      "to": Object {
+        "type": "array",
+        "value": Array [
+          Object {
+            "type": "number",
+            "value": "0",
+          },
+          Object {
+            "type": "string",
+            "value": "\\"foo\\"",
+          },
+          Object {
+            "args": Object {
+              "type": "arguments",
+              "value": Array [
+                Object {
+                  "type": "number",
+                  "value": "44",
+                },
+              ],
+            },
+            "name": "sin",
+            "type": "func",
+          },
+        ],
+      },
+      "type": "assignment",
+    },
+  ],
+  "type": "block",
+}
+`;
+
+exports[`parser arrays build ast for an empty array 1`] = `
+Object {
+  "statements": Array [
+    Object {
+      "set": Object {
+        "name": Object {
+          "type": "name",
+          "value": "foo",
+        },
+        "type": "variable",
+      },
+      "to": Object {
+        "type": "array",
+        "value": Array [],
+      },
+      "type": "assignment",
+    },
+  ],
+  "type": "block",
+}
+`;
+
 exports[`parser expressions should build ast for != 1`] = `
 Object {
   "statements": Array [
@@ -1111,6 +1204,143 @@ Object {
 }
 `;
 
+exports[`parser loops should build ast for a loop statement 1`] = `
+Object {
+  "statements": Array [
+    Object {
+      "then": Object {
+        "statements": Array [
+          Object {
+            "set": Object {
+              "name": Object {
+                "type": "name",
+                "value": "y",
+              },
+              "type": "variable",
+            },
+            "to": Object {
+              "args": Object {
+                "type": "arguments",
+                "value": Array [
+                  Object {
+                    "type": "number",
+                    "value": "3",
+                  },
+                ],
+              },
+              "name": "cos",
+              "type": "func",
+            },
+            "type": "assignment",
+          },
+        ],
+        "type": "block",
+      },
+      "times": Object {
+        "type": "number",
+        "value": "800",
+      },
+      "type": "loop",
+    },
+  ],
+  "type": "block",
+}
+`;
+
+exports[`parser loops should build ast for a setting loop statement 1`] = `
+Object {
+  "statements": Array [
+    Object {
+      "setting": Object {
+        "name": Object {
+          "type": "name",
+          "value": "x",
+        },
+        "type": "variable",
+      },
+      "then": Object {
+        "statements": Array [
+          Object {
+            "set": Object {
+              "name": Object {
+                "type": "name",
+                "value": "y",
+              },
+              "type": "variable",
+            },
+            "to": Object {
+              "args": Object {
+                "type": "arguments",
+                "value": Array [
+                  Object {
+                    "name": Object {
+                      "type": "name",
+                      "value": "x",
+                    },
+                    "type": "variable",
+                  },
+                ],
+              },
+              "name": "cos",
+              "type": "func",
+            },
+            "type": "assignment",
+          },
+        ],
+        "type": "block",
+      },
+      "times": Object {
+        "type": "number",
+        "value": "800",
+      },
+      "type": "loop",
+    },
+  ],
+  "type": "block",
+}
+`;
+
+exports[`parser loops should build ast for a while statement 1`] = `
+Object {
+  "statements": Array [
+    Object {
+      "condition": Object {
+        "left": Object {
+          "type": "number",
+          "value": "2",
+        },
+        "operation": ">",
+        "right": Object {
+          "type": "number",
+          "value": "1",
+        },
+        "type": "comparison",
+      },
+      "then": Object {
+        "statements": Array [
+          Object {
+            "args": Object {
+              "type": "arguments",
+              "value": Array [
+                Object {
+                  "type": "number",
+                  "value": "3",
+                },
+              ],
+            },
+            "name": "sin",
+            "type": "func",
+          },
+        ],
+        "type": "block",
+      },
+      "type": "while",
+    },
+  ],
+  "type": "block",
+}
+`;
+
 exports[`parser numbers should build ast for a negative decimal 1`] = `
 Object {
   "statements": Array [
@@ -1213,6 +1443,436 @@ Object {
       "to": Object {
         "type": "number",
         "value": "0",
+      },
+      "type": "assignment",
+    },
+  ],
+  "type": "block",
+}
+`;
+
+exports[`parser objects build ast for an empty object 1`] = `
+Object {
+  "statements": Array [
+    Object {
+      "set": Object {
+        "name": Object {
+          "type": "name",
+          "value": "foo",
+        },
+        "type": "variable",
+      },
+      "to": Object {
+        "entries": Array [],
+        "type": "object",
+      },
+      "type": "assignment",
+    },
+  ],
+  "type": "block",
+}
+`;
+
+exports[`parser objects build ast for an object with a name key 1`] = `
+Object {
+  "statements": Array [
+    Object {
+      "set": Object {
+        "name": Object {
+          "type": "name",
+          "value": "foo",
+        },
+        "type": "variable",
+      },
+      "to": Object {
+        "entries": Array [
+          Object {
+            "key": Object {
+              "type": "object_key",
+              "value": Object {
+                "type": "name",
+                "value": "bar",
+              },
+            },
+            "type": "object_entry",
+            "value": Object {
+              "type": "string",
+              "value": "\\"baz\\"",
+            },
+          },
+        ],
+        "type": "object",
+      },
+      "type": "assignment",
+    },
+  ],
+  "type": "block",
+}
+`;
+
+exports[`parser objects build ast for an object with a string key 1`] = `
+Object {
+  "statements": Array [
+    Object {
+      "set": Object {
+        "name": Object {
+          "type": "name",
+          "value": "foo",
+        },
+        "type": "variable",
+      },
+      "to": Object {
+        "entries": Array [
+          Object {
+            "key": Object {
+              "type": "object_key",
+              "value": Object {
+                "type": "string",
+                "value": "\\"bar-bar\\"",
+              },
+            },
+            "type": "object_entry",
+            "value": Object {
+              "type": "string",
+              "value": "\\"baz\\"",
+            },
+          },
+        ],
+        "type": "object",
+      },
+      "type": "assignment",
+    },
+  ],
+  "type": "block",
+}
+`;
+
+exports[`parser objects build ast for an object with an expression key 1`] = `
+Object {
+  "statements": Array [
+    Object {
+      "set": Object {
+        "name": Object {
+          "type": "name",
+          "value": "foo",
+        },
+        "type": "variable",
+      },
+      "to": Object {
+        "entries": Array [
+          Object {
+            "key": Object {
+              "type": "object_key",
+              "value": Object {
+                "args": Object {
+                  "type": "arguments",
+                  "value": Array [
+                    Object {
+                      "type": "number",
+                      "value": "5",
+                    },
+                  ],
+                },
+                "name": "sin",
+                "type": "func",
+              },
+            },
+            "type": "object_entry",
+            "value": Object {
+              "type": "string",
+              "value": "\\"baz\\"",
+            },
+          },
+        ],
+        "type": "object",
+      },
+      "type": "assignment",
+    },
+  ],
+  "type": "block",
+}
+`;
+
+exports[`parser objects build ast for an object with many named keys 1`] = `
+Object {
+  "statements": Array [
+    Object {
+      "set": Object {
+        "name": Object {
+          "type": "name",
+          "value": "foo",
+        },
+        "type": "variable",
+      },
+      "to": Object {
+        "entries": Array [
+          Object {
+            "key": Object {
+              "type": "object_key",
+              "value": Object {
+                "type": "name",
+                "value": "bar",
+              },
+            },
+            "type": "object_entry",
+            "value": Object {
+              "type": "number",
+              "value": "1",
+            },
+          },
+          Object {
+            "key": Object {
+              "type": "object_key",
+              "value": Object {
+                "type": "name",
+                "value": "baz",
+              },
+            },
+            "type": "object_entry",
+            "value": Object {
+              "type": "number",
+              "value": "2",
+            },
+          },
+          Object {
+            "key": Object {
+              "type": "object_key",
+              "value": Object {
+                "type": "name",
+                "value": "baa",
+              },
+            },
+            "type": "object_entry",
+            "value": Object {
+              "type": "number",
+              "value": "3",
+            },
+          },
+        ],
+        "type": "object",
+      },
+      "type": "assignment",
+    },
+  ],
+  "type": "block",
+}
+`;
+
+exports[`parser objects build ast for an object with mixed keys 1`] = `
+Object {
+  "statements": Array [
+    Object {
+      "set": Object {
+        "name": Object {
+          "type": "name",
+          "value": "foo",
+        },
+        "type": "variable",
+      },
+      "to": Object {
+        "entries": Array [
+          Object {
+            "key": Object {
+              "type": "object_key",
+              "value": Object {
+                "type": "name",
+                "value": "bar",
+              },
+            },
+            "type": "object_entry",
+            "value": Object {
+              "type": "number",
+              "value": "1",
+            },
+          },
+          Object {
+            "key": Object {
+              "type": "object_key",
+              "value": Object {
+                "type": "string",
+                "value": "\\"baz\\"",
+              },
+            },
+            "type": "object_entry",
+            "value": Object {
+              "type": "number",
+              "value": "2",
+            },
+          },
+          Object {
+            "key": Object {
+              "type": "object_key",
+              "value": Object {
+                "type": "string",
+                "value": "\\"baa\\"",
+              },
+            },
+            "type": "object_entry",
+            "value": Object {
+              "type": "number",
+              "value": "3",
+            },
+          },
+          Object {
+            "key": Object {
+              "type": "object_key",
+              "value": Object {
+                "args": Object {
+                  "type": "arguments",
+                  "value": Array [
+                    Object {
+                      "type": "number",
+                      "value": "4",
+                    },
+                  ],
+                },
+                "name": "sin",
+                "type": "func",
+              },
+            },
+            "type": "object_entry",
+            "value": Object {
+              "type": "number",
+              "value": "4",
+            },
+          },
+          Object {
+            "key": Object {
+              "type": "object_key",
+              "value": Object {
+                "type": "name",
+                "value": "something",
+              },
+            },
+            "type": "object_entry",
+            "value": Object {
+              "type": "string",
+              "value": "\\"else\\"",
+            },
+          },
+        ],
+        "type": "object",
+      },
+      "type": "assignment",
+    },
+  ],
+  "type": "block",
+}
+`;
+
+exports[`parser objects build ast for an object with nested objects 1`] = `
+Object {
+  "statements": Array [
+    Object {
+      "set": Object {
+        "name": Object {
+          "type": "name",
+          "value": "foo",
+        },
+        "type": "variable",
+      },
+      "to": Object {
+        "entries": Array [
+          Object {
+            "key": Object {
+              "type": "object_key",
+              "value": Object {
+                "type": "name",
+                "value": "bar",
+              },
+            },
+            "type": "object_entry",
+            "value": Object {
+              "entries": Array [
+                Object {
+                  "key": Object {
+                    "type": "object_key",
+                    "value": Object {
+                      "type": "name",
+                      "value": "baz",
+                    },
+                  },
+                  "type": "object_entry",
+                  "value": Object {
+                    "entries": Array [
+                      Object {
+                        "key": Object {
+                          "type": "object_key",
+                          "value": Object {
+                            "type": "name",
+                            "value": "nested",
+                          },
+                        },
+                        "type": "object_entry",
+                        "value": Object {
+                          "entries": Array [
+                            Object {
+                              "key": Object {
+                                "type": "object_key",
+                                "value": Object {
+                                  "type": "name",
+                                  "value": "array",
+                                },
+                              },
+                              "type": "object_entry",
+                              "value": Object {
+                                "type": "array",
+                                "value": Array [
+                                  Object {
+                                    "type": "number",
+                                    "value": "234",
+                                  },
+                                  Object {
+                                    "entries": Array [
+                                      Object {
+                                        "key": Object {
+                                          "type": "object_key",
+                                          "value": Object {
+                                            "type": "string",
+                                            "value": "\\"with-an-object\\"",
+                                          },
+                                        },
+                                        "type": "object_entry",
+                                        "value": Object {
+                                          "entries": Array [
+                                            Object {
+                                              "key": Object {
+                                                "type": "object_key",
+                                                "value": Object {
+                                                  "type": "string",
+                                                  "value": "\\"inside\\"",
+                                                },
+                                              },
+                                              "type": "object_entry",
+                                              "value": Object {
+                                                "type": "string",
+                                                "value": "\\"boo\\"",
+                                              },
+                                            },
+                                          ],
+                                          "type": "object",
+                                        },
+                                      },
+                                    ],
+                                    "type": "object",
+                                  },
+                                ],
+                              },
+                            },
+                          ],
+                          "type": "object",
+                        },
+                      },
+                    ],
+                    "type": "object",
+                  },
+                },
+              ],
+              "type": "object",
+            },
+          },
+        ],
+        "type": "object",
       },
       "type": "assignment",
     },

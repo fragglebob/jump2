@@ -28,6 +28,10 @@ jobs:
       - name: Install Dependencies
         run: npm install
 
+      # Build grammer
+      - name: Build Grammer
+        run: npm run build:grammer
+
       # Finally, run our tests
       - name: Run the tests
         run: npm test

@@ -19,26 +19,30 @@ declare var nl: any;
     const lexer = moo.compile({
         ws:     /[ \t]+/,
         number:  [
-			/(?:-?(?:0|[1-9][0-9]*)?\.[0-9]+)/,   // [123].123
-			/(?:-?(?:0|[1-9][0-9]*)\.[0-9]*)/,    // 123.[123]
-			/(?:0|-?[1-9][0-9]*)/,              // 123
-		],
-		binops: ["&&", "||"],
-		comparison: ["<", ">", "<=", ">=", "==", "!="],
-		sum: ["+", "-"],
-		product: ["*", "/", "%"],
+            /(?:-?(?:0|[1-9][0-9]*)?\.[0-9]+)/,   // [123].123
+            /(?:-?(?:0|[1-9][0-9]*)\.[0-9]*)/,    // 123.[123]
+            /(?:0|-?[1-9][0-9]*)/,              // 123
+        ],
+		setting: '<-',
+        binops: ["&&", "||"],
+        comparison: ["<", ">", "<=", ">=", "==", "!="],
+        sum: ["+", "-"],
+        product: ["*", "/", "%"],
         string:  /"(?:\\["\\]|[^\n"\\])*"/,
         lparen:  '(',
         rparen:  ')',
-	    lqb:  '[',
+        lqb:  '[',
         rqb:  ']',
-		dot: '.',
-		eq: '=',
-		comma: ',',
-		nl: { match: /\r|\r\n|\n/, lineBreaks: true },
-		variableName: /[\w_][\w\d_]*/,
-		keywords: ["if", "else", "then", "elseif", "endif"]
-		
+		lcb:  '{',
+        rcb:  '}',
+        dot: '.',
+        eq: '=',
+        comma: ',',
+		colon: ':',
+        nl: { match: /\r|\r\n|\n/, lineBreaks: true },
+        variableName: /[\w_][\w\d_]*/,
+        keywords: ["if", "else", "then", "elseif", "endif"]
+        
     });
 
 interface NearleyToken {
@@ -78,23 +82,26 @@ const grammar: Grammar = {
     {"name": "Statement", "symbols": ["FunctionCalls"], "postprocess": id},
     {"name": "Statement", "symbols": ["Var", "_", {"literal":"="}, "_", "Expression"], "postprocess": (d) => ({ type: "assignment", set: d[0], to: d[4] })},
     {"name": "Statement", "symbols": [{"literal":"if"}, "__", "Expression", "__", {"literal":"then"}, "__", "Block", "__", "Else"], "postprocess": (d) => ({ type: "if", condition: d[2], then: d[6], else: d[8] })},
+    {"name": "Statement", "symbols": [{"literal":"while"}, "__", "Expression", "__", {"literal":"then"}, "__", "Block", "__", {"literal":"endwhile"}], "postprocess": (d) => ({ type: "while", condition: d[2], then: d[6] })},
+    {"name": "Statement", "symbols": [{"literal":"loop"}, "__", "NamedVariable", "__", {"literal":"<-"}, "__", "Expression", "__", {"literal":"times"}, "__", "Block", "__", {"literal":"endloop"}], "postprocess": (d) => ({ type: "loop", times: d[6], then: d[10], setting: d[2] })},
+    {"name": "Statement", "symbols": [{"literal":"loop"}, "__", "Expression", "__", {"literal":"times"}, "__", "Block", "__", {"literal":"endloop"}], "postprocess": (d) => ({ type: "loop", times: d[2], then: d[6] })},
     {"name": "Else", "symbols": [{"literal":"endif"}], "postprocess": () => null},
     {"name": "Else", "symbols": [{"literal":"else"}, "__", "Block", "__", {"literal":"endif"}], "postprocess": (d) => d[2]},
     {"name": "Else", "symbols": ["_ElseIf", "__", {"literal":"endif"}], "postprocess": (d) => d[0][0]},
     {"name": "Else", "symbols": ["_ElseIf", "__", {"literal":"else"}, "__", "Block", "__", {"literal":"endif"}], "postprocess":  (d) => {
-        	d[0][d[0].length - 1].else = d[4];
-        	return d[0][0];
+            d[0][d[0].length - 1].else = d[4];
+            return d[0][0];
         } },
     {"name": "_ElseIf", "symbols": [{"literal":"elseif"}, "__", "Expression", "__", {"literal":"then"}, "__", "Block"], "postprocess": (d) => [{ type: "if", condition: d[2], then: d[6], else: null }]},
     {"name": "_ElseIf", "symbols": ["_ElseIf", "__", {"literal":"elseif"}, "__", "Expression", "__", {"literal":"then"}, "__", "Block"], "postprocess":  (d) => {
-        	const thisIf = { type: "if", condition: d[4], then: d[8], else: null };
-        	d[0][d[0].length - 1].else = thisIf;
-        	return [...d[0], thisIf];
+            const thisIf = { type: "if", condition: d[4], then: d[8], else: null };
+            d[0][d[0].length - 1].else = thisIf;
+            return [...d[0], thisIf];
         } },
-    {"name": "Var", "symbols": ["Name"], "postprocess": (d) => ({ type: "variable", name: d[0] })},
+    {"name": "Var", "symbols": ["NamedVariable"], "postprocess": id},
     {"name": "Var", "symbols": ["Var", "_", {"literal":"["}, "_", "Expression", "_", {"literal":"]"}], "postprocess": (d) => ({ type: "key_access", key: d[4], from: d[0] })},
     {"name": "Var", "symbols": ["Var", "_", {"literal":"."}, "_", "Name"], "postprocess": (d) => ({ type: "key_access", key: d[4], from: d[0] })},
-    {"name": "Name", "symbols": ["_name"], "postprocess": (d) => ({ type: "name", value: d[0] })},
+    {"name": "NamedVariable", "symbols": ["Name"], "postprocess": (d) => ({ type: "variable", name: d[0] })},
     {"name": "FunctionCalls", "symbols": ["MathsFunctions"], "postprocess": id},
     {"name": "MathsFunctions", "symbols": [{"literal":"sin"}, "_", "Args"], "postprocess": (d) => ({ type: "func", name: "sin", args: d[2] })},
     {"name": "MathsFunctions", "symbols": [{"literal":"cos"}, "_", "Args"], "postprocess": (d) => ({ type: "func", name: "cos", args: d[2] })},
@@ -120,8 +127,21 @@ const grammar: Grammar = {
     {"name": "Atom", "symbols": ["Var"], "postprocess": id},
     {"name": "Atom", "symbols": ["Parenthesized"], "postprocess": id},
     {"name": "Atom", "symbols": ["FunctionCalls"], "postprocess": id},
+    {"name": "Atom", "symbols": ["Array"], "postprocess": id},
+    {"name": "Atom", "symbols": ["Object"], "postprocess": id},
+    {"name": "Array", "symbols": [{"literal":"["}, "_", {"literal":"]"}], "postprocess": (d) => ({ type: "array", value: [] })},
+    {"name": "Array", "symbols": [{"literal":"["}, "_", "ExpressionList", "_", {"literal":"]"}], "postprocess": (d) => ({ type: "array", value: d[2] })},
+    {"name": "Object", "symbols": [{"literal":"{"}, "_", {"literal":"}"}], "postprocess": (d) => ({ type: "object", entries: [] })},
+    {"name": "Object", "symbols": [{"literal":"{"}, "_", "ObjectEntryList", "_", {"literal":"}"}], "postprocess": (d) => ({ type: "object", entries: d[2] })},
+    {"name": "ObjectEntryList", "symbols": ["ObjectEntry"], "postprocess": (d) => [d[0]]},
+    {"name": "ObjectEntryList", "symbols": ["ObjectEntryList", "_", {"literal":","}, "_", "ObjectEntry"], "postprocess": (d) => [...d[0], d[4]]},
+    {"name": "ObjectEntry", "symbols": ["ObjectKey", "_", {"literal":":"}, "_", "Expression"], "postprocess": (d) => ({ type: "object_entry", key: d[0], value: d[4] })},
+    {"name": "ObjectKey", "symbols": ["Name"], "postprocess": (d) => ({ type: "object_key", value: d[0] })},
+    {"name": "ObjectKey", "symbols": ["String"], "postprocess": (d) => ({ type: "object_key", value: d[0] })},
+    {"name": "ObjectKey", "symbols": [{"literal":"["}, "_", "Expression", "_", {"literal":"]"}], "postprocess": (d) => ({ type: "object_key", value: d[2] })},
     {"name": "Number", "symbols": [(lexer.has("number") ? {type: "number"} : number)], "postprocess": (d) => ({ type: "number", value: d[0].value })},
     {"name": "String", "symbols": [(lexer.has("string") ? {type: "string"} : string)], "postprocess": (d) => ({ type: "string", value: d[0].value })},
+    {"name": "Name", "symbols": ["_name"], "postprocess": (d) => ({ type: "name", value: d[0] })},
     {"name": "_name", "symbols": [(lexer.has("variableName") ? {type: "variableName"} : variableName)], "postprocess": (d) => d[0].value},
     {"name": "_", "symbols": [], "postprocess": () => null},
     {"name": "_", "symbols": ["_", (lexer.has("ws") ? {type: "ws"} : ws)], "postprocess": () => null},

@@ -1,53 +1,93 @@
-import type { Statement, Block, FunctionCall, Arguments, Expression, Assignment, Var, Operation, IfStatement, NamedVariable } from "../parser/ast";
+import type { Statement, Block, FunctionCall, Arguments, Expression, Assignment, Var, Operation, IfStatement, NamedVariable, ASTItem, LoopStatement, WhileStatement, ArrayASTItem, ObjectASTItem, ObjectKeyASTItem } from "../parser/ast";
 
-export function compileAST(block: Block) : string {
-    return compileBlock(block);
+function unhandledError(type: string, item: ASTItem): never {
+    throw new Error(`Unhandled ${type}: ${item.type}`);
 }
 
-function compileBlock(block: Block) : string {
-    return block.statements.map(compileStatement).join("\n");
+class Context {
+    readonly depth: number;
+    constructor({ depth }: { depth: number }) {
+        this.depth = depth;
+    }
+
+    indent() : Context {
+        return new Context({ depth: this.depth + 1 });
+    }
+    
+    public get whitespace() : string {
+        return " ".repeat(this.depth * 2);
+    }
+    
+    static start() : Context {
+        return new Context({ depth: 0 });
+    }
 }
 
-function compileStatement(statement: Statement) : string {
+export function compileAST(block: Block): string {
+    return compileBlock(Context.start(), block);
+}
+
+function compileBlock(ctx: Context, block: Block): string {
+    return block.statements.map(value => ctx.whitespace + compileStatement(ctx, value)).join("\n");
+}
+
+function compileStatement(ctx: Context, statement: Statement): string {
     switch (statement.type) {
         case "func":
-            return compileFunctionCall(statement);
+            return compileFunctionCall(ctx, statement);
         case "assignment":
-            return compileAssignment(statement);
+            return compileAssignment(ctx, statement);
         case "if":
-            return compileIfStatment(statement);
+            return compileIfStatment(ctx, statement);
+        case "loop":
+            return compileLoopStatment(ctx, statement);
+        case "while":
+            return compileWhileStatment(ctx, statement);
     }
+    unhandledError("statement", statement);
 }
 
-function compileIfStatment(ifStatement: IfStatement) : string {
-    const start = `if (${compileExpression(ifStatement.condition)}) {\n${compileBlock(ifStatement.then)}\n}`;
-    if(!ifStatement.else) {
+function compileLoopStatment(ctx: Context, statement: LoopStatement): string {
+
+    if(!statement.setting) {
+        return `for (let i = 0; i < ${compileExpression(ctx, statement.times)}; i++) {\n${compileBlock(ctx.indent(), statement.then)}\n${ctx.whitespace}}`;
+    }
+    return `for (${compileVar(ctx, statement.setting)} = 0; ${compileVar(ctx, statement.setting)} < ${compileExpression(ctx, statement.times)}; ${compileVar(ctx, statement.setting)}++) {\n${compileBlock(ctx.indent(), statement.then)}\n${ctx.whitespace}}`;
+}
+
+function compileWhileStatment(ctx: Context, statement: WhileStatement): string {
+    return `while (${compileExpression(ctx, statement.condition)} {\n${compileBlock(ctx.indent(), statement.then)}\n${ctx.whitespace}}`;
+}
+
+function compileIfStatment(ctx: Context, ifStatement: IfStatement): string {
+    const start = `if (${compileExpression(ctx, ifStatement.condition)}) {\n${compileBlock(ctx.indent(), ifStatement.then)}\n${ctx.whitespace}}`;
+    if (!ifStatement.else) {
         return start;
     }
-    if(ifStatement.else.type === "block") {
-        return start + ` else {\n${compileBlock(ifStatement.else)}\n}`
+    if (ifStatement.else.type === "block") {
+        return start + ` else {\n${compileBlock(ctx.indent(), ifStatement.else)}\n${ctx.whitespace}}`
     } else {
-        return start + ` else${compileIfStatment(ifStatement.else)}`
+        return start + ` else${compileIfStatment(ctx, ifStatement.else)}`
     }
 }
 
-function compileFunctionCall(functionCall: FunctionCall) : string {
+function compileFunctionCall(ctx: Context, functionCall: FunctionCall): string {
     const mathFunctions = ["cos", "sin"];
 
     const funcName = functionCall.name;
 
-    if(mathFunctions.includes(funcName)) {
-        return `Math.${funcName}(${compileArguments(functionCall.args)})`
+    if (mathFunctions.includes(funcName)) {
+        return `Math.${funcName}(${compileArguments(ctx, functionCall.args)})`
     }
     throw new Error(`Unknown function: ${funcName}`);
 }
 
-function compileArguments(args: Arguments) : string {
-    return args.value.map(compileExpression).join(", ");
+function compileArguments(ctx: Context, args: Arguments): string {
+    return args.value.map((value) => compileExpression(ctx, value)).join(", ");
 }
 
-function compileAssignment(assignment: Assignment) : string {
-    return `${compileVar(assignment.set)} = ${compileExpression(assignment.to)}`
+function compileAssignment(ctx: Context, assignment: Assignment): string {
+    return `${compileVar(ctx, assignment.set)} = ${compileExpression(ctx, assignment.to)}`
 }
 
 const constants: Record<string, string> = {
@@ -57,58 +97,93 @@ const constants: Record<string, string> = {
     "pi": "Math.PI"
 };
 
-function isAConstant(variable: Var) : boolean {
-    if(variable.type === "variable") {
+function isAConstant(ctx: Context, variable: Var): boolean {
+    if (variable.type === "variable") {
         return variable.name.value.toLowerCase() in constants;
     }
     return false;
 }
 
-function getConstant(variable: NamedVariable) : string {
+function getConstant(ctx: Context, variable: NamedVariable): string {
     return constants[variable.name.value.toLowerCase()];
 }
 
-function compileVar(variable: Var) : string {
-    
-
-    switch(variable.type) {
+function compileVar(ctx: Context, variable: Var): string {
+    switch (variable.type) {
         case "variable":
-            if(isAConstant(variable)) {
-                return getConstant(variable)
+            if (isAConstant(ctx, variable)) {
+                return getConstant(ctx, variable)
             }
             return `state['${variable.name.value}']`;
         case "key_access":
-            if(isAConstant(variable.from)) {
+            if (isAConstant(ctx, variable.from)) {
                 throw new Error("Cannot access key of constant");
             }
-            if(variable.key.type === "name") {
-                return `${compileVar(variable.from)}['${variable.key.value}']`;
+            if (variable.key.type === "name") {
+                return `${compileVar(ctx, variable.from)}['${variable.key.value}']`;
             } else {
-                return `${compileVar(variable.from)}[${compileExpression(variable.key)}]`;
+                return `${compileVar(ctx, variable.from)}[${compileExpression(ctx, variable.key)}]`;
             }
     }
+    unhandledError("var", variable);
 }
 
-function compileExpression(expression: Expression) : string {
-    switch(expression.type) {
+function compileExpression(ctx: Context, expression: Expression): string {
+    switch (expression.type) {
         case "number":
         case "string":
             return expression.value;
+        case "array":
+            return compileArray(ctx ,expression);
+        case "object":
+            return compileObject(ctx, expression);
         case "key_access":
         case "variable":
-            return compileVar(expression);
+            return compileVar(ctx, expression);
         case "product":
         case "sum":
         case "comparison":
         case "binary":
-            return compileOperation(expression);
+            return compileOperation(ctx, expression);
         case "func":
-            return compileFunctionCall(expression);
-        case "parenthesized": 
-            return `(${compileExpression(expression.value)})`
+            return compileFunctionCall(ctx ,expression);
+        case "parenthesized":
+            return `(${compileExpression(ctx, expression.value)})`
     }
+    unhandledError("expression", expression);
 }
 
-function compileOperation<Op extends string, Left extends Expression, Right extends Expression>(operation: Operation<Op, Left, Right>) : string {
-    return `${compileExpression(operation.left)} ${operation.operation} ${compileExpression(operation.right)}`
+function compileOperation<Op extends string, Left extends Expression, Right extends Expression>(ctx: Context, operation: Operation<Op, Left, Right>): string {
+    return `${compileExpression(ctx, operation.left)} ${operation.operation} ${compileExpression(ctx, operation.right)}`
+}
+
+function compileArray(ctx: Context, array: ArrayASTItem): string {
+    if (array.value.length === 0) {
+        return "[]";
+    }
+    const indented = ctx.indent();
+    return `[\n${array.value.map((value) => indented.whitespace + compileExpression(indented, value)).join(",\n")}\n${ctx.whitespace}]`;
+}
+
+function compileObject(ctx: Context, object: ObjectASTItem): string {
+    if (object.entries.length === 0) {
+        return "{}";
+    }
+    const indented = ctx.indent();
+    const entries = object.entries.map(entry => {
+        return `${indented.whitespace}${complieObjectKey(ctx, entry.key)}: ${compileExpression(indented, entry.value)}`;
+    }).join(",\n");
+
+    return `{\n${entries}\n${ctx.whitespace}}`;
+}
+
+function complieObjectKey(ctx: Context, objectKey: ObjectKeyASTItem): string {
+    switch (objectKey.value.type) {
+        case "name":
+            return objectKey.value.value;
+        case "string":
+            return objectKey.value.value;
+        default:
+            return `[${compileExpression(ctx, objectKey.value)}]`;
+    }
 }

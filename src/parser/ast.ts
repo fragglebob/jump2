@@ -11,13 +11,26 @@ export interface Block extends ASTItem {
     statements: Statement[]
 }
 
-export type Statement = IfStatement | FunctionCall | Assignment;
+export type Statement = IfStatement | FunctionCall | Assignment | WhileStatement | LoopStatement;
 
 export interface IfStatement extends ASTItem {
     type: "if"
     condition: Expression;
     then: Block;
     else: Block | IfStatement | null;
+}
+
+export interface WhileStatement extends ASTItem {
+    type: "while"
+    condition: Expression;
+    then: Block;
+}
+
+export interface LoopStatement extends ASTItem {
+    type: "loop"
+    times: Expression;
+    then: Block;
+    setting?: NamedVariable;
 }
 
 export interface FunctionCall extends ASTItem {
@@ -81,16 +94,35 @@ export interface ProductOp extends Operation<"*" | "/" | "%", Expression, Expres
     type: "product"
 }
 
-export type Atom = String | Number | FunctionCall | Parenthesized | Var;
+export type Atom = ObjectASTItem | ArrayASTItem | StringASTItem | NumberASTItem | FunctionCall | Parenthesized | Var;
 
-export interface String extends BasicASTItem<string> {
+export interface ArrayASTItem extends BasicASTItem<Expression[]> {
+    type: "array"
+}
+
+export interface StringASTItem extends BasicASTItem<string> {
     type: "string"
 }
 
-export interface Number extends BasicASTItem<string> {
+export interface NumberASTItem extends BasicASTItem<string> {
     type: "number"
 }
 
 export interface Parenthesized extends BasicASTItem<Expression> {
     type: "parenthesized"
+}
+
+export interface ObjectASTItem extends ASTItem {
+    type: "object"
+    entries: ObjectEntryASTItem[]
+}
+
+export interface ObjectEntryASTItem extends ASTItem {
+    type: "object_entry"
+    key: ObjectKeyASTItem
+    value: Expression
+}
+
+export interface ObjectKeyASTItem extends BasicASTItem<Name | StringASTItem | Expression> {
+    type: "object_key"
 }

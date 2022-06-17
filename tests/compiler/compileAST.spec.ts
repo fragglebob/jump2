@@ -33,87 +33,239 @@ describe("compileAST", () => {
         expect(result).toMatchInlineSnapshot(`"state['foo']['bing'][state['bar'][Math.sin(34) * (4 - 13.37)]] = \\"baz\\""`);
     });
 
-    it("should handle a if statement", () => {
-        const result = compileAST(buildASTFromString(`
-            if foo < bar then
-                x = cos(foo / 3)
-            endif
-        `));
+    it("should handle a variable set to an empty array", () => {
+        const result = compileAST(buildASTFromString(`foo = []`));
+        expect(result).toMatchInlineSnapshot(`"state['foo'] = []"`);
+    });
+
+    it("should handle a variable set to a mixed array", () => {
+        const result = compileAST(buildASTFromString(`foo = [123, "bar", sin(3), ["inner"]]`));
         expect(result).toMatchInlineSnapshot(`
-"if (state['foo'] < state['bar']) {
-state['x'] = Math.cos(state['foo'] / 3)
+"state['foo'] = [
+  123,
+  \\"bar\\",
+  Math.sin(3),
+  [
+    \\"inner\\"
+  ]
+]"
+`);
+    });
+
+    it("should handle a variable set to an empty object", () => {
+        const result = compileAST(buildASTFromString(`foo = {}`));
+        expect(result).toMatchInlineSnapshot(`"state['foo'] = {}"`);
+    });
+
+    it("should handle a variable set to an object with a named key", () => {
+        const result = compileAST(buildASTFromString(`foo = { bar: "baz" }`));
+        expect(result).toMatchInlineSnapshot(`
+"state['foo'] = {
+  bar: \\"baz\\"
 }"
 `);
     });
 
-    it("should handle a if...else statement", () => {
+    it("should handle a variable set to an object with a string key", () => {
+        const result = compileAST(buildASTFromString(`foo = { "bar-baz": "baz" }`));
+        expect(result).toMatchInlineSnapshot(`
+"state['foo'] = {
+  \\"bar-baz\\": \\"baz\\"
+}"
+`);
+    });
+
+    it("should handle a variable set to an object with a expression key", () => {
+        const result = compileAST(buildASTFromString(`foo = { [sin(9.3)]: "baz" }`));
+        expect(result).toMatchInlineSnapshot(`
+"state['foo'] = {
+  [Math.sin(9.3)]: \\"baz\\"
+}"
+`);
+    });
+
+    it("should handle a variable set with a object with many mixed keys", () => {
         const result = compileAST(buildASTFromString(`
-            if foo < bar then
-                x = cos(foo / 3)
-            else
-                x = cos(bar % 4)
-            endif
+            foo = {
+                bar: 1,
+                "baz": 2,
+                ["baa"]: 3,
+                [sin(4)]: 4,
+                something: "else"
+            }
         `));
         expect(result).toMatchInlineSnapshot(`
+"state['foo'] = {
+  bar: 1,
+  \\"baz\\": 2,
+  \\"baa\\": 3,
+  [Math.sin(4)]: 4,
+  something: \\"else\\"
+}"
+`);
+    });
+
+    it("should handle a variable set with a deep nested object", () => {
+        const result = compileAST(buildASTFromString(`
+            foo = {
+                bar: {
+                    baz: {
+                        nested: {
+                            array: [  234, { "with-an-object": { "inside": "boo" } } ]
+                        }
+                    }
+                }
+            }
+        `));
+        expect(result).toMatchInlineSnapshot(`
+"state['foo'] = {
+  bar: {
+    baz: {
+      nested: {
+        array: [
+          234,
+          {
+            \\"with-an-object\\": {
+              \\"inside\\": \\"boo\\"
+            }
+          }
+        ]
+      }
+    }
+  }
+}"
+`);
+    });
+
+    describe("if", () => {
+        it("should handle a if statement", () => {
+            const result = compileAST(buildASTFromString(`
+                if foo < bar then
+                    x = cos(foo / 3)
+                endif
+            `));
+            expect(result).toMatchInlineSnapshot(`
 "if (state['foo'] < state['bar']) {
-state['x'] = Math.cos(state['foo'] / 3)
+  state['x'] = Math.cos(state['foo'] / 3)
+}"
+`);
+        });
+
+        it("should handle a if...else statement", () => {
+            const result = compileAST(buildASTFromString(`
+                if foo < bar then
+                    x = cos(foo / 3)
+                else
+                    x = cos(bar % 4)
+                endif
+            `));
+            expect(result).toMatchInlineSnapshot(`
+"if (state['foo'] < state['bar']) {
+  state['x'] = Math.cos(state['foo'] / 3)
 } else {
-state['x'] = Math.cos(state['bar'] % 4)
+  state['x'] = Math.cos(state['bar'] % 4)
 }"
 `);
-    });
+        });
 
-    it("should handle a if...elseif statement", () => {
-        const result = compileAST(buildASTFromString(`
-            if foo < bar then
-                x = cos(foo / 3)
-            elseif bar == foo then
-                x = cos(bar % 4)
-            endif
-        `));
-        expect(result).toMatchInlineSnapshot(`
+        it("should handle a if...elseif statement", () => {
+            const result = compileAST(buildASTFromString(`
+                if foo < bar then
+                    x = cos(foo / 3)
+                elseif bar == foo then
+                    x = cos(bar % 4)
+                endif
+            `));
+            expect(result).toMatchInlineSnapshot(`
 "if (state['foo'] < state['bar']) {
-state['x'] = Math.cos(state['foo'] / 3)
+  state['x'] = Math.cos(state['foo'] / 3)
 } elseif (state['bar'] == state['foo']) {
-state['x'] = Math.cos(state['bar'] % 4)
+  state['x'] = Math.cos(state['bar'] % 4)
 }"
 `);
-    });
+        });
 
-    it("should handle a if...elseif...else statement", () => {
-        const result = compileAST(buildASTFromString(`
-            if foo < bar then
-                x = cos(foo / 3)
-            elseif bar == foo then
-                x = cos(bar % 4)
-            else 
-                x = cos(bar + bar)
-            endif
-        `));
-        expect(result).toMatchInlineSnapshot(`
+        it("should handle a if...elseif...else statement", () => {
+            const result = compileAST(buildASTFromString(`
+                if foo < bar then
+                    x = cos(foo / 3)
+                elseif bar == foo then
+                    x = cos(bar % 4)
+                else 
+                    x = cos(bar + bar)
+                endif
+            `));
+            expect(result).toMatchInlineSnapshot(`
 "if (state['foo'] < state['bar']) {
-state['x'] = Math.cos(state['foo'] / 3)
+  state['x'] = Math.cos(state['foo'] / 3)
 } elseif (state['bar'] == state['foo']) {
-state['x'] = Math.cos(state['bar'] % 4)
+  state['x'] = Math.cos(state['bar'] % 4)
 } else {
-state['x'] = Math.cos(state['bar'] + state['bar'])
+  state['x'] = Math.cos(state['bar'] + state['bar'])
 }"
 `);
-    });
+        });
 
-    it("should handle binary logic", () => {
-        const result = compileAST(buildASTFromString(`
-            if foo && bar || (foo && somethingElse) then
-                x = cos(foo / 3)
-                y = sin(bar * 1111)
-            endif
-        `));
-        expect(result).toMatchInlineSnapshot(`
+        it("should handle binary logic", () => {
+            const result = compileAST(buildASTFromString(`
+                if foo && bar || (foo && somethingElse) then
+                    x = cos(foo / 3)
+                    y = sin(bar * 1111)
+                endif
+            `));
+            expect(result).toMatchInlineSnapshot(`
 "if (state['foo'] && state['bar'] || (state['foo'] && state['somethingElse'])) {
-state['x'] = Math.cos(state['foo'] / 3)
-state['y'] = Math.sin(state['bar'] * 1111)
+  state['x'] = Math.cos(state['foo'] / 3)
+  state['y'] = Math.sin(state['bar'] * 1111)
 }"
 `);
+        });
+    });
+
+
+
+    describe("loops", () => {
+        it("should handle a while loop", () => {
+            const result = compileAST(buildASTFromString(`
+                something = 0
+                while something < 10 then
+                    y = sin(45 + y)
+                    something = something + 1
+                endwhile
+            `));
+            expect(result).toMatchInlineSnapshot(`
+"state['something'] = 0
+while (state['something'] < 10 {
+  state['y'] = Math.sin(45 + state['y'])
+  state['something'] = state['something'] + 1
+}"
+`);
+        });
+        it("should handle a loop loop", () => {
+            const result = compileAST(buildASTFromString(`
+                loop 7 times
+                    y = sin(45 + y)
+                endloop
+            `));
+            expect(result).toMatchInlineSnapshot(`
+"for (let i = 0; i < 7; i++) {
+  state['y'] = Math.sin(45 + state['y'])
+}"
+`);
+        });
+
+        it("should handle a setting loop loop", () => {
+            const result = compileAST(buildASTFromString(`
+                loop x <- 7 times
+                    y = sin(x)
+                endloop
+            `));
+            expect(result).toMatchInlineSnapshot(`
+"for (state['x'] = 0; state['x'] < 7; state['x']++) {
+  state['y'] = Math.sin(state['x'])
+}"
+`);
+        });
     });
 
     describe("constants", () => {
@@ -138,8 +290,5 @@ state['y'] = Math.sin(state['bar'] * 1111)
         it("should not let constants have key access on them", () => {
             expect(() => compileAST(buildASTFromString(`foo = PI.bar`))).toThrow();
         });
-    })
-
-    
-
-})
+    });
+});
