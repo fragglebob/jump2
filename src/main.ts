@@ -1,6 +1,6 @@
 import './style.css';
 
-import { Renderer } from "./renderer";
+import { GLApp } from "./gl";
 
 function findCanvas() : HTMLCanvasElement {
     const canvas = document.querySelector<HTMLCanvasElement>("#canvas");
@@ -22,7 +22,7 @@ function start () {
     const canvas = findCanvas();
     const gl = createWebGLContext(canvas);
 
-    const render = new Renderer(canvas, gl);
+    const render = new GLApp(canvas, gl);
 
     render.start();
 }
