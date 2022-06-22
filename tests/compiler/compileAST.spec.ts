@@ -291,4 +291,63 @@ while (state['something'] < 10 {
             expect(() => compileAST(buildASTFromString(`foo = PI.bar`))).toThrow();
         });
     });
+
+    describe("functions", () => {
+        it("should handle a sin call", () => {
+            const result = compileAST(buildASTFromString(`sin(123)`));
+            expect(result).toMatchInlineSnapshot(`"Math.sin(123)"`);
+        });
+        it("should handle a cos call", () => {
+            const result = compileAST(buildASTFromString(`cos(123)`));
+            expect(result).toMatchInlineSnapshot(`"Math.cos(123)"`);
+        });
+
+        it("should handle a box call", () => {
+            const result = compileAST(buildASTFromString(`box()`));
+            expect(result).toMatchInlineSnapshot(`"manager.box()"`);
+        });
+
+        it("should handle a ball call", () => {
+            const result = compileAST(buildASTFromString(`ball()`));
+            expect(result).toMatchInlineSnapshot(`"manager.ball()"`);
+        });
+
+
+
+        it("should handle a pushMatrix call", () => {
+            const result = compileAST(buildASTFromString(`pushMatrix()`));
+            expect(result).toMatchInlineSnapshot(`"manager.pushMatrix()"`);
+        });
+        it("should handle a popMatrix call", () => {
+            const result = compileAST(buildASTFromString(`popMatrix()`));
+            expect(result).toMatchInlineSnapshot(`"manager.popMatrix()"`);
+        });
+
+        it("should handle a scale call - 1", () => {
+            const result = compileAST(buildASTFromString(`scale(1.1)`));
+            expect(result).toMatchInlineSnapshot(`"manager.scale(1.1)"`);
+        });
+        it("should handle a scale call - 2", () => {
+            const result = compileAST(buildASTFromString(`scale(1.1, 1.3, 1.5)`));
+            expect(result).toMatchInlineSnapshot(`"manager.scale(1.1, 1.3, 1.5)"`);
+        });
+
+        it("should handle a translate call", () => {
+            const result = compileAST(buildASTFromString(`translate(15, 10, 5)`));
+            expect(result).toMatchInlineSnapshot(`"manager.translate(15, 10, 5)"`);
+        });
+
+        it("should handle a rotateX call", () => {
+            const result = compileAST(buildASTFromString(`rotateX(123)`));
+            expect(result).toMatchInlineSnapshot(`"manager.rotateX(123)"`);
+        });
+        it("should handle a rotateY call", () => {
+            const result = compileAST(buildASTFromString(`rotateY(123)`));
+            expect(result).toMatchInlineSnapshot(`"manager.rotateY(123)"`);
+        });
+        it("should handle a rotateZ call", () => {
+            const result = compileAST(buildASTFromString(`rotateZ(123)`));
+            expect(result).toMatchInlineSnapshot(`"manager.rotateZ(123)"`);
+        });
+    })
 });

@@ -1,36 +1,61 @@
-import * as twgl from "twgl.js";
 
-import basicVert from "./shaders/basic.vert.glsl";
-import basicFrag from "./shaders/basic.frag.glsl";
-import { MatrixStack } from "./MatrixStack";
-import { RenderContext } from "./types";
+
+import { createFunction, UserRenderFunction } from "../compiler/createFunction";
 import { Renderer } from "./Renderer";
 
-const m4 = twgl.m4;
+
 
 export class GLApp {
   readonly canvas: HTMLCanvasElement;
   readonly gl: WebGLRenderingContext;
+  readonly textarea: HTMLTextAreaElement;
 
-  renderer: Renderer;
+  readonly renderer: Renderer;
 
-  constructor(canvas: HTMLCanvasElement, gl: WebGLRenderingContext) {
+  renderFunc: UserRenderFunction;
+
+  constructor(canvas: HTMLCanvasElement, gl: WebGLRenderingContext, textarea: HTMLTextAreaElement) {
     this.canvas = canvas;
     this.gl = gl;
+    this.textarea = textarea;
 
     this.renderer = new Renderer(gl);
 
+    // set to a noop function
+    this.renderFunc = () => {};
+  }
+
+  compileTextarea() {
+    const userInputCode = this.textarea.value;
+    try {
+      this.renderFunc = createFunction(userInputCode)
+      this.textarea.style.border = "";
+      console.log(this.renderFunc)
+    } catch(e) {
+      this.textarea.style.border = "2px red solid";
+      console.error(e);
+    }
+  }
+
+  handleTextareaUpdate = () => {
+    this.compileTextarea();
   }
 
   start() {
+    this.compileTextarea();
+    this.textarea.addEventListener("input", this.handleTextareaUpdate)
     requestAnimationFrame(this._render);
   }
 
   _render = (time: number) => {
 
     time *= 0.001;
-    
+
+
     this.renderer.render((manager) => {
+
+
+      this.renderFunc({}, manager);
 
       manager.pushMatrix();
 
