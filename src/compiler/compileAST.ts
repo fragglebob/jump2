@@ -127,6 +127,8 @@ function compileFunctionCall(ctx: Context, functionCall: FunctionCall): string {
     case "scale":
     case "box":
     case "ball":
+      case "time":
+        case "frame":
       return `manager.${funcName}(${compileArguments(ctx, functionCall.args)})`;
   }
 

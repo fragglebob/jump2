@@ -29,10 +29,10 @@ export class GLApp {
     const userInputCode = this.textarea.value;
     try {
       this.renderFunc = createFunction(userInputCode)
-      this.textarea.style.border = "";
+      this.textarea.classList.remove("error");
       console.log(this.renderFunc)
     } catch(e) {
-      this.textarea.style.border = "2px red solid";
+      this.textarea.classList.add("error");
       console.error(e);
     }
   }
@@ -51,34 +51,10 @@ export class GLApp {
 
     time *= 0.001;
 
+    this.renderer.update(time);
 
     this.renderer.render((manager) => {
-
-
       this.renderFunc({}, manager);
-
-      manager.pushMatrix();
-
-      for (let ii = 0; ii < 100; ii++) {
-        manager.pushMatrix();
-        
-        manager.translate(Math.cos(time/2+ii/2+ii)*5, Math.sin(time*2+ii/2)*2, Math.sin(time+ii/3+55)*10);
-        manager.rotateX(time-ii);
-        manager.rotateY(time+ii);
-        manager.scale((2-Math.sin(time+ii/3+55)+1)/4, (2-Math.sin(time+ii/3+55)+1)/4, (2-Math.sin(time+ii/3+55)+1)/4)
-
-        if(ii % 2) {
-          manager.box();
-        } else {
-          manager.ball();
-        }
-        
-
-        manager.popMatrix();
-      }    
-
-      manager.popMatrix();
-
     })
 
     requestAnimationFrame(this._render);

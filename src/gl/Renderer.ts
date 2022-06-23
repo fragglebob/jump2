@@ -32,6 +32,9 @@ export class Renderer {
       box: BufferInfo
   }
 
+  frame: number = 0;
+  time: number = 0;
+
   constructor(gl: WebGLRenderingContext) {
     this.gl = gl;
 
@@ -115,6 +118,19 @@ export class Renderer {
 
   renderBall(ctx: RenderContext) {
     this.renderBufferInfo(ctx, this.primatives.ball);
+  }
+
+  update(time: number) : void {
+    this.time = time;
+    this.frame++;
+  }
+
+  getTime() : number {
+    return this.time;
+  }
+
+  getFrame() : number {
+    return this.frame;
   }
 
   render(callback: (ctx: RenderManager) => void) {

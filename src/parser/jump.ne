@@ -92,10 +92,16 @@ NamedVariable -> Name {% (d) => ({ type: "variable", name: d[0] }) %}
 FunctionCalls -> MathsFunctions {% id %}
     | WorldFunctions {% id %}
     | ShapeFunctions {% id %}
+    | UtilFunctions {% id %}
+    
     
 MathsFunctions -> 
     "sin" _ Args {% (d) => ({ type: "func", name: "sin", args: d[2] }) %}
     | "cos" _ Args {% (d) => ({ type: "func", name: "cos", args: d[2] }) %}
+
+UtilFunctions ->
+    "time" _ Args {% (d) => ({ type: "func", name: "time", args: d[2] }) %} |
+    "frame" _ Args {% (d) => ({ type: "func", name: "frame", args: d[2] }) %}
 
 WorldFunctions -> 
     "pushMatrix" _ Args {% (d) => ({ type: "func", name: "pushMatrix", args: d[2] }) %}

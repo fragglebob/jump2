@@ -36,9 +36,21 @@ body {
     left: 0;
     right: 0;
     margin: var(--code-margin);
-    background: rgba(0, 0, 0, 0.3);
-    color: rgba(255, 255, 255, 0.7);
+    background: transparent;
+    color: rgba(255, 255, 255, 0.4);
     font-family: monospace;
     font-size: 2em;
-    border: 0;
+    border: 2px solid transparent;
+    resize: none;
+}
+
+#code:focus {
+    background: rgba(50, 50, 50, 0.4);
+    color: rgba(255, 255, 255, 0.8);
+    outline: none;
+    border-color: lightblue;
+}
+
+#code.error {
+    border-color: red;
 }

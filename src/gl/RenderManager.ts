@@ -72,6 +72,14 @@ export class RenderManager implements RenderManagerInterface {
     }
   }
 
+  time() {
+    return this.renderer.getTime();
+  }
+
+  frame() {
+    return this.renderer.getFrame();
+  }
+
   pushMatrix() {
     this.worldMatrix.push();
   }
