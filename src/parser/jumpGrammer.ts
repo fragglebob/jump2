@@ -15,13 +15,13 @@ declare var nl: any;
     // Moo lexer documention is here:
     // https://github.com/no-context/moo
 
-    const moo = require("moo")
+    import moo from "moo";
     const lexer = moo.compile({
         ws:     /[ \t]+/,
         number:  [
-            /(?:-?(?:0|[1-9][0-9]*)?\.[0-9]+)/,   // [123].123
-            /(?:-?(?:0|[1-9][0-9]*)\.[0-9]*)/,    // 123.[123]
-            /(?:0|-?[1-9][0-9]*)/,              // 123
+            { match: /(?:-?(?:0|[1-9][0-9]*)?\.[0-9]+)/ },  // [123].123
+            { match: /(?:-?(?:0|[1-9][0-9]*)\.[0-9]*)/ },   // 123.[123]
+            { match: /(?:0|-?[1-9][0-9]*)/ },               // 123
         ],
 		setting: '<-',
         binops: ["&&", "||"],

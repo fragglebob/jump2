@@ -19,6 +19,7 @@
   "devDependencies": {
     "@originjs/vite-plugin-commonjs": "^1.0.3",
     "@types/jest": "^28.1.1",
+    "@types/moo": "^0.5.5",
     "@types/nearley": "^2.11.2",
     "jest": "^28.1.1",
     "ts-jest": "^28.0.4",
