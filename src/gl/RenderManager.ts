@@ -25,7 +25,6 @@ type CameraMatrixes = {
   camera: m4.Mat4;
   projection: m4.Mat4;
   view: m4.Mat4;
-  viewProjection: m4.Mat4;
 };
 
 export class RenderManager implements RenderManagerInterface {
@@ -38,7 +37,8 @@ export class RenderManager implements RenderManagerInterface {
     this.worldMatrix = new MatrixStack();
     this.cameraDetails = this.setupCamera();
 
-    this.renderer.globalUniforms.u_viewInverse = this.cameraDetails.view;
+    this.renderer.globalUniforms.u_view = this.cameraDetails.view;
+    this.renderer.globalUniforms.u_projection = this.cameraDetails.projection;
   }
 
   private setupCamera() : CameraMatrixes {
@@ -56,20 +56,17 @@ export class RenderManager implements RenderManagerInterface {
     const camera = m4.lookAt(eye, target, up);
 
     const view = m4.inverse(camera);
-    const viewProjection = m4.multiply(projection, view);
 
     return {
       camera,
       projection,
       view,
-      viewProjection,
     };
   }
 
   private createRenderContext() : RenderContext {
     return {
-        world: this.worldMatrix.current,
-        viewProjection: this.cameraDetails.viewProjection
+        world: this.worldMatrix.current
     }
   }
 

@@ -35,16 +35,16 @@ export class Renderer {
     u_specular: Vec4,
     u_shininess: number,
     u_specularFactor: number,
-    u_viewInverse: m4.Mat4
+    u_view: m4.Mat4,
+    u_projection: m4.Mat4
   };
   styleUniforms: {
     u_diffuse: WebGLTexture,
     u_colorMult: Vec4
   };
+
   objectUniforms: {
-    u_world: m4.Mat4,
-    u_worldInverseTranspose: m4.Mat4,
-    u_worldViewProjection: m4.Mat4
+    u_world: m4.Mat4
   };
 
   primatives: {
@@ -69,7 +69,8 @@ export class Renderer {
       u_specular: [1, 1, 1, 1],
       u_shininess: 50,
       u_specularFactor: 1,
-      u_viewInverse: m4.identity()
+      u_view: m4.identity(),
+      u_projection: m4.identity(),
     };
 
     this.styleUniforms = {
@@ -79,8 +80,6 @@ export class Renderer {
 
     this.objectUniforms = {
       u_world: m4.identity(),
-      u_worldInverseTranspose: m4.identity(),
-      u_worldViewProjection: m4.identity()
     };
 
     this.primatives = {
@@ -124,13 +123,6 @@ export class Renderer {
 
   renderBufferInfo(ctx: RenderContext, bufferInfo: BufferInfo) {
     this.objectUniforms.u_world = ctx.world;
-    this.objectUniforms.u_worldInverseTranspose = m4.transpose(
-      m4.inverse(ctx.world)
-    );
-    this.objectUniforms.u_worldViewProjection = m4.multiply(
-        ctx.viewProjection,
-        ctx.world
-    );
 
     setUniforms(this.mainProgramInfo, this.objectUniforms);
 
