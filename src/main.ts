@@ -11,9 +11,9 @@ function findCanvas() : HTMLCanvasElement {
 }
 
 function createWebGLContext(canvas: HTMLCanvasElement) : WebGLRenderingContext {
-    const gl = canvas.getContext("webgl");
+    const gl = canvas.getContext("webgl2");
     if(!gl) {
-        throw new Error("Can't start webgl context. :(");
+        throw new Error("Can't start webgl 2context. :(");
     }
     return gl;
 }

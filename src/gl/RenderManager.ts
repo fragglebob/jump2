@@ -2,6 +2,7 @@ import { m4 } from "twgl.js";
 import { MatrixStack } from "./MatrixStack";
 import { Renderer } from "./Renderer";
 import { RenderContext } from "./types";
+import { hslToRgb } from "./utils/hsl2rgb";
 
 interface RenderManagerInterface {
   pushMatrix(): void;
@@ -37,7 +38,7 @@ export class RenderManager implements RenderManagerInterface {
     this.worldMatrix = new MatrixStack();
     this.cameraDetails = this.setupCamera();
 
-    this.renderer.updateUniforms({ u_viewInverse: this.cameraDetails.view })
+    this.renderer.globalUniforms.u_viewInverse = this.cameraDetails.view;
   }
 
   private setupCamera() : CameraMatrixes {
@@ -78,6 +79,24 @@ export class RenderManager implements RenderManagerInterface {
 
   frame() {
     return this.renderer.getFrame();
+  }
+
+  rgb(r: number, g: number, b: number) {
+    this.rgba(r, g, b, 1);
+  }
+
+  rgba(r: number, g: number, b: number, a: number) {
+    this.renderer.updateColor([r, g, b, a]);
+  }
+
+  hsl(h: number, s: number, l: number) {
+    const [r, g, b] = hslToRgb(h, s, l);
+    this.rgba(r, g, b, 1);
+  }
+
+  hsla(h: number, s: number, l: number, a: number) {
+    const [r, g, b] = hslToRgb(h, s, l);
+    this.rgba(r, g, b, a);
   }
 
   pushMatrix() {

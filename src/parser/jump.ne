@@ -93,6 +93,7 @@ FunctionCalls -> MathsFunctions {% id %}
     | WorldFunctions {% id %}
     | ShapeFunctions {% id %}
     | UtilFunctions {% id %}
+	| StyleFunctions {% id %}
     
     
 MathsFunctions -> 
@@ -115,6 +116,12 @@ WorldFunctions ->
 ShapeFunctions -> 
     "box" _ Args {% (d) => ({ type: "func", name: "box", args: d[2] }) %}
     | "ball" _ Args {% (d) => ({ type: "func", name: "ball", args: d[2] }) %}
+
+StyleFunctions -> 
+    "rgb" _ Args {% (d) => ({ type: "func", name: "rgb", args: d[2] }) %}
+    | "rgba" _ Args {% (d) => ({ type: "func", name: "rgba", args: d[2] }) %}
+	| "hsl" _ Args {% (d) => ({ type: "func", name: "hsl", args: d[2] }) %}
+    | "hsla" _ Args {% (d) => ({ type: "func", name: "hsla", args: d[2] }) %}
 
 ExpressionList -> Expression {% (d) => [d[0]] %}
     | ExpressionList _ "," _ Expression {% (d) => [...d[0], d[4]] %}

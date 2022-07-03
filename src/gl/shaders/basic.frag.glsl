@@ -12,6 +12,7 @@ uniform sampler2D u_diffuse;
 uniform vec4 u_specular;
 uniform float u_shininess;
 uniform float u_specularFactor;
+uniform vec4 u_colorMult;
 
 vec4 lit(float l ,float h, float m) {
   return vec4(1.0,
@@ -29,7 +30,7 @@ void main() {
   vec4 litR = lit(dot(a_normal, surfaceToLight),
                     dot(a_normal, halfVector), u_shininess);
   vec4 outColor = vec4((
-  u_lightColor * (diffuseColor * litR.y + diffuseColor * u_ambient +
+  u_lightColor * (diffuseColor * litR.y * u_colorMult + diffuseColor * u_ambient * u_colorMult +
                 u_specular * litR.z * u_specularFactor)).rgb,
       diffuseColor.a);
   gl_FragColor = outColor;

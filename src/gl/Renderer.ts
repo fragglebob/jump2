@@ -11,11 +11,15 @@ import {
   setUniforms,
 } from "twgl.js";
 
+
 import basicVert from "./shaders/basic.vert.glsl";
 import basicFrag from "./shaders/basic.frag.glsl";
 import { RenderContext } from "./types";
 import { MatrixStack } from "./MatrixStack";
 import { RenderManager } from "./RenderManager";
+
+type Vec4 = [number, number, number, number];
+type Vec3 = [number, number, number];
 
 export class Renderer {
   readonly gl: WebGLRenderingContext;
@@ -24,7 +28,24 @@ export class Renderer {
 
   basicTexture: WebGLTexture;
 
-  uniforms: Record<string, any>;
+  globalUniforms: {
+    u_lightWorldPos: Vec3,
+    u_lightColor: Vec4,
+    u_ambient: Vec4,
+    u_specular: Vec4,
+    u_shininess: number,
+    u_specularFactor: number,
+    u_viewInverse: m4.Mat4
+  };
+  styleUniforms: {
+    u_diffuse: WebGLTexture,
+    u_colorMult: Vec4
+  };
+  objectUniforms: {
+    u_world: m4.Mat4,
+    u_worldInverseTranspose: m4.Mat4,
+    u_worldViewProjection: m4.Mat4
+  };
 
   primatives: {
     rect: BufferInfo,
@@ -41,14 +62,25 @@ export class Renderer {
     this.mainProgramInfo = this.createMainProgram();
     this.basicTexture = this.createBasicTexture();
 
-    this.uniforms = {
+    this.globalUniforms = {
       u_lightWorldPos: [1, 8, -10],
       u_lightColor: [0.8, 0.8, 0.8, 1],
       u_ambient: [0.2, 0.2, 0.2, 1],
       u_specular: [1, 1, 1, 1],
       u_shininess: 50,
       u_specularFactor: 1,
+      u_viewInverse: m4.identity()
+    };
+
+    this.styleUniforms = {
       u_diffuse: this.basicTexture,
+      u_colorMult: [1, 1, 1, 1],
+    }
+
+    this.objectUniforms = {
+      u_world: m4.identity(),
+      u_worldInverseTranspose: m4.identity(),
+      u_worldViewProjection: m4.identity()
     };
 
     this.primatives = {
@@ -91,16 +123,16 @@ export class Renderer {
 
 
   renderBufferInfo(ctx: RenderContext, bufferInfo: BufferInfo) {
-    this.uniforms.u_world = ctx.world;
-    this.uniforms.u_worldInverseTranspose = m4.transpose(
+    this.objectUniforms.u_world = ctx.world;
+    this.objectUniforms.u_worldInverseTranspose = m4.transpose(
       m4.inverse(ctx.world)
     );
-    this.uniforms.u_worldViewProjection = m4.multiply(
+    this.objectUniforms.u_worldViewProjection = m4.multiply(
         ctx.viewProjection,
         ctx.world
     );
 
-    setUniforms(this.mainProgramInfo, this.uniforms);
+    setUniforms(this.mainProgramInfo, this.objectUniforms);
 
     setBuffersAndAttributes(this.gl, this.mainProgramInfo, bufferInfo);
 
@@ -145,12 +177,17 @@ export class Renderer {
 
     this.gl.useProgram(this.mainProgramInfo.program);
 
+    setUniforms(this.mainProgramInfo, this.globalUniforms);
+    setUniforms(this.mainProgramInfo, this.styleUniforms);
+
     const manager = new RenderManager(this);
 
     callback(manager);
   }
 
-  updateUniforms(updates: Record<string, any>) {
-      Object.assign(this.uniforms, updates);
+  updateColor(color: Vec4) {
+    this.styleUniforms.u_colorMult = color;
+    setUniforms(this.mainProgramInfo, this.styleUniforms);
   }
+
 }
