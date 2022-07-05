@@ -1,0 +1,106 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`MatrixStack transforms rotateX#should rotate the current matrix 1`] = `
+Float32Array [
+  1,
+  0,
+  0,
+  0,
+  -0,
+  -0.887968897819519,
+  -0.4599034786224365,
+  -0,
+  0,
+  0.4599034786224365,
+  -0.887968897819519,
+  0,
+  0,
+  0,
+  0,
+  1,
+]
+`;
+
+exports[`MatrixStack transforms rotateY#should rotate the current matrix 1`] = `
+Float32Array [
+  -0.887968897819519,
+  0,
+  0.4599034786224365,
+  0,
+  0,
+  1,
+  0,
+  0,
+  -0.4599034786224365,
+  -0,
+  -0.887968897819519,
+  -0,
+  0,
+  0,
+  0,
+  1,
+]
+`;
+
+exports[`MatrixStack transforms rotateZ#should rotate the current matrix 1`] = `
+Float32Array [
+  -0.887968897819519,
+  -0.4599034786224365,
+  -0,
+  -0,
+  0.4599034786224365,
+  -0.887968897819519,
+  0,
+  0,
+  0,
+  0,
+  1,
+  0,
+  0,
+  0,
+  0,
+  1,
+]
+`;
+
+exports[`MatrixStack transforms scale#should scale the current matrix 1`] = `
+Float32Array [
+  1,
+  0,
+  0,
+  0,
+  0,
+  2,
+  0,
+  0,
+  0,
+  0,
+  3,
+  0,
+  0,
+  0,
+  0,
+  1,
+]
+`;
+
+exports[`MatrixStack transforms translate#should translate the current matrix 1`] = `
+Float32Array [
+  1,
+  0,
+  0,
+  0,
+  0,
+  1,
+  0,
+  0,
+  0,
+  0,
+  1,
+  0,
+  1,
+  2,
+  3,
+  1,
+]
+`;

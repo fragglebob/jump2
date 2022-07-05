@@ -39,7 +39,7 @@ export class Renderer {
     u_projection: m4.Mat4
   };
   styleUniforms: {
-    u_diffuse: WebGLTexture,
+    // u_diffuse: WebGLTexture,
     u_colorMult: Vec4
   };
 
@@ -74,7 +74,7 @@ export class Renderer {
     };
 
     this.styleUniforms = {
-      u_diffuse: this.basicTexture,
+      // u_diffuse: this.basicTexture,
       u_colorMult: [1, 1, 1, 1],
     }
 

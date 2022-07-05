@@ -2,33 +2,33 @@ import { m4, v3 } from "twgl.js"
 
 export class MatrixStack {
 
-    _stack: m4.Mat4[];
-    _current: number;
+    private stack: m4.Mat4[];
+    private depth: number;
 
     constructor() {
-        this._stack = [m4.identity()]
-        this._current = 0;
+        this.stack = [m4.identity()]
+        this.depth = 0;
     }
 
     reset() {
-        this._stack = [m4.identity()]
-        this._current = 0;
+        this.stack = [m4.identity()]
+        this.depth = 0;
     }
 
     public get current() : m4.Mat4 {
-        return this._stack[this._current]
+        return this.stack[this.depth]
     }  
 
     pop() {
-        if(this._current > 0) {
-            this._stack.pop();
-            this._current--;
+        if(this.depth > 0) {
+            this.stack.pop();
+            this.depth--;
         }
     }
 
     push() {
-        this._stack.push(this.copy());
-        this._current++;
+        this.stack.push(this.copy());
+        this.depth++;
     }
 
     copy() : m4.Mat4 {

@@ -10,11 +10,18 @@
     <div id="main">
         <canvas id="canvas"></canvas>
         <textarea name="code" id="code" cols="30" rows="10">
-loop ii <- 100 times
+loop ii <- 2000 times
     pushMatrix()
-        translate(sin(time()/2+ii*1.5)*5,sin(time()*2+ii/2)*2,sin(time()+ii/3+55)*10)
-        rotateX(time() + ii)
-        rotateY(time() - ii)
+        hsl((time()/4+ii/13.37)%1,0.8,0.73)
+        translate(
+            sin(time()/4+ii/40)*2.5 + cos(time()+ii), 
+            cos(time()/4+ii/40)*2+ sin(time()+ii), 
+            cos(time()/10+ii/7)*4  + sin(time()+ii)
+        )
+        rotateX(time()+ii)
+        rotateZ(time()+ii)   
+        rotateY(time()-ii) 
+        scale(0.28)
         box()
     popMatrix()
 endloop

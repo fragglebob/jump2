@@ -312,8 +312,6 @@ while (state['something'] < 10 {
             expect(result).toMatchInlineSnapshot(`"manager.ball()"`);
         });
 
-
-
         it("should handle a pushMatrix call", () => {
             const result = compileAST(buildASTFromString(`pushMatrix()`));
             expect(result).toMatchInlineSnapshot(`"manager.pushMatrix()"`);
@@ -348,6 +346,34 @@ while (state['something'] < 10 {
         it("should handle a rotateZ call", () => {
             const result = compileAST(buildASTFromString(`rotateZ(123)`));
             expect(result).toMatchInlineSnapshot(`"manager.rotateZ(123)"`);
+        });
+
+        it("should handle a rgb call", () => {
+            const result = compileAST(buildASTFromString(`rgb(1, 0.5, 0.2)`));
+            expect(result).toMatchInlineSnapshot(`"manager.rgb(1, 0.5, 0.2)"`);
+        });
+        it("should handle a hsl call", () => {
+            const result = compileAST(buildASTFromString(`hsl(1, 0.5, 0.2)`));
+            expect(result).toMatchInlineSnapshot(`"manager.hsl(1, 0.5, 0.2)"`);
+        });
+
+        it("should handle a rgba call", () => {
+            const result = compileAST(buildASTFromString(`rgba(1, 0.5, 0.2, 0.5)`));
+            expect(result).toMatchInlineSnapshot(`"manager.rgba(1, 0.5, 0.2, 0.5)"`);
+        });
+        it("should handle a hsla call", () => {
+            const result = compileAST(buildASTFromString(`hsla(1, 0.5, 0.2, 0.5)`));
+            expect(result).toMatchInlineSnapshot(`"manager.hsla(1, 0.5, 0.2, 0.5)"`);
+        });
+
+        it("should handle a time call", () => {
+            const result = compileAST(buildASTFromString(`time()`));
+            expect(result).toMatchInlineSnapshot(`"manager.time()"`);
+        });
+
+        it("should handle a frame call", () => {
+            const result = compileAST(buildASTFromString(`frame()`));
+            expect(result).toMatchInlineSnapshot(`"manager.frame()"`);
         });
     })
 });

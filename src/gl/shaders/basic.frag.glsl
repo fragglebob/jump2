@@ -26,7 +26,7 @@ vec4 lit(float l ,float h, float m) {
 }
 
 void main() {
-  vec4 diffuseColor = texture(u_diffuse, v_texCoord);
+  vec4 diffuseColor = u_colorMult;
   vec3 a_normal = normalize(v_normal);
   vec3 surfaceToLight = normalize(v_surfaceToLight);
   vec3 surfaceToView = normalize(v_surfaceToView);
@@ -34,7 +34,7 @@ void main() {
   vec4 litR = lit(dot(a_normal, surfaceToLight),
                     dot(a_normal, halfVector), u_shininess);
   outColor = vec4((
-  u_lightColor * (diffuseColor * litR.y * u_colorMult + diffuseColor * u_ambient * u_colorMult +
+  u_lightColor * (diffuseColor * litR.y + diffuseColor * u_ambient +
                 u_specular * litR.z * u_specularFactor)).rgb,
       diffuseColor.a);
 }

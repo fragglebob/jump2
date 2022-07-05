@@ -1,9 +1,5 @@
-
-
 import { createFunction, UserRenderFunction } from "../compiler/createFunction";
 import { Renderer } from "./Renderer";
-
-
 
 export class GLApp {
   readonly canvas: HTMLCanvasElement;
@@ -30,10 +26,8 @@ export class GLApp {
     try {
       this.renderFunc = createFunction(userInputCode)
       this.textarea.classList.remove("error");
-      console.log(this.renderFunc)
     } catch(e) {
       this.textarea.classList.add("error");
-      console.error(e);
     }
   }
 
