@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JUMP2</title>
+</head>
+<body>
+    <div id="main">
+        <canvas id="canvas"></canvas>
+        <textarea name="code" id="code" cols="30" rows="10">
+loop ii <- 100 times
+    pushMatrix()
+        translate(sin(time()/2+ii*1.5)*5,sin(time()*2+ii/2)*2,sin(time()+ii/3+55)*10)
+        rotateX(time() + ii)
+        rotateY(time() - ii)
+        box()
+    popMatrix()
+endloop
+        </textarea>
+    </div>
+
+    <script type="module" src="/src/main.ts"></script>
+</body>
+</html>

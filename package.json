@@ -4,20 +4,28 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
     "test": "jest",
     "build:grammer": "nearleyc src/parser/jump.ne -o src/parser/jumpGrammer.ts"
   },
   "author": "Rob Wells",
   "license": "ISC",
   "dependencies": {
-    "nearley": "^2.20.1"
+    "nearley": "^2.20.1",
+    "twgl.js": "^4.23.1"
   },
   "devDependencies": {
+    "@originjs/vite-plugin-commonjs": "^1.0.3",
     "@types/jest": "^28.1.1",
+    "@types/moo": "^0.5.5",
     "@types/nearley": "^2.11.2",
     "jest": "^28.1.1",
     "ts-jest": "^28.0.4",
     "ts-node": "^10.8.1",
-    "typescript": "^4.7.3"
+    "typescript": "^4.7.3",
+    "vite": "^2.9.12",
+    "vite-plugin-raw": "^1.0.3"
   }
 }

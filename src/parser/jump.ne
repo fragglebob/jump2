@@ -4,13 +4,13 @@
     // Moo lexer documention is here:
     // https://github.com/no-context/moo
 
-    const moo = require("moo")
+    import moo from "moo";
     const lexer = moo.compile({
         ws:     /[ \t]+/,
         number:  [
-            /(?:-?(?:0|[1-9][0-9]*)?\.[0-9]+)/,   // [123].123
-            /(?:-?(?:0|[1-9][0-9]*)\.[0-9]*)/,    // 123.[123]
-            /(?:0|-?[1-9][0-9]*)/,              // 123
+            { match: /(?:-?(?:0|[1-9][0-9]*)?\.[0-9]+)/ },  // [123].123
+            { match: /(?:-?(?:0|[1-9][0-9]*)\.[0-9]*)/ },   // 123.[123]
+            { match: /(?:0|-?[1-9][0-9]*)/ },               // 123
         ],
 		setting: '<-',
         binops: ["&&", "||"],
@@ -90,11 +90,38 @@ Var -> NamedVariable {% id %}
 NamedVariable -> Name {% (d) => ({ type: "variable", name: d[0] }) %}
     
 FunctionCalls -> MathsFunctions {% id %}
+    | WorldFunctions {% id %}
+    | ShapeFunctions {% id %}
+    | UtilFunctions {% id %}
+	| StyleFunctions {% id %}
+    
     
 MathsFunctions -> 
     "sin" _ Args {% (d) => ({ type: "func", name: "sin", args: d[2] }) %}
     | "cos" _ Args {% (d) => ({ type: "func", name: "cos", args: d[2] }) %}
-    
+
+UtilFunctions ->
+    "time" _ Args {% (d) => ({ type: "func", name: "time", args: d[2] }) %} |
+    "frame" _ Args {% (d) => ({ type: "func", name: "frame", args: d[2] }) %}
+
+WorldFunctions -> 
+    "pushMatrix" _ Args {% (d) => ({ type: "func", name: "pushMatrix", args: d[2] }) %}
+    | "popMatrix" _ Args {% (d) => ({ type: "func", name: "popMatrix", args: d[2] }) %}
+    | "translate" _ Args {% (d) => ({ type: "func", name: "translate", args: d[2] }) %}
+    | "rotateX" _ Args {% (d) => ({ type: "func", name: "rotateX", args: d[2] }) %}
+    | "rotateY" _ Args {% (d) => ({ type: "func", name: "rotateY", args: d[2] }) %}
+    | "rotateZ" _ Args {% (d) => ({ type: "func", name: "rotateZ", args: d[2] }) %}
+    | "scale" _ Args {% (d) => ({ type: "func", name: "scale", args: d[2] }) %}
+
+ShapeFunctions -> 
+    "box" _ Args {% (d) => ({ type: "func", name: "box", args: d[2] }) %}
+    | "ball" _ Args {% (d) => ({ type: "func", name: "ball", args: d[2] }) %}
+
+StyleFunctions -> 
+    "rgb" _ Args {% (d) => ({ type: "func", name: "rgb", args: d[2] }) %}
+    | "rgba" _ Args {% (d) => ({ type: "func", name: "rgba", args: d[2] }) %}
+	| "hsl" _ Args {% (d) => ({ type: "func", name: "hsl", args: d[2] }) %}
+    | "hsla" _ Args {% (d) => ({ type: "func", name: "hsla", args: d[2] }) %}
 
 ExpressionList -> Expression {% (d) => [d[0]] %}
     | ExpressionList _ "," _ Expression {% (d) => [...d[0], d[4]] %}
