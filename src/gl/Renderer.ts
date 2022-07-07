@@ -1,21 +1,21 @@
 import {
-  BufferInfo,
-  createBufferInfoFromArrays,
   createProgramInfo,
   createTexture,
+  createVertexArrayInfo,
+  drawBufferInfo,
   m4,
   primitives,
   ProgramInfo,
   resizeCanvasToDisplaySize,
   setBuffersAndAttributes,
   setUniforms,
+  VertexArrayInfo,
 } from "twgl.js";
 
 
 import basicVert from "./shaders/basic.vert.glsl";
 import basicFrag from "./shaders/basic.frag.glsl";
 import { RenderContext } from "./types";
-import { MatrixStack } from "./MatrixStack";
 import { RenderManager } from "./RenderManager";
 
 type Vec4 = [number, number, number, number];
@@ -48,9 +48,9 @@ export class Renderer {
   };
 
   primatives: {
-    rect: BufferInfo,
-      ball: BufferInfo,
-      box: BufferInfo
+    rect: VertexArrayInfo,
+    ball: VertexArrayInfo,
+    box: VertexArrayInfo
   }
 
   frame: number = 0;
@@ -105,43 +105,32 @@ export class Renderer {
   }
 
 
-  createRect(): BufferInfo {
-    const arrays = {
-      position: [-1, -1, 0, 1, -1, 0, -1, 1, 0, -1, 1, 0, 1, -1, 0, 1, 1, 0],
-    };
-    return createBufferInfoFromArrays(this.gl, arrays);
+  createRect(): VertexArrayInfo {
+    return createVertexArrayInfo(this.gl, this.mainProgramInfo, primitives.createPlaneBufferInfo(this.gl, 1, 1));
   }
 
-  createCube(): BufferInfo {
-    return primitives.createCubeBufferInfo(this.gl, 1);
+  createCube(): VertexArrayInfo {
+    return createVertexArrayInfo(this.gl, this.mainProgramInfo, primitives.createCubeBufferInfo(this.gl, 1));
   }
 
-  createBall() : BufferInfo {
-    return primitives.createSphereBufferInfo(this.gl, 1, 10, 10);
+  createBall() : VertexArrayInfo {
+    return createVertexArrayInfo(this.gl, this.mainProgramInfo, primitives.createSphereBufferInfo(this.gl, 1, 10, 10));
   }
 
-
-  renderBufferInfo(ctx: RenderContext, bufferInfo: BufferInfo) {
+  renderVertexArrayInfo(ctx: RenderContext, vertexArrayInfo: VertexArrayInfo) {
     this.objectUniforms.u_world = ctx.world;
-
     setUniforms(this.mainProgramInfo, this.objectUniforms);
 
-    setBuffersAndAttributes(this.gl, this.mainProgramInfo, bufferInfo);
-
-    this.gl.drawElements(
-      this.gl.TRIANGLES,
-      bufferInfo.numElements,
-      this.gl.UNSIGNED_SHORT,
-      0
-    );
+    setBuffersAndAttributes(this.gl, this.mainProgramInfo, vertexArrayInfo);
+    drawBufferInfo(this.gl, vertexArrayInfo);
   }
 
   renderBox(ctx: RenderContext) {
-    this.renderBufferInfo(ctx, this.primatives.box);
+    this.renderVertexArrayInfo(ctx, this.primatives.box);
   }
 
   renderBall(ctx: RenderContext) {
-    this.renderBufferInfo(ctx, this.primatives.ball);
+    this.renderVertexArrayInfo(ctx, this.primatives.ball);
   }
 
   update(time: number) : void {
