@@ -1,16 +1,18 @@
 #version 300 es
 
-uniform sampler2D tDiffuse;
-uniform float _Offset;
-uniform float _Divisor;
-uniform float _Roll;
-uniform float iTime;
+precision mediump float;
+
+uniform sampler2D u_texture;
+
+uniform float u_offset;
+uniform float u_divisor;
+uniform float u_roll;
+uniform float u_time;
 
 in vec4 v_position;
 in vec2 v_texCoord;
 
 out vec4 outColor;
-
 
 float random (vec2 st) {
     return fract(sin(dot(st.xy,
@@ -27,12 +29,12 @@ void main() {
     float r = sqrt(dot(sc, sc));
 
     // Angular repeating.
-    phi += _Offset;
-    phi = phi - _Divisor * floor(phi / _Divisor);
+    phi += u_offset;
+    phi = phi - u_divisor * floor(phi / u_divisor);
     // #if SYMMETRY_ON
-    phi = min(phi, _Divisor - phi);
+    phi = min(phi, u_divisor - phi);
     // #endif
-    phi += _Roll - _Offset;
+    phi += u_roll - u_offset;
 
     // Convert back to the texture coordinate.
     vec2 uv = vec2(cos(phi), sin(phi)) * r + 0.5;
@@ -40,6 +42,6 @@ void main() {
     // Reflection at the border of the screen.
     uv = max(min(uv, 2.0 - uv), -uv);
 
-    outColor = texture2D(tDiffuse, uv);
+    outColor = texture(u_texture, uv);
 
 }

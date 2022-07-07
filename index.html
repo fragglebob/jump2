@@ -15,16 +15,21 @@ loop ii <- 200 times
         hsl((time()/4+ii/13.37)%1,0.8,0.73)
         translate(
             sin(time()/4+ii/40)*2.5 + cos(time()+ii), 
-            cos(time()/4+ii/40)*2+ sin(time()+ii), 
-            cos(time()/10+ii/7)*4  + sin(time()+ii)
+            cos(time()/4+ii/40)*6+ sin(time()+ii), 
+            cos(time()/10+ii/7)*6  + sin(time()+ii)
         )
         rotateX(time()+ii)
         rotateZ(time()+ii)   
         rotateY(time()-ii) 
-        scale(0.28)
+        scale(1)
         box()
     popMatrix()
 endloop
+scale(2)
+fx_kale(6)
+rotateX(time()/7)
+rotateY(time()/7.6)
+box()      
         </textarea>
     </div>
 

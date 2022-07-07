@@ -94,7 +94,10 @@ FunctionCalls -> MathsFunctions {% id %}
     | ShapeFunctions {% id %}
     | UtilFunctions {% id %}
 	| StyleFunctions {% id %}
-    
+    | FXFunctions {% id %}
+
+FXFunctions -> 
+    "fx_kale" _ Args {% (d) => ({ type: "func", name: "fx_kale", args: d[2] }) %}
     
 MathsFunctions -> 
     "sin" _ Args {% (d) => ({ type: "func", name: "sin", args: d[2] }) %}

@@ -12,6 +12,7 @@ import {
   primitives,
   ProgramInfo,
   resizeCanvasToDisplaySize,
+  resizeFramebufferInfo,
   setBuffersAndAttributes,
   setUniforms,
   VertexArrayInfo,
@@ -24,6 +25,8 @@ import screenVert from "./shaders/screen.vert.glsl";
 import screenFrag from "./shaders/screen.frag.glsl";
 import { RenderContext } from "./types";
 import { RenderManager } from "./RenderManager";
+import { KaleidoscopePass } from "./postfx/kaleidoscope/KaleidoscopePass";
+import { RenderPass } from "./postfx/RenderPass";
 
 
 type Vec4 = [number, number, number, number];
@@ -65,10 +68,14 @@ export class Renderer {
   frame: number = 0;
   time: number = 0;
 
+  passes: {
+    kaleidoscope: KaleidoscopePass,
+  }
+
   screenBufferInfo: BufferInfo;
 
   framebuffers: [FramebufferInfo, FramebufferInfo];
-  currentFramebuffer: number = 0;
+  currentFramebufferIndex: number = 0;
 
   constructor(gl: WebGL2RenderingContext) {
     this.gl = gl;
@@ -106,10 +113,25 @@ export class Renderer {
 
     this.screenBufferInfo = primitives.createXYQuadBufferInfo(this.gl, 2);
 
+    const attachments = [
+      {
+        format: this.gl.RGBA,
+        type: this.gl.UNSIGNED_BYTE,
+        min: this.gl.LINEAR,
+        wrap: this.gl.CLAMP_TO_EDGE
+      }, {
+        format: this.gl.DEPTH_STENCIL
+      }
+    ]
+
     this.framebuffers = [
-      createFramebufferInfo(this.gl, undefined, 1024, 1024),
-      createFramebufferInfo(this.gl, undefined, 1024, 1024),
+      createFramebufferInfo(this.gl, attachments),
+      createFramebufferInfo(this.gl, attachments),
     ];
+
+    this.passes = {
+      kaleidoscope: new KaleidoscopePass(this),
+    };
   }
 
   private createMainProgram(): ProgramInfo {
@@ -173,18 +195,25 @@ export class Renderer {
     return this.frame;
   }
 
-  render(callback: (ctx: RenderManager) => void) {
-
-    resizeCanvasToDisplaySize(this.gl.canvas);
-
-    bindFramebufferInfo(this.gl, this.framebuffers[this.currentFramebuffer]);
-
+  useMainProgram() {
     this.gl.enable(this.gl.DEPTH_TEST);
     this.gl.enable(this.gl.CULL_FACE);
+    this.gl.useProgram(this.mainProgramInfo.program);
+    this.gl.clear(this.gl.DEPTH_BUFFER_BIT);
+  }
+
+  render(callback: (ctx: RenderManager) => void) {
+
+    if(resizeCanvasToDisplaySize(this.gl.canvas)) {
+      resizeFramebufferInfo(this.gl, this.framebuffers[0]);
+      resizeFramebufferInfo(this.gl, this.framebuffers[1]);
+    }
+
+    bindFramebufferInfo(this.gl, this.currentFramebuffer());
+
     this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
 
-
-    this.gl.useProgram(this.mainProgramInfo.program);
+    this.useMainProgram();
 
     setUniforms(this.mainProgramInfo, this.globalUniforms);
     setUniforms(this.mainProgramInfo, this.styleUniforms);
@@ -193,22 +222,51 @@ export class Renderer {
 
     callback(manager);
 
-    bindFramebufferInfo(this.gl, null);
+    this.gl.useProgram(this.screenProgramInfo.program);
+    this.drawFramebuffer(
+      this.screenProgramInfo,
+      this.currentFramebuffer(),
+      null
+    )
+  }
+
+  renderRenderPass(pass: RenderPass<any>) {
+    const currentFramebuffer = this.currentFramebuffer();
+    const nextFramebuffer = this.nextFramebuffer();
+
+    this.drawFramebuffer(
+      pass.getProgramInfo(),
+      currentFramebuffer,
+      nextFramebuffer
+    );
+  }
+
+  currentFramebuffer() : FramebufferInfo {
+    return this.framebuffers[this.currentFramebufferIndex];;
+  }
+
+  nextFramebuffer() : FramebufferInfo {
+    this.currentFramebufferIndex++;
+    if(this.currentFramebufferIndex >= this.framebuffers.length) {
+      this.currentFramebufferIndex = 0;
+    }
+    return this.framebuffers[this.currentFramebufferIndex];
+  }
+
+  drawFramebuffer(program: ProgramInfo, from: FramebufferInfo, to: FramebufferInfo | null) {
+    bindFramebufferInfo(this.gl, to);
 
     this.gl.clearColor(0, 0, 0, 0);
     this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
 
-    this.gl.useProgram(this.screenProgramInfo.program);
-
-    setUniforms(this.screenProgramInfo, {
-      u_texture: this.framebuffers[0].attachments[0]
+    setUniforms(program, {
+      u_texture: from.attachments[0]
     });
 
     this.gl.bindVertexArray(null)
     
-    setBuffersAndAttributes(this.gl, this.screenProgramInfo, this.screenBufferInfo);
+    setBuffersAndAttributes(this.gl, program, this.screenBufferInfo);
     drawBufferInfo(this.gl, this.screenBufferInfo);
-
   }
 
   updateColor(color: Vec4) {

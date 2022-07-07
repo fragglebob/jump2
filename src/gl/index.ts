@@ -3,14 +3,14 @@ import { Renderer } from "./Renderer";
 
 export class GLApp {
   readonly canvas: HTMLCanvasElement;
-  readonly gl: WebGLRenderingContext;
+  readonly gl: WebGL2RenderingContext;
   readonly textarea: HTMLTextAreaElement;
 
   readonly renderer: Renderer;
 
   renderFunc: UserRenderFunction;
 
-  constructor(canvas: HTMLCanvasElement, gl: WebGLRenderingContext, textarea: HTMLTextAreaElement) {
+  constructor(canvas: HTMLCanvasElement, gl: WebGL2RenderingContext, textarea: HTMLTextAreaElement) {
     this.canvas = canvas;
     this.gl = gl;
     this.textarea = textarea;
@@ -24,7 +24,7 @@ export class GLApp {
   compileTextarea() {
     const userInputCode = this.textarea.value;
     try {
-      this.renderFunc = createFunction(userInputCode)
+      this.renderFunc = createFunction(userInputCode);
       this.textarea.classList.remove("error");
     } catch(e) {
       this.textarea.classList.add("error");

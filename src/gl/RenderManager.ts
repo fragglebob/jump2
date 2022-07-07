@@ -19,6 +19,13 @@ interface RenderManagerInterface {
 
   box(): void;
   ball(): void;
+
+  rgb(r: number, g: number, b: number): void;
+  rgba(r: number, g: number, b: number, a: number): void;
+  hsl(h: number, s: number, l: number): void;
+  hsla(h: number, s: number, l: number, a: number): void;
+
+  fx_kale(segments: number): void;
 }
 
 type CameraMatrixes = {
@@ -132,5 +139,10 @@ export class RenderManager implements RenderManagerInterface {
     } else {
       this.worldMatrix.scale([x, x, x]);
     }
+  }
+
+  fx_kale(segments: number) {
+    this.renderer.passes.kaleidoscope.render({ segments: segments ?? 2 });
+    this.renderer.useMainProgram();
   }
 }
