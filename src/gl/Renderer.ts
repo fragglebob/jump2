@@ -1,8 +1,13 @@
 import {
+  bindFramebufferInfo,
+  BufferInfo,
+  createBufferInfoFromArrays,
+  createFramebufferInfo,
   createProgramInfo,
   createTexture,
   createVertexArrayInfo,
   drawBufferInfo,
+  FramebufferInfo,
   m4,
   primitives,
   ProgramInfo,
@@ -15,16 +20,20 @@ import {
 
 import basicVert from "./shaders/basic.vert.glsl";
 import basicFrag from "./shaders/basic.frag.glsl";
+import screenVert from "./shaders/screen.vert.glsl";
+import screenFrag from "./shaders/screen.frag.glsl";
 import { RenderContext } from "./types";
 import { RenderManager } from "./RenderManager";
+
 
 type Vec4 = [number, number, number, number];
 type Vec3 = [number, number, number];
 
 export class Renderer {
-  readonly gl: WebGLRenderingContext;
+  readonly gl: WebGL2RenderingContext;
 
   mainProgramInfo: ProgramInfo;
+  screenProgramInfo: ProgramInfo;
 
   basicTexture: WebGLTexture;
 
@@ -56,10 +65,17 @@ export class Renderer {
   frame: number = 0;
   time: number = 0;
 
-  constructor(gl: WebGLRenderingContext) {
+  screenBufferInfo: BufferInfo;
+
+  framebuffers: [FramebufferInfo, FramebufferInfo];
+  currentFramebuffer: number = 0;
+
+  constructor(gl: WebGL2RenderingContext) {
     this.gl = gl;
 
     this.mainProgramInfo = this.createMainProgram();
+    this.screenProgramInfo = this.createScreenProgram();
+
     this.basicTexture = this.createBasicTexture();
 
     this.globalUniforms = {
@@ -87,10 +103,21 @@ export class Renderer {
         ball: this.createBall(),
         rect: this.createRect()
     }
+
+    this.screenBufferInfo = primitives.createXYQuadBufferInfo(this.gl, 2);
+
+    this.framebuffers = [
+      createFramebufferInfo(this.gl, undefined, 1024, 1024),
+      createFramebufferInfo(this.gl, undefined, 1024, 1024),
+    ];
   }
 
   private createMainProgram(): ProgramInfo {
     return createProgramInfo(this.gl, [basicVert, basicFrag]);
+  }
+
+  private createScreenProgram(): ProgramInfo {
+    return createProgramInfo(this.gl, [screenVert, screenFrag]);
   }
 
   private createBasicTexture(): WebGLTexture {
@@ -150,11 +177,12 @@ export class Renderer {
 
     resizeCanvasToDisplaySize(this.gl.canvas);
 
-    this.gl.viewport(0, 0, this.gl.canvas.width, this.gl.canvas.height);
+    bindFramebufferInfo(this.gl, this.framebuffers[this.currentFramebuffer]);
 
     this.gl.enable(this.gl.DEPTH_TEST);
     this.gl.enable(this.gl.CULL_FACE);
     this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
+
 
     this.gl.useProgram(this.mainProgramInfo.program);
 
@@ -164,6 +192,23 @@ export class Renderer {
     const manager = new RenderManager(this);
 
     callback(manager);
+
+    bindFramebufferInfo(this.gl, null);
+
+    this.gl.clearColor(0, 0, 0, 0);
+    this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
+
+    this.gl.useProgram(this.screenProgramInfo.program);
+
+    setUniforms(this.screenProgramInfo, {
+      u_texture: this.framebuffers[0].attachments[0]
+    });
+
+    this.gl.bindVertexArray(null)
+    
+    setBuffersAndAttributes(this.gl, this.screenProgramInfo, this.screenBufferInfo);
+    drawBufferInfo(this.gl, this.screenBufferInfo);
+
   }
 
   updateColor(color: Vec4) {
