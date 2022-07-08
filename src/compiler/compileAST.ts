@@ -134,6 +134,7 @@ function compileFunctionCall(ctx: Context, functionCall: FunctionCall): string {
     case "time":
     case "frame":
     case "fx_kale":
+    case "fx_grid":
       return `manager.${funcName}(${compileArguments(ctx, functionCall.args)})`;
   }
 

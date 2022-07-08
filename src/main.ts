@@ -10,8 +10,8 @@ function findCanvas() : HTMLCanvasElement {
     return canvas;
 }
 
-function createWebGLContext(canvas: HTMLCanvasElement) : WebGLRenderingContext {
-    const gl = canvas.getContext("webgl2");
+function createWebGLContext(canvas: HTMLCanvasElement) : WebGL2RenderingContext {
+    const gl = canvas.getContext("webgl2", { antialias: false });
     if(!gl) {
         throw new Error("Can't start webgl 2context. :(");
     }

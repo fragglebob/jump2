@@ -1,8 +1,8 @@
-import { Renderer } from "../../Renderer";
-import { RenderPass } from "../RenderPass";
+import { Renderer } from "../Renderer";
+import { RenderPass } from "./RenderPass";
 
-import vertShader from "./kaleidoscope.vert.glsl";
-import fragShader from "./kaleidoscope.frag.glsl";
+import vertShader from "../shaders/screen.vert.glsl";
+import fragShader from "../shaders/kaleidoscope.frag.glsl";
 import { setUniforms } from "twgl.js";
 
 export type Props = {

@@ -109,6 +109,7 @@ const grammar: Grammar = {
     {"name": "FunctionCalls", "symbols": ["StyleFunctions"], "postprocess": id},
     {"name": "FunctionCalls", "symbols": ["FXFunctions"], "postprocess": id},
     {"name": "FXFunctions", "symbols": [{"literal":"fx_kale"}, "_", "Args"], "postprocess": (d) => ({ type: "func", name: "fx_kale", args: d[2] })},
+    {"name": "FXFunctions", "symbols": [{"literal":"fx_grid"}, "_", "Args"], "postprocess": (d) => ({ type: "func", name: "fx_grid", args: d[2] })},
     {"name": "MathsFunctions", "symbols": [{"literal":"sin"}, "_", "Args"], "postprocess": (d) => ({ type: "func", name: "sin", args: d[2] })},
     {"name": "MathsFunctions", "symbols": [{"literal":"cos"}, "_", "Args"], "postprocess": (d) => ({ type: "func", name: "cos", args: d[2] })},
     {"name": "UtilFunctions", "symbols": [{"literal":"time"}, "_", "Args"], "postprocess": (d) => ({ type: "func", name: "time", args: d[2] })},

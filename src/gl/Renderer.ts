@@ -25,8 +25,9 @@ import screenVert from "./shaders/screen.vert.glsl";
 import screenFrag from "./shaders/screen.frag.glsl";
 import { RenderContext } from "./types";
 import { RenderManager } from "./RenderManager";
-import { KaleidoscopePass } from "./postfx/kaleidoscope/KaleidoscopePass";
+import { KaleidoscopePass } from "./postfx/KaleidoscopePass";
 import { RenderPass } from "./postfx/RenderPass";
+import { GridShiftPass } from "./postfx/GridShiftPass";
 
 
 type Vec4 = [number, number, number, number];
@@ -70,12 +71,16 @@ export class Renderer {
 
   passes: {
     kaleidoscope: KaleidoscopePass,
+    grid: GridShiftPass,
   }
 
   screenBufferInfo: BufferInfo;
 
-  framebuffers: [FramebufferInfo, FramebufferInfo];
+  renderFramebuffer: FramebufferInfo;
+  colorFramebuffer: FramebufferInfo;
   currentFramebufferIndex: number = 0;
+
+  framebufferAttachmentSetup: any[] = [];
 
   constructor(gl: WebGL2RenderingContext) {
     this.gl = gl;
@@ -113,24 +118,26 @@ export class Renderer {
 
     this.screenBufferInfo = primitives.createXYQuadBufferInfo(this.gl, 2);
 
-    const attachments = [
+    this.framebufferAttachmentSetup = [
       {
-        format: this.gl.RGBA,
+        format: this.gl.RGBA8,
         type: this.gl.UNSIGNED_BYTE,
         min: this.gl.LINEAR,
-        wrap: this.gl.CLAMP_TO_EDGE
-      }, {
-        format: this.gl.DEPTH_STENCIL
+        wrap: this.gl.CLAMP_TO_EDGE,
+        samples: this.gl.getParameter(this.gl.MAX_SAMPLES),
+      },
+      {
+        format: this.gl.DEPTH_COMPONENT16,
+        samples: this.gl.getParameter(this.gl.MAX_SAMPLES),
       }
-    ]
-
-    this.framebuffers = [
-      createFramebufferInfo(this.gl, attachments),
-      createFramebufferInfo(this.gl, attachments),
     ];
+
+    this.renderFramebuffer = createFramebufferInfo(this.gl, this.framebufferAttachmentSetup);
+    this.colorFramebuffer = createFramebufferInfo(this.gl);
 
     this.passes = {
       kaleidoscope: new KaleidoscopePass(this),
+      grid: new GridShiftPass(this),
     };
   }
 
@@ -196,22 +203,25 @@ export class Renderer {
   }
 
   useMainProgram() {
+    this.gl.enable(this.gl.BLEND)
     this.gl.enable(this.gl.DEPTH_TEST);
     this.gl.enable(this.gl.CULL_FACE);
     this.gl.useProgram(this.mainProgramInfo.program);
     this.gl.clear(this.gl.DEPTH_BUFFER_BIT);
+    this.gl.blendFunc(this.gl.SRC_ALPHA, this.gl.ONE_MINUS_SRC_ALPHA)
+    this.gl.blendEquation(this.gl.FUNC_ADD)
   }
 
   render(callback: (ctx: RenderManager) => void) {
 
     if(resizeCanvasToDisplaySize(this.gl.canvas)) {
-      resizeFramebufferInfo(this.gl, this.framebuffers[0]);
-      resizeFramebufferInfo(this.gl, this.framebuffers[1]);
+      resizeFramebufferInfo(this.gl, this.renderFramebuffer, this.framebufferAttachmentSetup);
+      resizeFramebufferInfo(this.gl, this.colorFramebuffer);      
     }
 
-    bindFramebufferInfo(this.gl, this.currentFramebuffer());
+    bindFramebufferInfo(this.gl, this.renderFramebuffer);
 
-    this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
+    this.clear();
 
     this.useMainProgram();
 
@@ -222,51 +232,75 @@ export class Renderer {
 
     callback(manager);
 
-    this.gl.useProgram(this.screenProgramInfo.program);
-    this.drawFramebuffer(
-      this.screenProgramInfo,
-      this.currentFramebuffer(),
-      null
-    )
+    bindFramebufferInfo(this.gl, this.renderFramebuffer, this.gl.READ_FRAMEBUFFER);
+    bindFramebufferInfo(this.gl, null, this.gl.DRAW_FRAMEBUFFER);
+    this.clear();
+    this.gl.blitFramebuffer(
+      0, 0, this.gl.drawingBufferWidth, this.gl.drawingBufferHeight,
+      0, 0, this.gl.drawingBufferWidth, this.gl.drawingBufferHeight,
+      this.gl.COLOR_BUFFER_BIT, this.gl.LINEAR
+    );
+
+    // this.gl.useProgram(this.screenProgramInfo.program);
+    // this.drawFramebuffer(
+    //   this.screenProgramInfo,
+    //   null
+    // );
+
+    // bindFramebufferInfo(this.gl, this.framebuffers[0]);
+    // this.clear();
+    // bindFramebufferInfo(this.gl, this.framebuffers[1]);
+    // this.clear();
+    // bindFramebufferInfo(this.gl, null);
   }
 
   renderRenderPass(pass: RenderPass<any>) {
-    const currentFramebuffer = this.currentFramebuffer();
-    const nextFramebuffer = this.nextFramebuffer();
 
-    this.drawFramebuffer(
-      pass.getProgramInfo(),
-      currentFramebuffer,
-      nextFramebuffer
+    this.processFragmentShaderProgram(
+      pass.getProgramInfo()
     );
   }
 
-  currentFramebuffer() : FramebufferInfo {
-    return this.framebuffers[this.currentFramebufferIndex];;
-  }
-
-  nextFramebuffer() : FramebufferInfo {
-    this.currentFramebufferIndex++;
-    if(this.currentFramebufferIndex >= this.framebuffers.length) {
-      this.currentFramebufferIndex = 0;
-    }
-    return this.framebuffers[this.currentFramebufferIndex];
-  }
-
-  drawFramebuffer(program: ProgramInfo, from: FramebufferInfo, to: FramebufferInfo | null) {
-    bindFramebufferInfo(this.gl, to);
-
+  clear() {
     this.gl.clearColor(0, 0, 0, 0);
     this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
+  }
+
+  processFragmentShaderProgram(program: ProgramInfo) {
+    bindFramebufferInfo(this.gl, this.renderFramebuffer, this.gl.READ_FRAMEBUFFER);
+    bindFramebufferInfo(this.gl, this.colorFramebuffer, this.gl.DRAW_FRAMEBUFFER);
+    this.clear();
+    this.gl.blitFramebuffer(
+      0, 0, this.colorFramebuffer.width, this.colorFramebuffer.height,
+      0, 0, this.colorFramebuffer.width, this.colorFramebuffer.height,
+      this.gl.COLOR_BUFFER_BIT, this.gl.LINEAR
+    );
+
+    bindFramebufferInfo(this.gl, this.renderFramebuffer);
+
+    this.clear();
 
     setUniforms(program, {
-      u_texture: from.attachments[0]
+      u_texture: this.colorFramebuffer.attachments[0]
     });
 
     this.gl.bindVertexArray(null)
     
     setBuffersAndAttributes(this.gl, program, this.screenBufferInfo);
     drawBufferInfo(this.gl, this.screenBufferInfo);
+
+    this.useMainProgram();
+
+    // bindFramebufferInfo(this.gl, this.transferFramebuffer, this.gl.READ_FRAMEBUFFER);
+    // bindFramebufferInfo(this.gl, to, this.gl.DRAW_FRAMEBUFFER);
+    // this.clear();
+    // this.gl.blitFramebuffer(
+    //   0, 0, from.width, from.height,
+    //   0, 0, from.width, from.height,
+    //   this.gl.COLOR_BUFFER_BIT, this.gl.LINEAR
+    // );
+
+    // bindFramebufferInfo(this.gl, to);
   }
 
   updateColor(color: Vec4) {
