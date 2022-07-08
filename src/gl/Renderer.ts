@@ -1,7 +1,6 @@
 import {
   bindFramebufferInfo,
   BufferInfo,
-  createBufferInfoFromArrays,
   createFramebufferInfo,
   createProgramInfo,
   createTexture,
@@ -21,8 +20,6 @@ import {
 
 import basicVert from "./shaders/basic.vert.glsl";
 import basicFrag from "./shaders/basic.frag.glsl";
-import screenVert from "./shaders/screen.vert.glsl";
-import screenFrag from "./shaders/screen.frag.glsl";
 import { RenderContext } from "./types";
 import { RenderManager } from "./RenderManager";
 import { KaleidoscopePass } from "./postfx/KaleidoscopePass";
@@ -37,7 +34,6 @@ export class Renderer {
   readonly gl: WebGL2RenderingContext;
 
   mainProgramInfo: ProgramInfo;
-  screenProgramInfo: ProgramInfo;
 
   basicTexture: WebGLTexture;
 
@@ -86,7 +82,6 @@ export class Renderer {
     this.gl = gl;
 
     this.mainProgramInfo = this.createMainProgram();
-    this.screenProgramInfo = this.createScreenProgram();
 
     this.basicTexture = this.createBasicTexture();
 
@@ -143,10 +138,6 @@ export class Renderer {
 
   private createMainProgram(): ProgramInfo {
     return createProgramInfo(this.gl, [basicVert, basicFrag]);
-  }
-
-  private createScreenProgram(): ProgramInfo {
-    return createProgramInfo(this.gl, [screenVert, screenFrag]);
   }
 
   private createBasicTexture(): WebGLTexture {
@@ -232,6 +223,7 @@ export class Renderer {
 
     callback(manager);
 
+    // renders the render buffer to the canvas with antialisaing 
     bindFramebufferInfo(this.gl, this.renderFramebuffer, this.gl.READ_FRAMEBUFFER);
     bindFramebufferInfo(this.gl, null, this.gl.DRAW_FRAMEBUFFER);
     this.clear();
@@ -240,18 +232,6 @@ export class Renderer {
       0, 0, this.gl.drawingBufferWidth, this.gl.drawingBufferHeight,
       this.gl.COLOR_BUFFER_BIT, this.gl.LINEAR
     );
-
-    // this.gl.useProgram(this.screenProgramInfo.program);
-    // this.drawFramebuffer(
-    //   this.screenProgramInfo,
-    //   null
-    // );
-
-    // bindFramebufferInfo(this.gl, this.framebuffers[0]);
-    // this.clear();
-    // bindFramebufferInfo(this.gl, this.framebuffers[1]);
-    // this.clear();
-    // bindFramebufferInfo(this.gl, null);
   }
 
   renderRenderPass(pass: RenderPass<any>) {
@@ -267,40 +247,38 @@ export class Renderer {
   }
 
   processFragmentShaderProgram(program: ProgramInfo) {
+    // draw the render framebuffer into the color framebuffer
     bindFramebufferInfo(this.gl, this.renderFramebuffer, this.gl.READ_FRAMEBUFFER);
     bindFramebufferInfo(this.gl, this.colorFramebuffer, this.gl.DRAW_FRAMEBUFFER);
+    // clear to make the color framebuffer empty
     this.clear();
+    // blit for the antialiasing
     this.gl.blitFramebuffer(
       0, 0, this.colorFramebuffer.width, this.colorFramebuffer.height,
       0, 0, this.colorFramebuffer.width, this.colorFramebuffer.height,
       this.gl.COLOR_BUFFER_BIT, this.gl.LINEAR
     );
 
+    // switch back to the render framebuffer
     bindFramebufferInfo(this.gl, this.renderFramebuffer);
 
+    // clear the render framebuffer
     this.clear();
 
+    // set the color framebuffer attachment as a uniform for the shader
     setUniforms(program, {
       u_texture: this.colorFramebuffer.attachments[0]
     });
 
+    // reset after the VAO drawing
     this.gl.bindVertexArray(null)
     
+    // draw a quad for the size of the screen
     setBuffersAndAttributes(this.gl, program, this.screenBufferInfo);
     drawBufferInfo(this.gl, this.screenBufferInfo);
 
+    // switch back to the main program
     this.useMainProgram();
-
-    // bindFramebufferInfo(this.gl, this.transferFramebuffer, this.gl.READ_FRAMEBUFFER);
-    // bindFramebufferInfo(this.gl, to, this.gl.DRAW_FRAMEBUFFER);
-    // this.clear();
-    // this.gl.blitFramebuffer(
-    //   0, 0, from.width, from.height,
-    //   0, 0, from.width, from.height,
-    //   this.gl.COLOR_BUFFER_BIT, this.gl.LINEAR
-    // );
-
-    // bindFramebufferInfo(this.gl, to);
   }
 
   updateColor(color: Vec4) {

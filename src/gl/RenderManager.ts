@@ -144,11 +144,9 @@ export class RenderManager implements RenderManagerInterface {
 
   fx_kale(segments: number) {
     this.renderer.passes.kaleidoscope.render({ segments: segments ?? 2 });
-    this.renderer.useMainProgram();
   }
 
   fx_grid(rows: number) {
     this.renderer.passes.grid.render({ rows: rows ?? 2 });
-    this.renderer.useMainProgram();
   }
 }
