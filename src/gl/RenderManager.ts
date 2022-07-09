@@ -32,6 +32,8 @@ interface RenderManagerInterface {
 
   fx_kale(segments: number): void;
   fx_grid(rows: number): void;
+  fx_rgb(amount: number, angle?: number): void;
+  fx_bloom(): void;
 }
 
 type CameraMatrixes = {
@@ -160,5 +162,13 @@ export class RenderManager implements RenderManagerInterface {
 
   fx_grid(rows: number) {
     this.renderer.passes.grid.render({ rows: rows ?? 2 });
+  }
+
+  fx_rgb(amount: number, angle?: number) {
+    this.renderer.passes.rgb.render({ amount: amount ?? 0.01, angle });
+  }
+
+  fx_bloom() {
+    this.renderer.passes.bloom.render({});
   }
 }

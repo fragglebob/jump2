@@ -136,6 +136,8 @@ function compileFunctionCall(ctx: Context, functionCall: FunctionCall): string {
     case "fft":
     case "fx_kale":
     case "fx_grid":
+    case "fx_rgb":
+    case "fx_bloom":
       return `manager.${funcName}(${compileArguments(ctx, functionCall.args)})`;
   }
 

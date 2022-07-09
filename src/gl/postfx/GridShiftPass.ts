@@ -4,12 +4,13 @@ import { RenderPass } from "./RenderPass";
 import vertShader from "../shaders/screen.vert.glsl";
 import fragShader from "../shaders/grid-shift.frag.glsl";
 import { setUniforms } from "twgl.js";
+import { ShaderRenderPass } from "./ShaderRenderPass";
 
 export type Props = {
     rows: number;
 };
 
-export class GridShiftPass extends RenderPass<Props> {
+export class GridShiftPass extends ShaderRenderPass<Props> {
     constructor(renderer: Renderer) {
         super(renderer, vertShader, fragShader)
     }
@@ -24,6 +25,6 @@ export class GridShiftPass extends RenderPass<Props> {
             u_time: time,
         })
 
-        this.renderer.renderRenderPass(this);
+        this.renderer.renderShaderRenderPass(this);
     }
 }

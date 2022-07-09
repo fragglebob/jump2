@@ -3,7 +3,6 @@ import {
   BufferInfo,
   createFramebufferInfo,
   createProgramInfo,
-  createTexture,
   createVertexArrayInfo,
   drawBufferInfo,
   FramebufferInfo,
@@ -20,11 +19,16 @@ import {
 
 import basicVert from "./shaders/basic.vert.glsl";
 import basicFrag from "./shaders/basic.frag.glsl";
+import screenVert from "./shaders/screen.vert.glsl";
+import screenFrag from "./shaders/screen.frag.glsl";
 import { RenderContext } from "./types";
 import { RenderManager } from "./RenderManager";
 import { KaleidoscopePass } from "./postfx/KaleidoscopePass";
-import { RenderPass } from "./postfx/RenderPass";
 import { GridShiftPass } from "./postfx/GridShiftPass";
+import { RGBShiftPass } from "./postfx/RGBShiftPass";
+import { ConvolutionPass } from "./postfx/ConvolutionPass";
+import { ShaderRenderPass } from "./postfx/ShaderRenderPass";
+import { BloomPass } from "./postfx/BloomPass";
 
 
 type Vec4 = [number, number, number, number];
@@ -34,6 +38,7 @@ export class Renderer {
   readonly gl: WebGL2RenderingContext;
 
   mainProgramInfo: ProgramInfo;
+  passThroughProgramInfo: ProgramInfo;
 
   globalUniforms: {
     u_lightWorldPos: Vec3,
@@ -67,6 +72,9 @@ export class Renderer {
   passes: {
     kaleidoscope: KaleidoscopePass,
     grid: GridShiftPass,
+    rgb: RGBShiftPass,
+    convolution: ConvolutionPass,
+    bloom: BloomPass
   }
 
   screenBufferInfo: BufferInfo;
@@ -81,6 +89,7 @@ export class Renderer {
     this.gl = gl;
 
     this.mainProgramInfo = this.createMainProgram();
+    this.passThroughProgramInfo = this.createPassThroughProgram();
 
     this.globalUniforms = {
       u_lightWorldPos: [1, 8, -10],
@@ -129,11 +138,26 @@ export class Renderer {
     this.passes = {
       kaleidoscope: new KaleidoscopePass(this),
       grid: new GridShiftPass(this),
+      rgb: new RGBShiftPass(this),
+      convolution: new ConvolutionPass(this),
+      bloom: new BloomPass(this),
     };
+  }
+
+  createMultiSampledFramebuffer() {
+    return createFramebufferInfo(this.gl, this.framebufferAttachmentSetup);
+  }
+
+  resizeMultiSampledFramebuffer(framebuffer: FramebufferInfo) {
+    return resizeFramebufferInfo(this.gl, framebuffer, this.framebufferAttachmentSetup);
   }
 
   private createMainProgram(): ProgramInfo {
     return createProgramInfo(this.gl, [basicVert, basicFrag]);
+  }
+
+  private createPassThroughProgram(): ProgramInfo {
+    return createProgramInfo(this.gl, [screenVert, screenFrag]);
   }
 
   createRect(): VertexArrayInfo {
@@ -194,8 +218,9 @@ export class Renderer {
   render(callback: (ctx: RenderManager) => void) {
 
     if(resizeCanvasToDisplaySize(this.gl.canvas)) {
-      resizeFramebufferInfo(this.gl, this.renderFramebuffer, this.framebufferAttachmentSetup);
-      resizeFramebufferInfo(this.gl, this.colorFramebuffer);      
+      this.resizeMultiSampledFramebuffer(this.renderFramebuffer);
+      resizeFramebufferInfo(this.gl, this.colorFramebuffer); 
+      this.passes.bloom.resizeFramebuffers();     
     }
 
     bindFramebufferInfo(this.gl, this.renderFramebuffer);
@@ -222,10 +247,11 @@ export class Renderer {
     );
   }
 
-  renderRenderPass(pass: RenderPass<any>) {
-
+  renderShaderRenderPass(pass: ShaderRenderPass<any>, fromFramebuffer?: FramebufferInfo, toFramebuffer?: FramebufferInfo) {
     this.processFragmentShaderProgram(
-      pass.getProgramInfo()
+      pass.getProgramInfo(),
+      fromFramebuffer,
+      toFramebuffer
     );
   }
 
@@ -234,9 +260,9 @@ export class Renderer {
     this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
   }
 
-  processFragmentShaderProgram(program: ProgramInfo) {
+  processFragmentShaderProgram(program: ProgramInfo, fromFramebuffer?: FramebufferInfo, toFramebuffer?: FramebufferInfo) {
     // draw the render framebuffer into the color framebuffer
-    bindFramebufferInfo(this.gl, this.renderFramebuffer, this.gl.READ_FRAMEBUFFER);
+    bindFramebufferInfo(this.gl, fromFramebuffer || this.renderFramebuffer, this.gl.READ_FRAMEBUFFER);
     bindFramebufferInfo(this.gl, this.colorFramebuffer, this.gl.DRAW_FRAMEBUFFER);
     // clear to make the color framebuffer empty
     this.clear();
@@ -248,7 +274,7 @@ export class Renderer {
     );
 
     // switch back to the render framebuffer
-    bindFramebufferInfo(this.gl, this.renderFramebuffer);
+    bindFramebufferInfo(this.gl, toFramebuffer ?? this.renderFramebuffer);
 
     // clear the render framebuffer
     this.clear();
@@ -259,7 +285,7 @@ export class Renderer {
     });
 
     // reset after the VAO drawing
-    this.gl.bindVertexArray(null)
+    this.gl.bindVertexArray(null);
     
     // draw a quad for the size of the screen
     setBuffersAndAttributes(this.gl, program, this.screenBufferInfo);
@@ -269,9 +295,46 @@ export class Renderer {
     this.useMainProgram();
   }
 
+  blendFramebuffer(fromFramebuffer: FramebufferInfo, onFramebuffer: FramebufferInfo) {
+    // draw the render framebuffer into the color framebuffer
+    bindFramebufferInfo(this.gl, fromFramebuffer, this.gl.READ_FRAMEBUFFER);
+    bindFramebufferInfo(this.gl, this.colorFramebuffer, this.gl.DRAW_FRAMEBUFFER);
+    // clear to make the color framebuffer empty
+    this.clear();
+    // blit for the antialiasing
+    this.gl.blitFramebuffer(
+      0, 0, this.colorFramebuffer.width, this.colorFramebuffer.height,
+      0, 0, this.colorFramebuffer.width, this.colorFramebuffer.height,
+      this.gl.COLOR_BUFFER_BIT, this.gl.LINEAR
+    );
+
+    bindFramebufferInfo(this.gl, onFramebuffer);
+
+    this.gl.useProgram(this.passThroughProgramInfo.program);
+
+    // set the color framebuffer attachment as a uniform for the shader
+    setUniforms(this.passThroughProgramInfo, {
+      u_texture: this.colorFramebuffer.attachments[0]
+    });
+
+    // reset after the VAO drawing
+    this.gl.bindVertexArray(null);
+    
+    // draw a quad for the size of the screen
+    setBuffersAndAttributes(this.gl, this.passThroughProgramInfo, this.screenBufferInfo);
+    drawBufferInfo(this.gl, this.screenBufferInfo);
+
+    // switch back to the main program
+    this.useMainProgram();
+  }
+
   updateColor(color: Vec4) {
     this.styleUniforms.u_colorMult = color;
     setUniforms(this.mainProgramInfo, this.styleUniforms);
+  }
+
+  blendFunc(sfactor: number, dfactor: number) {
+    this.gl.blendFunc(sfactor, dfactor);
   }
 
 }
