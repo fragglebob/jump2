@@ -29,6 +29,7 @@ import { RGBShiftPass } from "./postfx/RGBShiftPass";
 import { ConvolutionPass } from "./postfx/ConvolutionPass";
 import { ShaderRenderPass } from "./postfx/ShaderRenderPass";
 import { BloomPass } from "./postfx/BloomPass";
+import { FeedbackPass } from "./postfx/FeedbackPass";
 
 
 type Vec4 = [number, number, number, number];
@@ -74,7 +75,8 @@ export class Renderer {
     grid: GridShiftPass,
     rgb: RGBShiftPass,
     convolution: ConvolutionPass,
-    bloom: BloomPass
+    bloom: BloomPass,
+    feedback: FeedbackPass,
   }
 
   screenBufferInfo: BufferInfo;
@@ -141,6 +143,7 @@ export class Renderer {
       rgb: new RGBShiftPass(this),
       convolution: new ConvolutionPass(this),
       bloom: new BloomPass(this),
+      feedback: new FeedbackPass(this),
     };
   }
 
@@ -220,7 +223,8 @@ export class Renderer {
     if(resizeCanvasToDisplaySize(this.gl.canvas)) {
       this.resizeMultiSampledFramebuffer(this.renderFramebuffer);
       resizeFramebufferInfo(this.gl, this.colorFramebuffer); 
-      this.passes.bloom.resizeFramebuffers();     
+      this.passes.bloom.resizeFramebuffers();
+      this.passes.feedback.resizeFramebuffers();
     }
 
     bindFramebufferInfo(this.gl, this.renderFramebuffer);
@@ -295,13 +299,15 @@ export class Renderer {
     this.useMainProgram();
   }
 
-  blendFramebuffer(fromFramebuffer: FramebufferInfo, onFramebuffer: FramebufferInfo) {
+  blendFramebuffer(fromFramebuffer: FramebufferInfo, onFramebuffer: FramebufferInfo, clear: boolean = false) {
     // draw the render framebuffer into the color framebuffer
     bindFramebufferInfo(this.gl, fromFramebuffer, this.gl.READ_FRAMEBUFFER);
     bindFramebufferInfo(this.gl, this.colorFramebuffer, this.gl.DRAW_FRAMEBUFFER);
     // clear to make the color framebuffer empty
     this.clear();
     // blit for the antialiasing
+
+    // this.gl.colorMask( true, true, true, true );
     this.gl.blitFramebuffer(
       0, 0, this.colorFramebuffer.width, this.colorFramebuffer.height,
       0, 0, this.colorFramebuffer.width, this.colorFramebuffer.height,
@@ -309,6 +315,10 @@ export class Renderer {
     );
 
     bindFramebufferInfo(this.gl, onFramebuffer);
+
+    if(clear) {
+      this.clear();
+    }
 
     this.gl.useProgram(this.passThroughProgramInfo.program);
 

@@ -34,6 +34,7 @@ interface RenderManagerInterface {
   fx_grid(rows: number): void;
   fx_rgb(amount: number, angle?: number): void;
   fx_bloom(): void;
+  fx_feedback(): void;
 }
 
 type CameraMatrixes = {
@@ -170,5 +171,9 @@ export class RenderManager implements RenderManagerInterface {
 
   fx_bloom() {
     this.renderer.passes.bloom.render({});
+  }
+
+  fx_feedback() {
+    this.renderer.passes.feedback.render({});
   }
 }

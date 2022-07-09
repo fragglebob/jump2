@@ -101,6 +101,7 @@ FXFunctions ->
     | "fx_grid" _ Args {% (d) => ({ type: "func", name: "fx_grid", args: d[2] }) %}
     | "fx_rgb" _ Args {% (d) => ({ type: "func", name: "fx_rgb", args: d[2] }) %}
     | "fx_bloom" _ Args {% (d) => ({ type: "func", name: "fx_bloom", args: d[2] }) %}
+    | "fx_feedback" _ Args {% (d) => ({ type: "func", name: "fx_feedback", args: d[2] }) %}
 
 MathsFunctions -> 
     "sin" _ Args {% (d) => ({ type: "func", name: "sin", args: d[2] }) %}

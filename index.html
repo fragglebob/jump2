@@ -11,9 +11,9 @@
         
         <canvas id="canvas"></canvas>
         <textarea name="code" id="code" cols="30" rows="10">
-loop ii <- 2000 times
+loop ii <- 200 times
     pushMatrix()
-        hsl((time()/4+ii/13.37)%1,1,6)
+        hsl((time()/4+ii/13.37)%1,1,0.7)
         translate(
             sin(time()/4+ii/40)*2.5 + cos(time()+ii), 
             cos(time()/4+ii/40)*6+ sin(time()+ii), 
@@ -27,21 +27,25 @@ loop ii <- 2000 times
     popMatrix()
 endloop
 
-fx_grid(9)
-fx_kale(6)
+fx_feedback()
 
-rgb(1, time()%1,time()%1)
+fx_kale(2)
+
+fx_feedback()
+
+rgb(0.6, time()%0.6,time()%0.9)
 loop ii <- 10 times
     pushMatrix()
-        scale(fft(ii+6)*5.5+1)
+        scale(fft(ii+6)*2+1)
         rotateY(ii+(3+fft(12)*0.5))
         rotateX(ii/2)
         rotateZ(ii+(2+fft(6)*5))
         box()
     popMatrix()
 endloop
-        
-        </textarea>
+fx_rgb(0.003)
+fx_bloom()
+</textarea>
         <select name="audio-input" id="audio-input-select">
             <option disabled selected>Start Audio</option>
         </select>
