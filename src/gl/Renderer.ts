@@ -35,8 +35,6 @@ export class Renderer {
 
   mainProgramInfo: ProgramInfo;
 
-  basicTexture: WebGLTexture;
-
   globalUniforms: {
     u_lightWorldPos: Vec3,
     u_lightColor: Vec4,
@@ -48,7 +46,6 @@ export class Renderer {
     u_projection: m4.Mat4
   };
   styleUniforms: {
-    // u_diffuse: WebGLTexture,
     u_colorMult: Vec4
   };
 
@@ -64,6 +61,8 @@ export class Renderer {
 
   frame: number = 0;
   time: number = 0;
+
+  fftData?: Float32Array;
 
   passes: {
     kaleidoscope: KaleidoscopePass,
@@ -83,8 +82,6 @@ export class Renderer {
 
     this.mainProgramInfo = this.createMainProgram();
 
-    this.basicTexture = this.createBasicTexture();
-
     this.globalUniforms = {
       u_lightWorldPos: [1, 8, -10],
       u_lightColor: [0.8, 0.8, 0.8, 1],
@@ -97,7 +94,6 @@ export class Renderer {
     };
 
     this.styleUniforms = {
-      // u_diffuse: this.basicTexture,
       u_colorMult: [1, 1, 1, 1],
     }
 
@@ -140,18 +136,6 @@ export class Renderer {
     return createProgramInfo(this.gl, [basicVert, basicFrag]);
   }
 
-  private createBasicTexture(): WebGLTexture {
-    return createTexture(this.gl, {
-      min: this.gl.NEAREST,
-      mag: this.gl.NEAREST,
-      src: [
-        255, 255, 255, 255, 192, 192, 192, 255, 192, 192, 192, 255, 255, 255,
-        255, 255,
-      ],
-    });
-  }
-
-
   createRect(): VertexArrayInfo {
     return createVertexArrayInfo(this.gl, this.mainProgramInfo, primitives.createPlaneBufferInfo(this.gl, 1, 1));
   }
@@ -183,6 +167,10 @@ export class Renderer {
   update(time: number) : void {
     this.time = time;
     this.frame++;
+  }
+
+  updateFFTData(fftData: Float32Array) {
+    this.fftData = fftData;
   }
 
   getTime() : number {

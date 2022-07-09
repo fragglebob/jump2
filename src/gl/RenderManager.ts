@@ -5,6 +5,11 @@ import { RenderContext } from "./types";
 import { hslToRgb } from "./utils/hsl2rgb";
 
 interface RenderManagerInterface {
+
+  time(): number;
+  frame(): number;
+  fft(index: number): number;
+
   pushMatrix(): void;
   popMatrix(): void;
 
@@ -84,6 +89,13 @@ export class RenderManager implements RenderManagerInterface {
 
   frame() {
     return this.renderer.getFrame();
+  }
+
+  fft(index: number = 0) : number {
+    if(!this.renderer.fftData || typeof this.renderer.fftData[index] === "undefined") {
+      return 0;
+    }
+    return this.renderer.fftData[index];
   }
 
   rgb(r: number, g: number, b: number) {

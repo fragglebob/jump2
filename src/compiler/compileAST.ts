@@ -133,6 +133,7 @@ function compileFunctionCall(ctx: Context, functionCall: FunctionCall): string {
     case "hsla":
     case "time":
     case "frame":
+    case "fft":
     case "fx_kale":
     case "fx_grid":
       return `manager.${funcName}(${compileArguments(ctx, functionCall.args)})`;

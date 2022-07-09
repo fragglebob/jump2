@@ -114,6 +114,7 @@ const grammar: Grammar = {
     {"name": "MathsFunctions", "symbols": [{"literal":"cos"}, "_", "Args"], "postprocess": (d) => ({ type: "func", name: "cos", args: d[2] })},
     {"name": "UtilFunctions", "symbols": [{"literal":"time"}, "_", "Args"], "postprocess": (d) => ({ type: "func", name: "time", args: d[2] })},
     {"name": "UtilFunctions", "symbols": [{"literal":"frame"}, "_", "Args"], "postprocess": (d) => ({ type: "func", name: "frame", args: d[2] })},
+    {"name": "UtilFunctions", "symbols": [{"literal":"fft"}, "_", "Args"], "postprocess": (d) => ({ type: "func", name: "fft", args: d[2] })},
     {"name": "WorldFunctions", "symbols": [{"literal":"pushMatrix"}, "_", "Args"], "postprocess": (d) => ({ type: "func", name: "pushMatrix", args: d[2] })},
     {"name": "WorldFunctions", "symbols": [{"literal":"popMatrix"}, "_", "Args"], "postprocess": (d) => ({ type: "func", name: "popMatrix", args: d[2] })},
     {"name": "WorldFunctions", "symbols": [{"literal":"translate"}, "_", "Args"], "postprocess": (d) => ({ type: "func", name: "translate", args: d[2] })},

@@ -1,3 +1,4 @@
+import { Analyser } from "../audio/Analyser";
 import { createFunction, UserRenderFunction } from "../compiler/createFunction";
 import { Renderer } from "./Renderer";
 
@@ -7,6 +8,10 @@ export class GLApp {
   readonly textarea: HTMLTextAreaElement;
 
   readonly renderer: Renderer;
+
+  audioAnalyser?: Analyser;
+
+  animationFrame?: number;
 
   renderFunc: UserRenderFunction;
 
@@ -38,7 +43,17 @@ export class GLApp {
   start() {
     this.compileTextarea();
     this.textarea.addEventListener("input", this.handleTextareaUpdate)
-    requestAnimationFrame(this._render);
+    this.animationFrame = requestAnimationFrame(this._render);
+  }
+
+  stop() {
+    if(this.animationFrame) {
+      cancelAnimationFrame(this.animationFrame);
+    }
+  }
+
+  setAudioAnalyser(audioAnalyser: Analyser) {
+    this.audioAnalyser = audioAnalyser;
   }
 
   _render = (time: number) => {
@@ -47,11 +62,15 @@ export class GLApp {
 
     this.renderer.update(time);
 
+    if(this.audioAnalyser) {
+      this.renderer.updateFFTData(this.audioAnalyser.getFFTData());
+    }
+
     this.renderer.render((manager) => {
       this.renderFunc({}, manager);
     })
 
-    requestAnimationFrame(this._render);
+    this.animationFrame = requestAnimationFrame(this._render);
   };
 
 

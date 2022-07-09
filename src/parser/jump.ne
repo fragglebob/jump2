@@ -106,7 +106,8 @@ MathsFunctions ->
 
 UtilFunctions ->
     "time" _ Args {% (d) => ({ type: "func", name: "time", args: d[2] }) %} |
-    "frame" _ Args {% (d) => ({ type: "func", name: "frame", args: d[2] }) %}
+    "frame" _ Args {% (d) => ({ type: "func", name: "frame", args: d[2] }) %} | 
+    "fft" _ Args {% (d) => ({ type: "func", name: "fft", args: d[2] }) %}
 
 WorldFunctions -> 
     "pushMatrix" _ Args {% (d) => ({ type: "func", name: "pushMatrix", args: d[2] }) %}

@@ -55,3 +55,9 @@ body {
 #code.error {
     border-color: red;
 }
+
+#audio-input-select {
+    position: absolute;
+    top: 0;
+    right: 0;
+}
