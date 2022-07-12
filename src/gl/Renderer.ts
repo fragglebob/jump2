@@ -30,6 +30,7 @@ import { ConvolutionPass } from "./postfx/ConvolutionPass";
 import { ShaderRenderPass } from "./postfx/ShaderRenderPass";
 import { BloomPass } from "./postfx/BloomPass";
 import { FeedbackPass } from "./postfx/FeedbackPass";
+import { WarpPass } from "./postfx/WarpPass";
 
 
 type Vec4 = [number, number, number, number];
@@ -77,6 +78,7 @@ export class Renderer {
     convolution: ConvolutionPass,
     bloom: BloomPass,
     feedback: FeedbackPass,
+    warp: WarpPass
   }
 
   screenBufferInfo: BufferInfo;
@@ -144,6 +146,7 @@ export class Renderer {
       convolution: new ConvolutionPass(this),
       bloom: new BloomPass(this),
       feedback: new FeedbackPass(this),
+      warp: new WarpPass(this)
     };
   }
 

@@ -35,6 +35,7 @@ interface RenderManagerInterface {
   fx_rgb(amount: number, angle?: number): void;
   fx_bloom(): void;
   fx_feedback(): void;
+  fx_warp(size?: number, speed?: number, amount?: number): void;
 }
 
 type CameraMatrixes = {
@@ -175,5 +176,9 @@ export class RenderManager implements RenderManagerInterface {
 
   fx_feedback() {
     this.renderer.passes.feedback.render({});
+  }
+
+  fx_warp(size?: number, speed?: number, amount?: number) {
+    this.renderer.passes.warp.render({ size, speed, amount });
   }
 }
