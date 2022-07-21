@@ -47,11 +47,18 @@ body {
 }
 
 #code:focus {
-    color: rgba(255, 255, 255, 0.8);
+    color: rgba(255, 255, 255, 0.9);
+    text-shadow: 0 0 3px rgba(0, 0, 0, 0.9);
     outline: none;
     border-color: lightblue;
 }
 
 #code.error {
     border-color: red;
+}
+
+#audio-input-select {
+    position: absolute;
+    top: 0;
+    right: 0;
 }

@@ -94,15 +94,24 @@ FunctionCalls -> MathsFunctions {% id %}
     | ShapeFunctions {% id %}
     | UtilFunctions {% id %}
 	| StyleFunctions {% id %}
-    
-    
+    | FXFunctions {% id %}
+
+FXFunctions -> 
+    "fx_kale" _ Args {% (d) => ({ type: "func", name: "fx_kale", args: d[2] }) %}
+    | "fx_grid" _ Args {% (d) => ({ type: "func", name: "fx_grid", args: d[2] }) %}
+    | "fx_rgb" _ Args {% (d) => ({ type: "func", name: "fx_rgb", args: d[2] }) %}
+    | "fx_bloom" _ Args {% (d) => ({ type: "func", name: "fx_bloom", args: d[2] }) %}
+    | "fx_feedback" _ Args {% (d) => ({ type: "func", name: "fx_feedback", args: d[2] }) %}
+    | "fx_warp" _ Args {% (d) => ({ type: "func", name: "fx_warp", args: d[2] }) %}
+
 MathsFunctions -> 
     "sin" _ Args {% (d) => ({ type: "func", name: "sin", args: d[2] }) %}
     | "cos" _ Args {% (d) => ({ type: "func", name: "cos", args: d[2] }) %}
 
 UtilFunctions ->
     "time" _ Args {% (d) => ({ type: "func", name: "time", args: d[2] }) %} |
-    "frame" _ Args {% (d) => ({ type: "func", name: "frame", args: d[2] }) %}
+    "frame" _ Args {% (d) => ({ type: "func", name: "frame", args: d[2] }) %} | 
+    "fft" _ Args {% (d) => ({ type: "func", name: "fft", args: d[2] }) %}
 
 WorldFunctions -> 
     "pushMatrix" _ Args {% (d) => ({ type: "func", name: "pushMatrix", args: d[2] }) %}

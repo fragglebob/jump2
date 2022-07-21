@@ -5,6 +5,11 @@ import { RenderContext } from "./types";
 import { hslToRgb } from "./utils/hsl2rgb";
 
 interface RenderManagerInterface {
+
+  time(): number;
+  frame(): number;
+  fft(index: number): number;
+
   pushMatrix(): void;
   popMatrix(): void;
 
@@ -19,6 +24,18 @@ interface RenderManagerInterface {
 
   box(): void;
   ball(): void;
+
+  rgb(r: number, g: number, b: number): void;
+  rgba(r: number, g: number, b: number, a: number): void;
+  hsl(h: number, s: number, l: number): void;
+  hsla(h: number, s: number, l: number, a: number): void;
+
+  fx_kale(segments: number): void;
+  fx_grid(rows: number): void;
+  fx_rgb(amount: number, angle?: number): void;
+  fx_bloom(): void;
+  fx_feedback(): void;
+  fx_warp(size?: number, speed?: number, amount?: number): void;
 }
 
 type CameraMatrixes = {
@@ -78,6 +95,13 @@ export class RenderManager implements RenderManagerInterface {
     return this.renderer.getFrame();
   }
 
+  fft(index: number = 0) : number {
+    if(!this.renderer.fftData || typeof this.renderer.fftData[index] === "undefined") {
+      return 0;
+    }
+    return this.renderer.fftData[index];
+  }
+
   rgb(r: number, g: number, b: number) {
     this.rgba(r, g, b, 1);
   }
@@ -132,5 +156,29 @@ export class RenderManager implements RenderManagerInterface {
     } else {
       this.worldMatrix.scale([x, x, x]);
     }
+  }
+
+  fx_kale(segments: number) {
+    this.renderer.passes.kaleidoscope.render({ segments: segments ?? 2 });
+  }
+
+  fx_grid(rows: number) {
+    this.renderer.passes.grid.render({ rows: rows ?? 2 });
+  }
+
+  fx_rgb(amount: number, angle?: number) {
+    this.renderer.passes.rgb.render({ amount: amount ?? 0.01, angle });
+  }
+
+  fx_bloom() {
+    this.renderer.passes.bloom.render({});
+  }
+
+  fx_feedback() {
+    this.renderer.passes.feedback.render({});
+  }
+
+  fx_warp(size?: number, speed?: number, amount?: number) {
+    this.renderer.passes.warp.render({ size, speed, amount });
   }
 }

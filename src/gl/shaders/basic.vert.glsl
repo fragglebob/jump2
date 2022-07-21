@@ -6,8 +6,8 @@ uniform mat4 u_view;
 uniform mat4 u_projection;
 
 in vec4 position;
-in vec3 normal;
 in vec2 texcoord;
+in vec3 normal;
 
 out vec4 v_position;
 out vec2 v_texCoord;
