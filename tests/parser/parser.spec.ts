@@ -343,6 +343,15 @@ describe("parser", () => {
             expect(result).toMatchSnapshot();
         });
 
+        it("should build ast for a for in statement", () => {
+            const result = parse(`
+                for i in 0..10 then
+                    sin(3)
+                endfor
+            `);
+            expect(result).toMatchSnapshot();
+        });
+
         it("should build ast for a loop statement", () => {
             const result = parse(`
                 loop 800 times

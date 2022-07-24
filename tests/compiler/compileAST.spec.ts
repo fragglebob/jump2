@@ -241,6 +241,97 @@ while (state['something'] < 10 {
 }"
 `);
         });
+
+        it("should handle a forin ranged loop - forward", () => {
+            const result = compileAST(buildASTFromString(`
+                for x in 1..10 then
+                    y = sin(45 + x)
+                endfor
+            `));
+            expect(result).toMatchInlineSnapshot(`
+"for (state['x'] = 1; state['x'] < 10; state['x']++) {
+  state['y'] = Math.sin(45 + state['x'])
+}"
+`);
+        });
+
+        it("should handle a forin ranged loop - backwards", () => {
+            const result = compileAST(buildASTFromString(`
+                for x in 10..0 then
+                    y = sin(45 + x)
+                endfor
+            `));
+            expect(result).toMatchInlineSnapshot(`
+"for (state['x'] = 10; state['x'] > 0; state['x']--) {
+  state['y'] = Math.sin(45 + state['x'])
+}"
+`);
+        });
+
+        it("should handle a forin ranged loop - same number", () => {
+            const result = compileAST(buildASTFromString(`
+                for x in 5..5 then
+                    y = sin(45 + x)
+                endfor
+            `));
+            expect(result).toMatchInlineSnapshot(`
+"for (state['x'] = 5; state['x'] < 5; state['x']++) {
+  state['y'] = Math.sin(45 + state['x'])
+}"
+`);
+        });
+
+        it("should handle a forin array loop", () => {
+            const result = compileAST(buildASTFromString(`
+                for x in [1, 2, 4, 8, 16] then
+                    y = sin(45 + x)
+                endfor
+            `));
+            expect(result).toMatchInlineSnapshot(`
+"for (state['x'] of [
+  1,
+  2,
+  4,
+  8,
+  16
+]) {
+  state['y'] = Math.sin(45 + state['x'])
+}"
+`);
+        });
+
+        it("should handle a forin variable loop", () => {
+            const result = compileAST(buildASTFromString(`
+                for x in someVar then
+                    y = sin(45 + x)
+                endfor
+            `));
+            expect(result).toMatchInlineSnapshot(`
+"for (state['x'] of state['someVar']) {
+  state['y'] = Math.sin(45 + state['x'])
+}"
+`);
+        });
+
+        it("should handle a forin function loop", () => {
+            const result = compileAST(buildASTFromString(`
+                for x in sin([1,2,3,4,5]) then
+                    y = sin(45 + x)
+                endfor
+            `));
+            expect(result).toMatchInlineSnapshot(`
+"for (state['x'] of Math.sin([
+  1,
+  2,
+  3,
+  4,
+  5
+])) {
+  state['y'] = Math.sin(45 + state['x'])
+}"
+`);
+        });
+
         it("should handle a loop loop", () => {
             const result = compileAST(buildASTFromString(`
                 loop 7 times

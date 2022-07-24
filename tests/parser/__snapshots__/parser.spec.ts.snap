@@ -1204,6 +1204,53 @@ Object {
 }
 `;
 
+exports[`parser loops should build ast for a for in statement 1`] = `
+Object {
+  "statements": Array [
+    Object {
+      "over": Object {
+        "from": Object {
+          "type": "number",
+          "value": "0",
+        },
+        "to": Object {
+          "type": "number",
+          "value": "10",
+        },
+        "type": "range",
+      },
+      "setting": Object {
+        "name": Object {
+          "type": "name",
+          "value": "i",
+        },
+        "type": "variable",
+      },
+      "then": Object {
+        "statements": Array [
+          Object {
+            "args": Object {
+              "type": "arguments",
+              "value": Array [
+                Object {
+                  "type": "number",
+                  "value": "3",
+                },
+              ],
+            },
+            "name": "sin",
+            "type": "func",
+          },
+        ],
+        "type": "block",
+      },
+      "type": "forin",
+    },
+  ],
+  "type": "block",
+}
+`;
+
 exports[`parser loops should build ast for a loop statement 1`] = `
 Object {
   "statements": Array [
