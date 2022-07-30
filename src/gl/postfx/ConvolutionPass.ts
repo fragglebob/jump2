@@ -15,7 +15,7 @@ export class ConvolutionPass extends ShaderRenderPass<Props> {
         super(renderer, vertShader, fragShader)
     }
 
-    render(args: Props, fromFramebuffer?: FramebufferInfo, toFramebuffer?: FramebufferInfo) {
+    render(args: Props, fromFramebuffer: FramebufferInfo, toFramebuffer: FramebufferInfo) {
         this.renderer.gl.useProgram(this.programInfo.program);
 
         setUniforms(this.programInfo, {
@@ -23,6 +23,6 @@ export class ConvolutionPass extends ShaderRenderPass<Props> {
             u_resolution: [1, 1],
         });
 
-        this.renderer.renderShaderRenderPass(this, fromFramebuffer, toFramebuffer);
+        this.renderer.processFragmentShaderProgram(this.getProgramInfo(), fromFramebuffer, toFramebuffer);
     }
 }

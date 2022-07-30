@@ -2,7 +2,7 @@ import { Renderer } from "../Renderer";
 
 import vertShader from "../shaders/screen.vert.glsl";
 import fragShader from "../shaders/warp.frag.glsl";
-import { setUniforms } from "twgl.js";
+import { FramebufferInfo, setUniforms } from "twgl.js";
 import { ShaderRenderPass } from "./ShaderRenderPass";
 
 export type Props = {
@@ -16,7 +16,7 @@ export class WarpPass extends ShaderRenderPass<Props> {
         super(renderer, vertShader, fragShader)
     }
 
-    render(args: Props) {
+    render(args: Props, fromFramebuffer: FramebufferInfo, toFramebuffer: FramebufferInfo) {
         const time = this.renderer.getTime();
 
         this.renderer.gl.useProgram(this.programInfo.program);
@@ -28,6 +28,6 @@ export class WarpPass extends ShaderRenderPass<Props> {
             u_amount: args.amount ?? 0.002
         })
 
-        this.renderer.renderShaderRenderPass(this);
+        this.renderer.processFragmentShaderProgram(this.getProgramInfo(), fromFramebuffer, toFramebuffer);
     }
 }

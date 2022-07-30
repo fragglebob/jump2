@@ -3,7 +3,7 @@ import { RenderPass } from "./RenderPass";
 
 import vertShader from "../shaders/screen.vert.glsl";
 import fragShader from "../shaders/rgb-shift.frag.glsl";
-import { setUniforms } from "twgl.js";
+import { FramebufferInfo, setUniforms } from "twgl.js";
 import { ShaderRenderPass } from "./ShaderRenderPass";
 
 export type Props = {
@@ -16,7 +16,7 @@ export class RGBShiftPass extends ShaderRenderPass<Props> {
         super(renderer, vertShader, fragShader)
     }
 
-    render(args: Props) {
+    render(args: Props, fromFramebuffer: FramebufferInfo, toFramebuffer: FramebufferInfo) {
 
         this.renderer.gl.useProgram(this.programInfo.program);
 
@@ -25,6 +25,6 @@ export class RGBShiftPass extends ShaderRenderPass<Props> {
             u_amount: args.amount,
         });
 
-        this.renderer.renderShaderRenderPass(this);
+        this.renderer.processFragmentShaderProgram(this.getProgramInfo(), fromFramebuffer, toFramebuffer);
     }
 }

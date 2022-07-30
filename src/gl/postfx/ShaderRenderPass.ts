@@ -1,4 +1,4 @@
-import { createProgramInfo, ProgramInfo } from "twgl.js";
+import { createProgramInfo, FramebufferInfo, ProgramInfo } from "twgl.js";
 import { Renderer } from "../Renderer";
 import { RenderPass } from "./RenderPass";
 
@@ -16,6 +16,6 @@ export abstract class ShaderRenderPass<T> extends RenderPass<T> {
         return this.programInfo;
     }
 
-    abstract render(props: T) : void;
+    abstract render(props: T, fromFramebuffer: FramebufferInfo, toFramebuffer: FramebufferInfo) : void;
 
 }
