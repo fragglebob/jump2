@@ -8,10 +8,10 @@
     const lexer = moo.compile({
         ws:     /[ \t]+/,
         number:  [
-            { match: /(?:-?(?:0|[1-9][0-9]*)?\.[0-9]+)/ },  // [123].123
-            { match: /(?:-?(?:0|[1-9][0-9]*)\.[0-9]*)/ },   // 123.[123]
+            { match: /(?:-?(?:0|[1-9][0-9]*)\.[0-9]+)/ },   // 123.[123]
             { match: /(?:0|-?[1-9][0-9]*)/ },               // 123
         ],
+        doubledot: '..',
 		setting: '<-',
         binops: ["&&", "||"],
         comparison: ["<", ">", "<=", ">=", "==", "!="],
@@ -51,6 +51,7 @@ Statement -> FunctionCalls {% id %}
 	| "while" __ Expression __ "then" __ Block __ "endwhile" {% (d) => ({ type: "while", condition: d[2], then: d[6] }) %}
 	| "loop" __ NamedVariable __ "<-" __ Expression __ "times" __ Block __ "endloop" {% (d) => ({ type: "loop", times: d[6], then: d[10], setting: d[2] }) %}
 	| "loop" __ Expression __ "times" __ Block __ "endloop" {% (d) => ({ type: "loop", times: d[2], then: d[6] }) %}
+    | "for" __ NamedVariable __ "in" __ Iterable __ "then" __ Block __ "endfor" {% (d) => ({ type: "forin", setting: d[2], over: d[6], then: d[10] }) %}
     
     
 Else -> "endif" {% () => null %}
@@ -68,10 +69,13 @@ _ElseIf ->       "elseif" __ Expression __ "then" __ Block {% (d) => [{ type: "i
     return [...d[0], thisIf];
 } %}
     
+
+Iterable -> Range {% id %} 
+    | Var {% id %}
+    | FunctionCalls {% id %}
+    | Array {% id %}
     
-    
-    
-    
+Range -> Number %doubledot Number {% (d) => ({ type: "range", from: d[0], to: d[2] }) %}
     
 #Else -> "endif" {% () => null %}
 #    | "else" __ Block __ "endif" {% (d) => d[2] %}

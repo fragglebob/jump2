@@ -11,7 +11,7 @@ export interface Block extends ASTItem {
     statements: Statement[]
 }
 
-export type Statement = IfStatement | FunctionCall | Assignment | WhileStatement | LoopStatement;
+export type Statement = IfStatement | FunctionCall | Assignment | WhileStatement | LoopStatement | ForinStatement;
 
 export interface IfStatement extends ASTItem {
     type: "if"
@@ -31,6 +31,21 @@ export interface LoopStatement extends ASTItem {
     times: Expression;
     then: Block;
     setting?: NamedVariable;
+}
+
+export interface ForinStatement extends ASTItem {
+    type: "forin"
+    over: Iterable;
+    then: Block;
+    setting: NamedVariable;
+}
+
+export type Iterable = Range | ArrayASTItem | FunctionCall | Var;
+
+export interface Range extends ASTItem {
+    type: "range"
+    from: NumberASTItem
+    to: NumberASTItem
 }
 
 export interface FunctionCall extends ASTItem {

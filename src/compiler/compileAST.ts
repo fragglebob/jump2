@@ -15,6 +15,8 @@ import type {
   ArrayASTItem,
   ObjectASTItem,
   ObjectKeyASTItem,
+  ForinStatement,
+  Range,
 } from "../parser/ast";
 
 function unhandledError(type: string, item: ASTItem): never {
@@ -62,8 +64,50 @@ function compileStatement(ctx: Context, statement: Statement): string {
       return compileLoopStatment(ctx, statement);
     case "while":
       return compileWhileStatment(ctx, statement);
+    case "forin":
+        return compileForinStatement(ctx, statement);
   }
   unhandledError("statement", statement);
+}
+
+function compileForinStatement(ctx: Context, statement: ForinStatement): string {
+  const block = `{\n${compileBlock(ctx.indent(), statement.then)}\n${ctx.whitespace}}`;
+  switch (statement.over.type) {
+    case "range":
+      return `${complieRangeFor(ctx, statement.over, statement.setting)} ${block}`;
+    case "array":
+      return `${complieArrayForof(ctx, statement.over, statement.setting)} ${block}`;
+    case "key_access":
+    case "variable":
+      return `${complieVarForof(ctx, statement.over, statement.setting)} ${block}`;
+    case "func":
+      return `${complieFunctionForof(ctx, statement.over, statement.setting)} ${block}`;
+  }
+  unhandledError("forin over", statement.over);
+}
+
+function complieRangeFor(ctx: Context, range: Range, settingVariable: NamedVariable): string {
+  const varName = compileVar(ctx, settingVariable);
+  const startingValue = parseFloat(range.from.value);
+  const endingValue = parseFloat(range.to.value);
+  const operator = startingValue <= endingValue ? "<" : ">";
+  const direction = startingValue <= endingValue ? "++" : "--";
+  return `for (${varName} = ${startingValue}; ${varName} ${operator} ${endingValue}; ${varName}${direction})`
+}
+
+function complieArrayForof(ctx: Context, array: ArrayASTItem, settingVariable: NamedVariable): string {
+  const varName = compileVar(ctx, settingVariable);
+  return `for (${varName} of ${compileArray(ctx, array)})`;
+}
+
+function complieFunctionForof(ctx: Context, func: FunctionCall, settingVariable: NamedVariable): string {
+  const varName = compileVar(ctx, settingVariable);
+  return `for (${varName} of ${compileFunctionCall(ctx, func)})`;
+}
+
+function complieVarForof(ctx: Context, variable: Var, settingVariable: NamedVariable): string {
+  const varName = compileVar(ctx, settingVariable);
+  return `for (${varName} of ${compileVar(ctx, variable)})`;
 }
 
 function compileLoopStatment(ctx: Context, statement: LoopStatement): string {

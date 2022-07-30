@@ -3,6 +3,7 @@
 // Bypasses TS6133. Allow declared but unused functions.
 // @ts-ignore
 function id(d: any[]): any { return d[0]; }
+declare var doubledot: any;
 declare var comparison: any;
 declare var sum: any;
 declare var product: any;
@@ -19,10 +20,10 @@ declare var nl: any;
     const lexer = moo.compile({
         ws:     /[ \t]+/,
         number:  [
-            { match: /(?:-?(?:0|[1-9][0-9]*)?\.[0-9]+)/ },  // [123].123
-            { match: /(?:-?(?:0|[1-9][0-9]*)\.[0-9]*)/ },   // 123.[123]
+            { match: /(?:-?(?:0|[1-9][0-9]*)\.[0-9]+)/ },   // 123.[123]
             { match: /(?:0|-?[1-9][0-9]*)/ },               // 123
         ],
+        doubledot: '..',
 		setting: '<-',
         binops: ["&&", "||"],
         comparison: ["<", ">", "<=", ">=", "==", "!="],
@@ -85,6 +86,7 @@ const grammar: Grammar = {
     {"name": "Statement", "symbols": [{"literal":"while"}, "__", "Expression", "__", {"literal":"then"}, "__", "Block", "__", {"literal":"endwhile"}], "postprocess": (d) => ({ type: "while", condition: d[2], then: d[6] })},
     {"name": "Statement", "symbols": [{"literal":"loop"}, "__", "NamedVariable", "__", {"literal":"<-"}, "__", "Expression", "__", {"literal":"times"}, "__", "Block", "__", {"literal":"endloop"}], "postprocess": (d) => ({ type: "loop", times: d[6], then: d[10], setting: d[2] })},
     {"name": "Statement", "symbols": [{"literal":"loop"}, "__", "Expression", "__", {"literal":"times"}, "__", "Block", "__", {"literal":"endloop"}], "postprocess": (d) => ({ type: "loop", times: d[2], then: d[6] })},
+    {"name": "Statement", "symbols": [{"literal":"for"}, "__", "NamedVariable", "__", {"literal":"in"}, "__", "Iterable", "__", {"literal":"then"}, "__", "Block", "__", {"literal":"endfor"}], "postprocess": (d) => ({ type: "forin", setting: d[2], over: d[6], then: d[10] })},
     {"name": "Else", "symbols": [{"literal":"endif"}], "postprocess": () => null},
     {"name": "Else", "symbols": [{"literal":"else"}, "__", "Block", "__", {"literal":"endif"}], "postprocess": (d) => d[2]},
     {"name": "Else", "symbols": ["_ElseIf", "__", {"literal":"endif"}], "postprocess": (d) => d[0][0]},
@@ -98,6 +100,11 @@ const grammar: Grammar = {
             d[0][d[0].length - 1].else = thisIf;
             return [...d[0], thisIf];
         } },
+    {"name": "Iterable", "symbols": ["Range"], "postprocess": id},
+    {"name": "Iterable", "symbols": ["Var"], "postprocess": id},
+    {"name": "Iterable", "symbols": ["FunctionCalls"], "postprocess": id},
+    {"name": "Iterable", "symbols": ["Array"], "postprocess": id},
+    {"name": "Range", "symbols": ["Number", (lexer.has("doubledot") ? {type: "doubledot"} : doubledot), "Number"], "postprocess": (d) => ({ type: "range", from: d[0], to: d[2] })},
     {"name": "Var", "symbols": ["NamedVariable"], "postprocess": id},
     {"name": "Var", "symbols": ["Var", "_", {"literal":"["}, "_", "Expression", "_", {"literal":"]"}], "postprocess": (d) => ({ type: "key_access", key: d[4], from: d[0] })},
     {"name": "Var", "symbols": ["Var", "_", {"literal":"."}, "_", "Name"], "postprocess": (d) => ({ type: "key_access", key: d[4], from: d[0] })},
