@@ -104,7 +104,6 @@ async function start() {
 
     if (import.meta.hot) {
         import.meta.hot.accept('./gl/index.ts', (newGLModule) => {
-            console.log(newGLModule);
           glapp.stop();
           // the callback receives the updated './foo.js' module
           glapp = new newGLModule.GLApp(canvas, gl, textarea);
