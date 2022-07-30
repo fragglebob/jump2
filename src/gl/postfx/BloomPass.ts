@@ -15,16 +15,16 @@ export class BloomPass extends RenderPass<Props> {
         super(renderer);
 
         this.frameBuffers = [
-            this.renderer.createMultiSampledFramebuffer(),
-            this.renderer.createMultiSampledFramebuffer(),
+            this.renderer.createStandardFramebuffer(),
+            this.renderer.createStandardFramebuffer(),
         ];
 
     }
 
-    render(args: Props) {
+    render(args: Props, fromFramebuffer: FramebufferInfo, toFramebuffer: FramebufferInfo) {
         this.renderer.passes.convolution.render(
             { imageIncrement: [0.001953125, 0] },
-            this.renderer.renderFramebuffer,
+            fromFramebuffer,
             this.frameBuffers[0],
         );
 
@@ -34,12 +34,14 @@ export class BloomPass extends RenderPass<Props> {
             this.frameBuffers[1]
         );
 
+    
+        this.renderer.blendFramebuffer(fromFramebuffer, toFramebuffer, true);
         this.renderer.blendFunc(this.renderer.gl.ONE, this.renderer.gl.ONE);
-        this.renderer.blendFramebuffer(this.frameBuffers[1], this.renderer.renderFramebuffer)
+        this.renderer.blendFramebuffer(this.frameBuffers[1], toFramebuffer, false)
     }
 
     resizeFramebuffers() {
-        this.renderer.resizeMultiSampledFramebuffer(this.frameBuffers[0]);
-        this.renderer.resizeMultiSampledFramebuffer(this.frameBuffers[1]);
+        this.renderer.resizeStandardFramebuffer(this.frameBuffers[0]);
+        this.renderer.resizeStandardFramebuffer(this.frameBuffers[1]);
     }
 }

@@ -31,6 +31,7 @@ import { ShaderRenderPass } from "./postfx/ShaderRenderPass";
 import { BloomPass } from "./postfx/BloomPass";
 import { FeedbackPass } from "./postfx/FeedbackPass";
 import { WarpPass } from "./postfx/WarpPass";
+import { RenderPass } from "./postfx/RenderPass";
 
 
 type Vec4 = [number, number, number, number];
@@ -83,11 +84,9 @@ export class Renderer {
 
   screenBufferInfo: BufferInfo;
 
-  renderFramebuffer: FramebufferInfo;
-  colorFramebuffer: FramebufferInfo;
-  currentFramebufferIndex: number = 0;
+  currentFramebufferPingPongIndex: number;
 
-  framebufferAttachmentSetup: any[] = [];
+  framebuffersPingPong: FramebufferInfo[];
 
   constructor(gl: WebGL2RenderingContext) {
     this.gl = gl;
@@ -122,22 +121,13 @@ export class Renderer {
 
     this.screenBufferInfo = primitives.createXYQuadBufferInfo(this.gl, 2);
 
-    this.framebufferAttachmentSetup = [
-      {
-        format: this.gl.RGBA8,
-        type: this.gl.UNSIGNED_BYTE,
-        min: this.gl.LINEAR,
-        wrap: this.gl.CLAMP_TO_EDGE,
-        samples: this.gl.getParameter(this.gl.MAX_SAMPLES),
-      },
-      {
-        format: this.gl.DEPTH_COMPONENT16,
-        samples: this.gl.getParameter(this.gl.MAX_SAMPLES),
-      }
+
+    this.framebuffersPingPong = [
+      this.createStandardFramebuffer(),
+      this.createStandardFramebuffer()
     ];
 
-    this.renderFramebuffer = createFramebufferInfo(this.gl, this.framebufferAttachmentSetup);
-    this.colorFramebuffer = createFramebufferInfo(this.gl);
+    this.currentFramebufferPingPongIndex = 0;
 
     this.passes = {
       kaleidoscope: new KaleidoscopePass(this),
@@ -150,12 +140,12 @@ export class Renderer {
     };
   }
 
-  createMultiSampledFramebuffer() {
-    return createFramebufferInfo(this.gl, this.framebufferAttachmentSetup);
+  createStandardFramebuffer() {
+    return createFramebufferInfo(this.gl);
   }
 
-  resizeMultiSampledFramebuffer(framebuffer: FramebufferInfo) {
-    return resizeFramebufferInfo(this.gl, framebuffer, this.framebufferAttachmentSetup);
+  resizeStandardFramebuffer(framebuffer: FramebufferInfo) {
+    return resizeFramebufferInfo(this.gl, framebuffer);
   }
 
   private createMainProgram(): ProgramInfo {
@@ -221,16 +211,29 @@ export class Renderer {
     this.gl.blendEquation(this.gl.FUNC_ADD)
   }
 
+  getCurrentFrameBuffer() : FramebufferInfo {
+    return this.framebuffersPingPong[this.currentFramebufferPingPongIndex];
+  }
+
+  getNextFrameBuffer() : FramebufferInfo {
+    return this.framebuffersPingPong[(this.currentFramebufferPingPongIndex+1)%this.framebuffersPingPong.length];
+  }
+
+  advanceFrameBufferPingPong() : void {
+    this.currentFramebufferPingPongIndex = (this.currentFramebufferPingPongIndex+1)%this.framebuffersPingPong.length
+  }
+
   render(callback: (ctx: RenderManager) => void) {
 
     if(resizeCanvasToDisplaySize(this.gl.canvas)) {
-      this.resizeMultiSampledFramebuffer(this.renderFramebuffer);
-      resizeFramebufferInfo(this.gl, this.colorFramebuffer); 
+      this.framebuffersPingPong.forEach(framebuffer => {
+        this.resizeStandardFramebuffer(framebuffer);
+      })
       this.passes.bloom.resizeFramebuffers();
       this.passes.feedback.resizeFramebuffers();
     }
 
-    bindFramebufferInfo(this.gl, this.renderFramebuffer);
+    bindFramebufferInfo(this.gl, this.getCurrentFrameBuffer());
 
     this.clear();
 
@@ -244,7 +247,7 @@ export class Renderer {
     callback(manager);
 
     // renders the render buffer to the canvas with antialisaing 
-    bindFramebufferInfo(this.gl, this.renderFramebuffer, this.gl.READ_FRAMEBUFFER);
+    bindFramebufferInfo(this.gl, this.getCurrentFrameBuffer(), this.gl.READ_FRAMEBUFFER);
     bindFramebufferInfo(this.gl, null, this.gl.DRAW_FRAMEBUFFER);
     this.clear();
     this.gl.blitFramebuffer(
@@ -254,12 +257,13 @@ export class Renderer {
     );
   }
 
-  renderShaderRenderPass(pass: ShaderRenderPass<any>, fromFramebuffer?: FramebufferInfo, toFramebuffer?: FramebufferInfo) {
-    this.processFragmentShaderProgram(
-      pass.getProgramInfo(),
-      fromFramebuffer,
-      toFramebuffer
-    );
+  doRenderPass<TRenderPassProps>(pass: RenderPass<TRenderPassProps>, props: TRenderPassProps) {
+    const currentFramebuffer = this.getCurrentFrameBuffer();
+    const nextFramebuffer = this.getNextFrameBuffer();
+
+    pass.render(props, currentFramebuffer, nextFramebuffer);
+
+    this.advanceFrameBufferPingPong();
   }
 
   clear() {
@@ -267,28 +271,17 @@ export class Renderer {
     this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
   }
 
-  processFragmentShaderProgram(program: ProgramInfo, fromFramebuffer?: FramebufferInfo, toFramebuffer?: FramebufferInfo) {
-    // draw the render framebuffer into the color framebuffer
-    bindFramebufferInfo(this.gl, fromFramebuffer || this.renderFramebuffer, this.gl.READ_FRAMEBUFFER);
-    bindFramebufferInfo(this.gl, this.colorFramebuffer, this.gl.DRAW_FRAMEBUFFER);
-    // clear to make the color framebuffer empty
-    this.clear();
-    // blit for the antialiasing
-    this.gl.blitFramebuffer(
-      0, 0, this.colorFramebuffer.width, this.colorFramebuffer.height,
-      0, 0, this.colorFramebuffer.width, this.colorFramebuffer.height,
-      this.gl.COLOR_BUFFER_BIT, this.gl.LINEAR
-    );
+  processFragmentShaderProgram(program: ProgramInfo, fromFramebuffer: FramebufferInfo, toFramebuffer: FramebufferInfo) {
 
     // switch back to the render framebuffer
-    bindFramebufferInfo(this.gl, toFramebuffer ?? this.renderFramebuffer);
+    bindFramebufferInfo(this.gl, toFramebuffer);
 
     // clear the render framebuffer
     this.clear();
 
     // set the color framebuffer attachment as a uniform for the shader
     setUniforms(program, {
-      u_texture: this.colorFramebuffer.attachments[0]
+      u_texture: fromFramebuffer.attachments[0]
     });
 
     // reset after the VAO drawing
@@ -303,19 +296,7 @@ export class Renderer {
   }
 
   blendFramebuffer(fromFramebuffer: FramebufferInfo, onFramebuffer: FramebufferInfo, clear: boolean = false) {
-    // draw the render framebuffer into the color framebuffer
-    bindFramebufferInfo(this.gl, fromFramebuffer, this.gl.READ_FRAMEBUFFER);
-    bindFramebufferInfo(this.gl, this.colorFramebuffer, this.gl.DRAW_FRAMEBUFFER);
-    // clear to make the color framebuffer empty
-    this.clear();
-    // blit for the antialiasing
 
-    // this.gl.colorMask( true, true, true, true );
-    this.gl.blitFramebuffer(
-      0, 0, this.colorFramebuffer.width, this.colorFramebuffer.height,
-      0, 0, this.colorFramebuffer.width, this.colorFramebuffer.height,
-      this.gl.COLOR_BUFFER_BIT, this.gl.LINEAR
-    );
 
     bindFramebufferInfo(this.gl, onFramebuffer);
 
@@ -327,7 +308,7 @@ export class Renderer {
 
     // set the color framebuffer attachment as a uniform for the shader
     setUniforms(this.passThroughProgramInfo, {
-      u_texture: this.colorFramebuffer.attachments[0]
+      u_texture: fromFramebuffer.attachments[0]
     });
 
     // reset after the VAO drawing

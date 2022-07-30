@@ -159,26 +159,44 @@ export class RenderManager implements RenderManagerInterface {
   }
 
   fx_kale(segments: number) {
-    this.renderer.passes.kaleidoscope.render({ segments: segments ?? 2 });
+    this.renderer.doRenderPass(
+      this.renderer.passes.kaleidoscope,
+      { segments: segments ?? 2 }
+    );
   }
 
   fx_grid(rows: number) {
-    this.renderer.passes.grid.render({ rows: rows ?? 2 });
+    this.renderer.doRenderPass(
+      this.renderer.passes.grid,
+      { rows: rows ?? 2 }
+    );
   }
 
   fx_rgb(amount: number, angle?: number) {
-    this.renderer.passes.rgb.render({ amount: amount ?? 0.01, angle });
+    this.renderer.doRenderPass(
+      this.renderer.passes.rgb,
+      { amount: amount ?? 0.01, angle }
+    );
   }
 
   fx_bloom() {
-    this.renderer.passes.bloom.render({});
+    this.renderer.doRenderPass(
+      this.renderer.passes.bloom,
+      {}
+    );
   }
 
   fx_feedback() {
-    this.renderer.passes.feedback.render({});
+    this.renderer.doRenderPass(
+      this.renderer.passes.feedback,
+      {}
+    );
   }
 
   fx_warp(size?: number, speed?: number, amount?: number) {
-    this.renderer.passes.warp.render({ size, speed, amount });
+    this.renderer.doRenderPass(
+      this.renderer.passes.warp,
+      { size, speed, amount }
+    );
   }
 }
