@@ -67,7 +67,7 @@ export class RenderManager implements RenderManagerInterface {
     const zFar = 100;
     const projection = m4.perspective(fov, aspect, zNear, zFar);
 
-    const eye = [1, 0, -15];
+    const eye = [0, 0, -15];
     const target = [0, 0, 0];
     const up = [0, 1, 0];
     const camera = m4.lookAt(eye, target, up);
