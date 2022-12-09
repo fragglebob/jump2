@@ -384,15 +384,55 @@ while (state['something'] < 10 {
     });
 
     describe("functions", () => {
-        it("should handle a sin call", () => {
-            const result = compileAST(buildASTFromString(`sin(123)`));
-            expect(result).toMatchInlineSnapshot(`"Math.sin(123)"`);
-        });
-        it("should handle a cos call", () => {
-            const result = compileAST(buildASTFromString(`cos(123)`));
-            expect(result).toMatchInlineSnapshot(`"Math.cos(123)"`);
-        });
+   
+        describe("maths", () => {
+            it("should handle a cos call", () => {
+                const result = compileAST(buildASTFromString(`cos(123)`));
+                expect(result).toMatchInlineSnapshot(`"Math.cos(123)"`);
+            });
+            it("should handle a sin call", () => {
+                const result = compileAST(buildASTFromString(`sin(123)`));
+                expect(result).toMatchInlineSnapshot(`"Math.sin(123)"`);
+            });
+    
+            it("should handle a round call", () => {
+                const result = compileAST(buildASTFromString(`round(123)`));
+                expect(result).toMatchInlineSnapshot(`"Math.round(123)"`);
+            });
+            it("should handle a floor call", () => {
+                const result = compileAST(buildASTFromString(`floor(123)`));
+                expect(result).toMatchInlineSnapshot(`"Math.floor(123)"`);
+            });
+            it("should handle a ceil call", () => {
+                const result = compileAST(buildASTFromString(`ceil(123)`));
+                expect(result).toMatchInlineSnapshot(`"Math.ceil(123)"`);
+            });
+    
+            it("should handle a pow call", () => {
+                const result = compileAST(buildASTFromString(`pow(123, 3)`));
+                expect(result).toMatchInlineSnapshot(`"Math.pow(123, 3)"`);
+            });
 
+            it("should handle a sqrt call", () => {
+                const result = compileAST(buildASTFromString(`sqrt(123)`));
+                expect(result).toMatchInlineSnapshot(`"Math.sqrt(123)"`);
+            });
+
+            it("should handle a log call", () => {
+                const result = compileAST(buildASTFromString(`log(123)`));
+                expect(result).toMatchInlineSnapshot(`"Math.log(123)"`);
+            });
+
+            it("should handle a min call", () => {
+                const result = compileAST(buildASTFromString(`min(123, 456)`));
+                expect(result).toMatchInlineSnapshot(`"Math.min(123, 456)"`);
+            });
+            it("should handle a max call", () => {
+                const result = compileAST(buildASTFromString(`max(123, 456)`));
+                expect(result).toMatchInlineSnapshot(`"Math.max(123, 456)"`);
+            });
+        });
+ 
         it("should handle a box call", () => {
             const result = compileAST(buildASTFromString(`box()`));
             expect(result).toMatchInlineSnapshot(`"manager.box()"`);
