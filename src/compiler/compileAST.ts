@@ -161,6 +161,14 @@ function compileFunctionCall(ctx: Context, functionCall: FunctionCall): string {
   switch (funcName) {
     case "sin":
     case "cos":
+    case "log":
+    case "round":
+    case "floor":
+    case "ceil":
+    case "pow":
+    case "sqrt":
+    case "min":
+    case "max":
       return `Math.${funcName}(${compileArguments(ctx, functionCall.args)})`;
     case "popMatrix":
     case "pushMatrix":
