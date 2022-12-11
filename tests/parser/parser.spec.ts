@@ -8,11 +8,15 @@ describe("createParser", () => {
     });
 });
 
+const runParse = (code: string) => {
+    return parse(createParser(), code);
+}
+
 describe("parser", () => {
 
     describe("stings", () => {
         it("should build ast for a string", () => {
-            const result = parse(`foo = "super string"`);
+            const result = runParse(`foo = "super string"`);
             expect(result).toMatchSnapshot();
         });
     });
@@ -21,44 +25,44 @@ describe("parser", () => {
 
         describe("usage", () => {
             it("should build ast for using a variable", () => {
-                const result = parse(`foo = bar`);
+                const result = runParse(`foo = bar`);
                 expect(result).toMatchSnapshot();
             });
 
             it("should build ast for using a key of variable", () => {
-                const result = parse(`foo = bar.baz`);
+                const result = runParse(`foo = bar.baz`);
                 expect(result).toMatchSnapshot();
             });
 
             it("should build ast for using a index of variable", () => {
-                const result = parse(`foo = bar["baz"]`);
+                const result = runParse(`foo = bar["baz"]`);
                 expect(result).toMatchSnapshot();
             });
         });
 
         describe("assignment", () => {
             it("should build ast for assignment of varaible", () => {
-                const result = parse(`foo = "bar"`);
+                const result = runParse(`foo = "bar"`);
                 expect(result).toMatchSnapshot();
             });
 
             it("should build ast for key assignment of variable", () => {
-                const result = parse(`foo.bar = "baz"`);
+                const result = runParse(`foo.bar = "baz"`);
                 expect(result).toMatchSnapshot();
             });
 
             it("should build ast for square bracket assignment of variable", () => {
-                const result = parse(`foo["bar"] = "baz"`);
+                const result = runParse(`foo["bar"] = "baz"`);
                 expect(result).toMatchSnapshot();
             });
 
             it("should build ast for square bracket then key assignment of variable", () => {
-                const result = parse(`foo["bar"].foo = "baz"`);
+                const result = runParse(`foo["bar"].foo = "baz"`);
                 expect(result).toMatchSnapshot();
             });
 
             it("should build ast for key then square bracket assignment of variable", () => {
-                const result = parse(`foo.bar["foo"] = "baz"`);
+                const result = runParse(`foo.bar["foo"] = "baz"`);
                 expect(result).toMatchSnapshot();
             });
         });
@@ -66,46 +70,46 @@ describe("parser", () => {
 
     describe("numbers", () => {
         it("should build ast for a positive interger", () => {
-            const result = parse("foo = 5");
+            const result = runParse("foo = 5");
             expect(result).toMatchSnapshot();
         });
 
         it("should build ast for a negative interger", () => {
-            const result = parse("foo = -5");
+            const result = runParse("foo = -5");
             expect(result).toMatchSnapshot();
         });
 
         it("should build ast for zero", () => {
-            const result = parse("foo = 0");
+            const result = runParse("foo = 0");
             expect(result).toMatchSnapshot();
         });
 
         it("should build ast for decimal", () => {
-            const result = parse("foo = 13.37");
+            const result = runParse("foo = 13.37");
             expect(result).toMatchSnapshot();
         });
 
         it("should build ast for a negative decimal", () => {
-            const result = parse("foo = -13.37");
+            const result = runParse("foo = -13.37");
             expect(result).toMatchSnapshot();
         });
     });
 
     describe("arrays", () => {
         it("build ast for an empty array", () => {
-            const result = parse(`
+            const result = runParse(`
                 foo = []
             `);
             expect(result).toMatchSnapshot();
         });
         it("build ast for an array with one item", () => {
-            const result = parse(`
+            const result = runParse(`
                 foo = [0]
             `);
             expect(result).toMatchSnapshot();
         });
         it("build ast for an array with three mixed item", () => {
-            const result = parse(`
+            const result = runParse(`
                 foo = [0, "foo", sin(44)]
             `);
             expect(result).toMatchSnapshot();
@@ -114,14 +118,14 @@ describe("parser", () => {
 
     describe("objects", () => {
         it("build ast for an empty object", () => {
-            const result = parse(`
+            const result = runParse(`
                 foo = {}
             `);
             expect(result).toMatchSnapshot();
         });
 
         it("build ast for an object with a name key", () => {
-            const result = parse(`
+            const result = runParse(`
                 foo = {
                     bar: "baz"
                 }
@@ -130,7 +134,7 @@ describe("parser", () => {
         });
 
         it("build ast for an object with a string key", () => {
-            const result = parse(`
+            const result = runParse(`
                 foo = {
                     "bar-bar": "baz"
                 }
@@ -139,7 +143,7 @@ describe("parser", () => {
         });
 
         it("build ast for an object with an expression key", () => {
-            const result = parse(`
+            const result = runParse(`
                 foo = {
                     [sin(5)]: "baz"
                 }
@@ -148,7 +152,7 @@ describe("parser", () => {
         });
 
         it("build ast for an object with many named keys", () => {
-            const result = parse(`
+            const result = runParse(`
                 foo = {
                     bar: 1,
                     baz: 2,
@@ -159,7 +163,7 @@ describe("parser", () => {
         });
 
         it("build ast for an object with mixed keys", () => {
-            const result = parse(`
+            const result = runParse(`
                 foo = {
                     bar: 1,
                     "baz": 2,
@@ -172,7 +176,7 @@ describe("parser", () => {
         });
 
         it("build ast for an object with nested objects", () => {
-            const result = parse(`
+            const result = runParse(`
                 foo = {
                     bar: {
                         baz: {
@@ -189,19 +193,19 @@ describe("parser", () => {
 
     describe("functions", () => {
         it("should build ast for a sin call", () => {
-            const result = parse("sin(3)");
+            const result = runParse("sin(3)");
             expect(result).toMatchSnapshot();
         });
 
         it("should build ast for a cos call", () => {
-            const result = parse("cos(3)");
+            const result = runParse("cos(3)");
             expect(result).toMatchSnapshot();
         });
     });
 
     describe("if blocks", () => {
         it("should build ast for a if statement", () => {
-            const result = parse(`
+            const result = runParse(`
                 if 2 > 1 then
                     sin(3)
                 endif
@@ -210,7 +214,7 @@ describe("parser", () => {
         });
 
         it("should build ast for a if...else statement", () => {
-            const result = parse(`
+            const result = runParse(`
                 if 2 > 1 then
                     sin(3)
                 else
@@ -221,7 +225,7 @@ describe("parser", () => {
         });
 
         it("should build ast for a if...elseif statement", () => {
-            const result = parse(`
+            const result = runParse(`
                 if 2 > 1 then
                     sin(3)
                 elseif 4 < 2 then
@@ -232,7 +236,7 @@ describe("parser", () => {
         });
 
         it("should build ast for a if...elseif...else statement", () => {
-            const result = parse(`
+            const result = runParse(`
                 if 2 > 1 then
                     sin(3)
                 elseif 4 < 2 then
@@ -245,7 +249,7 @@ describe("parser", () => {
         });
 
         it("should build ast for a if...elseif...elseif...elseif...else statement", () => {
-            const result = parse(`
+            const result = runParse(`
                 if 2 > 1 then
                     sin(3)
                 elseif 4 < 2 then
@@ -265,77 +269,77 @@ describe("parser", () => {
     describe("expressions", () => {
 
         it("should build ast for addition", () => {
-            const result = parse(`foo = 3 + 2`);
+            const result = runParse(`foo = 3 + 2`);
             expect(result).toMatchSnapshot();
         });
         it("should build ast for subtraction", () => {
-            const result = parse(`foo = 3 - 2`);
+            const result = runParse(`foo = 3 - 2`);
             expect(result).toMatchSnapshot();
         });
         it("should build ast for times", () => {
-            const result = parse(`foo = 3 * 2`);
+            const result = runParse(`foo = 3 * 2`);
             expect(result).toMatchSnapshot();
         });
         it("should build ast for divide", () => {
-            const result = parse(`foo = 3 / 2`);
+            const result = runParse(`foo = 3 / 2`);
             expect(result).toMatchSnapshot();
         });
         it("should build ast for mod", () => {
-            const result = parse(`foo = 3 % 2`);
+            const result = runParse(`foo = 3 % 2`);
             expect(result).toMatchSnapshot();
         });
 
         it("should build ast for >", () => {
-            const result = parse(`foo = 3 > 2`);
+            const result = runParse(`foo = 3 > 2`);
             expect(result).toMatchSnapshot();
         });
         it("should build ast for >=", () => {
-            const result = parse(`foo = 3 >= 2`);
+            const result = runParse(`foo = 3 >= 2`);
             expect(result).toMatchSnapshot();
         });
 
         it("should build ast for <", () => {
-            const result = parse(`foo = 3 < 2`);
+            const result = runParse(`foo = 3 < 2`);
             expect(result).toMatchSnapshot();
         });
         it("should build ast for <=", () => {
-            const result = parse(`foo = 3 <= 2`);
+            const result = runParse(`foo = 3 <= 2`);
             expect(result).toMatchSnapshot();
         });
 
         it("should build ast for ==", () => {
-            const result = parse(`foo = 3 == 2`);
+            const result = runParse(`foo = 3 == 2`);
             expect(result).toMatchSnapshot();
         });
         it("should build ast for !=", () => {
-            const result = parse(`foo = 3 != 2`);
+            const result = runParse(`foo = 3 != 2`);
             expect(result).toMatchSnapshot();
         });
 
         it("should build ast for boolean or logic", () => {
-            const result = parse(`foo = 0.5 > sin(224) || 0.5 < sin(124)`);
+            const result = runParse(`foo = 0.5 > sin(224) || 0.5 < sin(124)`);
             expect(result).toMatchSnapshot();
         });
 
         it("should build ast for boolean and logic", () => {
-            const result = parse(`foo = 0.5 > sin(224) && 0.5 < sin(124)`);
+            const result = runParse(`foo = 0.5 > sin(224) && 0.5 < sin(124)`);
             expect(result).toMatchSnapshot();
         });
 
         it("should build ast for a combination of boolean logic", () => {
-            const result = parse(`foo = sin(224) && (0 != cos(0) || sin(0) >= 0)`);
+            const result = runParse(`foo = sin(224) && (0 != cos(0) || sin(0) >= 0)`);
             expect(result).toMatchSnapshot();
         });
 
         it("should build ast for brackets", () => {
-            const result = parse(`foo = (234 * ((sin(5) - 8) / (988 + sin(592))))`);
+            const result = runParse(`foo = (234 * ((sin(5) - 8) / (988 + sin(592))))`);
             expect(result).toMatchSnapshot();
         });
     });
 
     describe("loops", () => {
         it("should build ast for a while statement", () => {
-            const result = parse(`
+            const result = runParse(`
                 while 2 > 1 then
                     sin(3)
                 endwhile
@@ -344,7 +348,7 @@ describe("parser", () => {
         });
 
         it("should build ast for a for in statement", () => {
-            const result = parse(`
+            const result = runParse(`
                 for i in 0..10 then
                     sin(3)
                 endfor
@@ -353,7 +357,7 @@ describe("parser", () => {
         });
 
         it("should build ast for a loop statement", () => {
-            const result = parse(`
+            const result = runParse(`
                 loop 800 times
                     y = cos(3)
                 endloop
@@ -362,7 +366,7 @@ describe("parser", () => {
         });
 
         it("should build ast for a setting loop statement", () => {
-            const result = parse(`
+            const result = runParse(`
                 loop x <- 800 times
                     y = cos(x)
                 endloop

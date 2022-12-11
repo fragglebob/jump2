@@ -29,6 +29,15 @@ body {
     display: block;
 }
 
+#code2 {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 100%;
+}
+
 #code {
     position: absolute;
     top: 0;
@@ -44,6 +53,7 @@ body {
     resize: none;
     padding: 12px;
     border-radius: 8px;
+    display: none;
 }
 
 #code:focus {
