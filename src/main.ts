@@ -2,6 +2,7 @@ import './style.css';
 
 import { GLApp } from "./gl";
 import { Analyser } from './audio/Analyser';
+import { setup as setupEditor } from "./editor/setup";
 
 function findElementOrThrow<THTMLElement extends HTMLElement>(selector: string) : THTMLElement {
     const elemet = document.querySelector<THTMLElement>(selector);
@@ -21,10 +22,6 @@ function createWebGLContext(canvas: HTMLCanvasElement): WebGL2RenderingContext {
         throw new Error("Can't start webgl 2context. :(");
     }
     return gl;
-}
-
-function findTextarea(): HTMLTextAreaElement {
-    return findElementOrThrow<HTMLTextAreaElement>("#code");
 }
 
 async function getUserMedia(constraits: MediaStreamConstraints): Promise<MediaStream> {
@@ -89,9 +86,9 @@ async function start() {
     const canvas = findCanvas();
     const gl = createWebGLContext(canvas);
 
-    const textarea = findTextarea();
+    const editor = setupEditor();
 
-    let glapp = new GLApp(canvas, gl, textarea);
+    let glapp = new GLApp(canvas, gl, editor);
 
     let analyser: Analyser;
 
@@ -107,7 +104,7 @@ async function start() {
             console.log(newGLModule);
           glapp.stop();
           // the callback receives the updated './foo.js' module
-          glapp = new newGLModule.GLApp(canvas, gl, textarea);
+          glapp = new newGLModule.GLApp(canvas, gl, editor);
           if(analyser) {
             glapp.setAudioAnalyser(analyser);
           }

@@ -1,9 +1,9 @@
 import { compileAST } from "../../src/compiler/compileAST";
 import { Block } from "../../src/parser/ast";
-import { parse } from "../../src/parser/parser";
+import { createParser, parse } from "../../src/parser/parser";
 
 function buildASTFromString(code: string): Block {
-    return parse(code)
+    return parse(createParser(), code)
 }
 
 describe("compileAST", () => {

@@ -4,12 +4,13 @@ import jumpGrammer from "./jumpGrammer";
 
 const grammer = nearley.Grammar.fromCompiled(jumpGrammer);
 
-export function createParser() {
-    return new nearley.Parser(grammer);
+export type NearlyParser = nearley.Parser & { table: any[] };
+
+export function createParser() : NearlyParser {
+    return new nearley.Parser(grammer, { keepHistory: true }) as NearlyParser;
 }
 
-export function parse(text: string): Block {
-    const parser = createParser();
+export function parse(parser: NearlyParser, text: string): Block {
     parser.feed(text);
     const result = parser.finish();
     if (result.length > 1) {
