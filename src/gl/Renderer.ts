@@ -32,6 +32,7 @@ import { BloomPass } from "./postfx/BloomPass";
 import { FeedbackPass } from "./postfx/FeedbackPass";
 import { WarpPass } from "./postfx/WarpPass";
 import { RenderPass } from "./postfx/RenderPass";
+import {PxGridPass} from "./postfx/PxGridPass";
 
 
 type Vec4 = [number, number, number, number];
@@ -75,6 +76,7 @@ export class Renderer {
   passes: {
     kaleidoscope: KaleidoscopePass,
     grid: GridShiftPass,
+    px: PxGridPass,
     rgb: RGBShiftPass,
     convolution: ConvolutionPass,
     bloom: BloomPass,
@@ -132,6 +134,7 @@ export class Renderer {
     this.passes = {
       kaleidoscope: new KaleidoscopePass(this),
       grid: new GridShiftPass(this),
+      px: new PxGridPass(this),
       rgb: new RGBShiftPass(this),
       convolution: new ConvolutionPass(this),
       bloom: new BloomPass(this),
@@ -225,7 +228,7 @@ export class Renderer {
 
   render(callback: (ctx: RenderManager) => void) {
 
-    if(resizeCanvasToDisplaySize(this.gl.canvas)) {
+    if(resizeCanvasToDisplaySize(this.gl.canvas as HTMLCanvasElement)) {
       this.framebuffersPingPong.forEach(framebuffer => {
         this.resizeStandardFramebuffer(framebuffer);
       })

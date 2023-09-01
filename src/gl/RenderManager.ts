@@ -32,6 +32,7 @@ interface RenderManagerInterface {
 
   fx_kale(segments: number): void;
   fx_grid(rows: number): void;
+  fx_px(x: number, y?: number): void;
   fx_rgb(amount: number, angle?: number): void;
   fx_bloom(): void;
   fx_feedback(): void;
@@ -158,10 +159,10 @@ export class RenderManager implements RenderManagerInterface {
     }
   }
 
-  fx_kale(segments: number) {
+  fx_kale(segments?: number, time?: number) {
     this.renderer.doRenderPass(
       this.renderer.passes.kaleidoscope,
-      { segments: segments ?? 2 }
+      { segments: segments ?? 2, time }
     );
   }
 
@@ -169,6 +170,13 @@ export class RenderManager implements RenderManagerInterface {
     this.renderer.doRenderPass(
       this.renderer.passes.grid,
       { rows: rows ?? 2 }
+    );
+  }
+
+  fx_px(x: number, y?: number) {
+    this.renderer.doRenderPass(
+        this.renderer.passes.px,
+        { x: x ?? 100, y: y ?? x ?? 100 }
     );
   }
 

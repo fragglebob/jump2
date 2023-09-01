@@ -1,6 +1,10 @@
 import { Analyser } from "../audio/Analyser";
 import { createFunction, UserRenderFunction } from "../compiler/createFunction";
 import { Renderer } from "./Renderer";
+import {startingCode} from "../demo-code";
+
+
+const localStorageKey = 'JUMP2_SCRIPT'
 
 export class GLApp {
   readonly canvas: HTMLCanvasElement;
@@ -30,9 +34,29 @@ export class GLApp {
     const userInputCode = this.textarea.value;
     try {
       this.renderFunc = createFunction(userInputCode);
-      this.textarea.classList.remove("error");
     } catch(e) {
       this.textarea.classList.add("error");
+      return;
+    }
+
+    this.textarea.classList.remove("error");
+    this.updateLocalStorageWithCode(userInputCode);
+  }
+
+  updateLocalStorageWithCode(code: string) {
+    try {
+      window.localStorage.setItem(localStorageKey, code)
+    } catch (e) {
+      console.error('Failed to save code to local storage', e);
+    }
+  }
+
+  getStartingCode(): string {
+    try {
+      return window.localStorage.getItem(localStorageKey) ?? startingCode;
+    } catch (e) {
+      console.error('Failed to fetch code from locale storage', e);
+      return startingCode;
     }
   }
 
@@ -40,9 +64,14 @@ export class GLApp {
     this.compileTextarea();
   }
 
-  start() {
+  initializeTextarea = () => {
+    this.textarea.value = this.getStartingCode();
     this.compileTextarea();
     this.textarea.addEventListener("input", this.handleTextareaUpdate)
+  }
+
+  start() {
+    this.initializeTextarea();
     this.animationFrame = requestAnimationFrame(this._render);
   }
 
