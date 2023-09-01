@@ -96,6 +96,7 @@ FunctionCalls -> MathsFunctions {% id %}
 FXFunctions -> 
     "fx_kale" _ NArgs {% (d) => ({ type: "func", name: "fx_kale", args: d[2] }) %}
     | "fx_grid" _ NArgs {% (d) => ({ type: "func", name: "fx_grid", args: d[2] }) %}
+    | "fx_px" _ NArgs {% (d) => ({ type: "func", name: "fx_px", args: d[2] }) %}
     | "fx_rgb" _ NArgs {% (d) => ({ type: "func", name: "fx_rgb", args: d[2] }) %}
     | "fx_bloom" _ NArgs {% (d) => ({ type: "func", name: "fx_bloom", args: d[2] }) %}
     | "fx_feedback" _ NArgs {% (d) => ({ type: "func", name: "fx_feedback", args: d[2] }) %}

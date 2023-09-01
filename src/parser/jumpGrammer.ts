@@ -117,6 +117,7 @@ const grammar: Grammar = {
     {"name": "FunctionCalls", "symbols": ["FXFunctions"], "postprocess": id},
     {"name": "FXFunctions", "symbols": [{"literal":"fx_kale"}, "_", "NArgs"], "postprocess": (d) => ({ type: "func", name: "fx_kale", args: d[2] })},
     {"name": "FXFunctions", "symbols": [{"literal":"fx_grid"}, "_", "NArgs"], "postprocess": (d) => ({ type: "func", name: "fx_grid", args: d[2] })},
+    {"name": "FXFunctions", "symbols": [{"literal":"fx_px"}, "_", "NArgs"], "postprocess": (d) => ({ type: "func", name: "fx_px", args: d[2] })},
     {"name": "FXFunctions", "symbols": [{"literal":"fx_rgb"}, "_", "NArgs"], "postprocess": (d) => ({ type: "func", name: "fx_rgb", args: d[2] })},
     {"name": "FXFunctions", "symbols": [{"literal":"fx_bloom"}, "_", "NArgs"], "postprocess": (d) => ({ type: "func", name: "fx_bloom", args: d[2] })},
     {"name": "FXFunctions", "symbols": [{"literal":"fx_feedback"}, "_", "NArgs"], "postprocess": (d) => ({ type: "func", name: "fx_feedback", args: d[2] })},

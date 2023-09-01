@@ -188,6 +188,7 @@ function compileFunctionCall(ctx: Context, functionCall: FunctionCall): string {
     case "fft":
     case "fx_kale":
     case "fx_grid":
+    case "fx_px":
     case "fx_rgb":
     case "fx_bloom":
     case "fx_feedback":
