@@ -27,12 +27,12 @@ import { KaleidoscopePass } from "./postfx/KaleidoscopePass";
 import { GridShiftPass } from "./postfx/GridShiftPass";
 import { RGBShiftPass } from "./postfx/RGBShiftPass";
 import { ConvolutionPass } from "./postfx/ConvolutionPass";
-import { ShaderRenderPass } from "./postfx/ShaderRenderPass";
 import { BloomPass } from "./postfx/BloomPass";
 import { FeedbackPass } from "./postfx/FeedbackPass";
 import { WarpPass } from "./postfx/WarpPass";
 import { RenderPass } from "./postfx/RenderPass";
-import {PxGridPass} from "./postfx/PxGridPass";
+import { PxGridPass } from "./postfx/PxGridPass";
+import { TempoData } from "../audio/Analyser";
 
 
 type Vec4 = [number, number, number, number];
@@ -72,6 +72,7 @@ export class Renderer {
   time: number = 0;
 
   fftData?: Float32Array;
+  tempoData?: TempoData;
 
   passes: {
     kaleidoscope: KaleidoscopePass,
@@ -194,6 +195,10 @@ export class Renderer {
 
   updateFFTData(fftData: Float32Array) {
     this.fftData = fftData;
+  }
+
+  updateTempoData(tempoData: TempoData) {
+    this.tempoData = tempoData;
   }
 
   getTime() : number {

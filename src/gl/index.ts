@@ -93,6 +93,7 @@ export class GLApp {
 
     if(this.audioAnalyser) {
       this.renderer.updateFFTData(this.audioAnalyser.getFFTData());
+      this.renderer.updateTempoData(this.audioAnalyser.updateBeat());
     }
 
     this.renderer.render((manager) => {

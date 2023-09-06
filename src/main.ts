@@ -44,7 +44,7 @@ function setupUserAudio() : Promise<Analyser> {
             let stream: MediaStream | null = null;
             let inputDevices;
     
-            const audioAnalyser = new Analyser();
+            const audioAnalyser = await Analyser.make();
     
             try {
                 stream = await getUserMedia({
