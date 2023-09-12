@@ -1,4 +1,5 @@
-import aubio, {Aubio, Tempo} from "aubiojs";
+import { type BeatData } from "./BeatDetectorProcessor";
+import BeatDetectorProcessorWorkletURL from "./BeatDetectorProcessor.ts?worker&url"
 
 export interface TempoData {
     currentBar: number;
@@ -14,46 +15,37 @@ export class Analyser {
     private analyserNode: AnalyserNode;
     private gainNode: GainNode;
 
-    private aubioScriptProcessor: ScriptProcessorNode;
-    private aubioTempo: Tempo
-
     private sourceNode?: MediaStreamAudioSourceNode;
 
     private fftData: Float32Array;
 
-    private constructor(ctx: AudioContext, aubio: Aubio) {
+    private constructor(ctx: AudioContext) {
         this.ctx = ctx;
 
-        this.aubioScriptProcessor = ctx.createScriptProcessor(512, 1, 1);
-        this.aubioTempo = new aubio.Tempo(
-            this.aubioScriptProcessor.bufferSize * 4,
-            this.aubioScriptProcessor.bufferSize,
-            ctx.sampleRate
-        );
-
-        this.aubioScriptProcessor.addEventListener("audioprocess", (event) => {
-            if (this.aubioTempo.do(event.inputBuffer.getChannelData(0))) {
-                console.log("confidence", this.aubioTempo.getConfidence(), "tempo", this.aubioTempo.getBpm());
-                this.handleBeat(this.aubioTempo.getBpm())
-            }
-        });
+        const testNode = new AudioWorkletNode(this.ctx, "beat-detector");
 
         this.analyserNode = this.setupAnalyserNode();
         this.gainNode = this.setupGainNode();
 
-        this.analyserNode.connect(this.aubioScriptProcessor);
-        this.aubioScriptProcessor.connect(this.gainNode);
+        this.analyserNode.connect(testNode);
+        testNode.connect(this.gainNode);
         this.gainNode.connect(this.ctx.destination);
 
         this.fftData = new Float32Array(this.analyserNode.frequencyBinCount);
+
+        testNode.port.onmessage = (message: MessageEvent<BeatData>) => {
+            this.handleBeat(message.data.bpm);
+        }
     }
 
     static async make(): Promise<Analyser> {
         const ctx = new AudioContext();
 
-        const aubioInstance = await aubio();
+        console.log(BeatDetectorProcessorWorkletURL);
 
-        return new Analyser(ctx, aubioInstance);
+        console.log(await ctx.audioWorklet.addModule(BeatDetectorProcessorWorkletURL));
+
+        return new Analyser(ctx);
     }
 
     private setupGainNode() : GainNode {
