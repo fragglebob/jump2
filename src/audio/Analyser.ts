@@ -1,3 +1,12 @@
+import { type BeatData } from "./BeatDetectorProcessor";
+import BeatDetectorProcessorWorkletURL from "./BeatDetectorProcessor.ts?worker&url"
+
+export interface TempoData {
+    currentBar: number;
+    currentBeat: number;
+    beatProgress: number;
+    barProgress:number;
+}
 
 export class Analyser {
 
@@ -10,15 +19,29 @@ export class Analyser {
 
     private fftData: Float32Array;
 
-    constructor() {
-        this.ctx = new AudioContext();
+    private constructor(ctx: AudioContext) {
+        this.ctx = ctx;
+
+        const testNode = new AudioWorkletNode(this.ctx, "beat-detector");
+
         this.analyserNode = this.setupAnalyserNode();
         this.gainNode = this.setupGainNode();
 
-        this.analyserNode.connect(this.gainNode);
+        this.analyserNode.connect(testNode);
+        testNode.connect(this.gainNode);
         this.gainNode.connect(this.ctx.destination);
 
         this.fftData = new Float32Array(this.analyserNode.frequencyBinCount);
+
+        testNode.port.onmessage = (message: MessageEvent<BeatData>) => {
+            this.handleBeat(message.data);
+        }
+    }
+
+    static async make(): Promise<Analyser> {
+        const ctx = new AudioContext();
+        await ctx.audioWorklet.addModule(BeatDetectorProcessorWorkletURL);
+        return new Analyser(ctx);
     }
 
     private setupGainNode() : GainNode {
@@ -34,6 +57,47 @@ export class Analyser {
         // analyserNode.maxDecibels = -10;
         // analyserNode.smoothingTimeConstant = 0.9;
         return analyserNode;
+    }
+
+    private tempoSetTime: number = Date.now();
+    private tempo: number = 120;
+    private beatsCounted: number = 0;
+
+    private currentBar: number = 0;
+    private currentBeat: number = 0;
+
+    private beatProgress: number = 0;
+    private barProgress: number = 0;
+
+    private handleBeat(beat: BeatData) {
+        this.tempoSetTime = beat.timestamp / 1000;
+        this.tempo = beat.bpm;
+        this.beatsCounted++;
+        this.updateBeat()
+    }
+
+    updateBeat() : TempoData {
+        const now = Date.now() / 1000;
+        const secondsPerBeat = 60 / this.tempo;
+
+        const timeSinceTempoWasSet = now - this.tempoSetTime;
+
+        const beatsElapsedSinceSet = timeSinceTempoWasSet / secondsPerBeat + this.beatsCounted;
+
+        const totalBeats = Math.floor(beatsElapsedSinceSet);
+
+        this.currentBar = Math.floor(totalBeats / 4);
+        this.currentBeat = totalBeats % 4;
+
+        this.beatProgress = beatsElapsedSinceSet;
+        this.barProgress = beatsElapsedSinceSet / 4;
+
+        return {
+            currentBar: this.currentBar,
+            currentBeat: this.currentBeat,
+            beatProgress: this.beatProgress,
+            barProgress: this.barProgress
+        }
     }
 
     setInputStream(stream: MediaStream) {

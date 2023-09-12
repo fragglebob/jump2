@@ -8,6 +8,10 @@ interface RenderManagerInterface {
 
   time(): number;
   frame(): number;
+
+  beat(): number;
+  bar(): number;
+
   fft(index: number): number;
 
   pushMatrix(): void;
@@ -94,6 +98,14 @@ export class RenderManager implements RenderManagerInterface {
 
   frame() {
     return this.renderer.getFrame();
+  }
+
+  beat() : number {
+    return this.renderer.tempoData?.currentBeat ?? 0;
+  }
+
+  bar() : number {
+    return this.renderer.tempoData?.currentBar ?? 0;
   }
 
   fft(index: number = 0) : number {

@@ -44,7 +44,7 @@ function setupUserAudio() : Promise<Analyser> {
             let stream: MediaStream | null = null;
             let inputDevices;
     
-            const audioAnalyser = new Analyser();
+            const audioAnalyser = await Analyser.make();
     
             try {
                 stream = await getUserMedia({
@@ -104,14 +104,16 @@ async function start() {
 
     if (import.meta.hot) {
         import.meta.hot.accept('./gl/index.ts', (newGLModule) => {
-            console.log(newGLModule);
-          glapp.stop();
-          // the callback receives the updated './foo.js' module
-          glapp = new newGLModule.GLApp(canvas, gl, textarea);
-          if(analyser) {
-            glapp.setAudioAnalyser(analyser);
-          }
-          glapp.start();
+            if(newGLModule) {
+                glapp.stop();
+                // the callback receives the updated './foo.js' module
+                glapp = new newGLModule.GLApp(canvas, gl, textarea);
+                if(analyser) {
+                    glapp.setAudioAnalyser(analyser);
+                }
+                glapp.start();
+            }
+
         })
     }
 }

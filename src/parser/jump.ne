@@ -116,7 +116,9 @@ MathsFunctions ->
 
 UtilFunctions ->
     "time" _ 0Args {% (d) => ({ type: "func", name: "time", args: d[2] }) %} |
-    "frame" _ 0Args {% (d) => ({ type: "func", name: "frame", args: d[2] }) %} | 
+    "frame" _ 0Args {% (d) => ({ type: "func", name: "frame", args: d[2] }) %} |
+    "beat" _ 0Args {% (d) => ({ type: "func", name: "beat", args: d[2] }) %} |
+    "bar" _ 0Args {% (d) => ({ type: "func", name: "bar", args: d[2] }) %} |
     "fft" _ 1Args {% (d) => ({ type: "func", name: "fft", args: d[2] }) %}
 
 WorldFunctions -> 
