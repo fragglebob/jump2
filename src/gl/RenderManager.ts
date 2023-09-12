@@ -105,7 +105,7 @@ export class RenderManager implements RenderManagerInterface {
   }
 
   bar() : number {
-    return this.renderer.tempoData?.currentBeat ?? 0;
+    return this.renderer.tempoData?.currentBar ?? 0;
   }
 
   fft(index: number = 0) : number {

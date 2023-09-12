@@ -34,17 +34,13 @@ export class Analyser {
         this.fftData = new Float32Array(this.analyserNode.frequencyBinCount);
 
         testNode.port.onmessage = (message: MessageEvent<BeatData>) => {
-            this.handleBeat(message.data.bpm);
+            this.handleBeat(message.data);
         }
     }
 
     static async make(): Promise<Analyser> {
         const ctx = new AudioContext();
-
-        console.log(BeatDetectorProcessorWorkletURL);
-
-        console.log(await ctx.audioWorklet.addModule(BeatDetectorProcessorWorkletURL));
-
+        await ctx.audioWorklet.addModule(BeatDetectorProcessorWorkletURL);
         return new Analyser(ctx);
     }
 
@@ -73,11 +69,11 @@ export class Analyser {
     private beatProgress: number = 0;
     private barProgress: number = 0;
 
-    private handleBeat(tempo: number) {
-        this.tempoSetTime = Date.now() / 1000;
-        this.tempo = tempo;
+    private handleBeat(beat: BeatData) {
+        this.tempoSetTime = beat.timestamp / 1000;
+        this.tempo = beat.bpm;
         this.beatsCounted++;
-        console.log(this.updateBeat());
+        this.updateBeat()
     }
 
     updateBeat() : TempoData {

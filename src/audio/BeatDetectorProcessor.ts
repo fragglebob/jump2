@@ -2,6 +2,7 @@ import makeAubio, { Tempo } from "aubiojs";
 
 export interface BeatData {
     bpm: number;
+    timestamp: number;
 }
 
 class BeatDetectorProcessor extends AudioWorkletProcessor implements AudioWorkletProcessorImpl {
@@ -25,7 +26,8 @@ class BeatDetectorProcessor extends AudioWorkletProcessor implements AudioWorkle
 
         if (this.tempo.do(input[0])) {
             const data: BeatData = {
-                bpm: this.tempo.getBpm()
+                bpm: this.tempo.getBpm(),
+                timestamp: Date.now(),
             };
             this.port.postMessage(data);
         }
