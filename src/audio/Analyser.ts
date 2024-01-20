@@ -71,7 +71,6 @@ export class Analyser {
     private barProgress: number = 0;
 
     private handleBeat(beat: BeatData) {
-        console.log(beat)
         this.tempoSetTime = beat.timestamp / 1000;
         this.tempo = beat.bpm;
         this.beatsCounted++;
