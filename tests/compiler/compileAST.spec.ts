@@ -1,3 +1,5 @@
+import { describe, it, expect } from "vitest";
+
 import { compileAST } from "../../src/compiler/compileAST";
 import { Block } from "../../src/parser/ast";
 import { parse } from "../../src/parser/parser";
@@ -20,17 +22,17 @@ describe("compileAST", () => {
 
     it("should handle a variable being set", () => {
         const result = compileAST(buildASTFromString(`foo = "bar"`));
-        expect(result).toMatchInlineSnapshot(`"state['foo'] = \\"bar\\""`);
+        expect(result).toMatchInlineSnapshot(`"state['foo'] = "bar""`);
     });
 
     it("should handle a variable key being set", () => {
         const result = compileAST(buildASTFromString(`foo.bar = "baz"`));
-        expect(result).toMatchInlineSnapshot(`"state['foo']['bar'] = \\"baz\\""`);
+        expect(result).toMatchInlineSnapshot(`"state['foo']['bar'] = "baz""`);
     });
 
     it("should handle a variable square bracket being set", () => {
         const result = compileAST(buildASTFromString(`foo.bing[bar[sin(34) * (4 - 13.37)]] = "baz"`));
-        expect(result).toMatchInlineSnapshot(`"state['foo']['bing'][state['bar'][Math.sin(34) * (4 - 13.37)]] = \\"baz\\""`);
+        expect(result).toMatchInlineSnapshot(`"state['foo']['bing'][state['bar'][Math.sin(34) * (4 - 13.37)]] = "baz""`);
     });
 
     it("should handle a variable set to an empty array", () => {
@@ -41,15 +43,15 @@ describe("compileAST", () => {
     it("should handle a variable set to a mixed array", () => {
         const result = compileAST(buildASTFromString(`foo = [123, "bar", sin(3), ["inner"]]`));
         expect(result).toMatchInlineSnapshot(`
-"state['foo'] = [
-  123,
-  \\"bar\\",
-  Math.sin(3),
-  [
-    \\"inner\\"
-  ]
-]"
-`);
+          "state['foo'] = [
+            123,
+            "bar",
+            Math.sin(3),
+            [
+              "inner"
+            ]
+          ]"
+        `);
     });
 
     it("should handle a variable set to an empty object", () => {
@@ -60,28 +62,28 @@ describe("compileAST", () => {
     it("should handle a variable set to an object with a named key", () => {
         const result = compileAST(buildASTFromString(`foo = { bar: "baz" }`));
         expect(result).toMatchInlineSnapshot(`
-"state['foo'] = {
-  bar: \\"baz\\"
-}"
-`);
+          "state['foo'] = {
+            bar: "baz"
+          }"
+        `);
     });
 
     it("should handle a variable set to an object with a string key", () => {
         const result = compileAST(buildASTFromString(`foo = { "bar-baz": "baz" }`));
         expect(result).toMatchInlineSnapshot(`
-"state['foo'] = {
-  \\"bar-baz\\": \\"baz\\"
-}"
-`);
+          "state['foo'] = {
+            "bar-baz": "baz"
+          }"
+        `);
     });
 
     it("should handle a variable set to an object with a expression key", () => {
         const result = compileAST(buildASTFromString(`foo = { [sin(9.3)]: "baz" }`));
         expect(result).toMatchInlineSnapshot(`
-"state['foo'] = {
-  [Math.sin(9.3)]: \\"baz\\"
-}"
-`);
+          "state['foo'] = {
+            [Math.sin(9.3)]: "baz"
+          }"
+        `);
     });
 
     it("should handle a variable set with a object with many mixed keys", () => {
@@ -95,14 +97,14 @@ describe("compileAST", () => {
             }
         `));
         expect(result).toMatchInlineSnapshot(`
-"state['foo'] = {
-  bar: 1,
-  \\"baz\\": 2,
-  \\"baa\\": 3,
-  [Math.sin(4)]: 4,
-  something: \\"else\\"
-}"
-`);
+          "state['foo'] = {
+            bar: 1,
+            "baz": 2,
+            "baa": 3,
+            [Math.sin(4)]: 4,
+            something: "else"
+          }"
+        `);
     });
 
     it("should handle a variable set with a deep nested object", () => {
@@ -118,23 +120,23 @@ describe("compileAST", () => {
             }
         `));
         expect(result).toMatchInlineSnapshot(`
-"state['foo'] = {
-  bar: {
-    baz: {
-      nested: {
-        array: [
-          234,
-          {
-            \\"with-an-object\\": {
-              \\"inside\\": \\"boo\\"
+          "state['foo'] = {
+            bar: {
+              baz: {
+                nested: {
+                  array: [
+                    234,
+                    {
+                      "with-an-object": {
+                        "inside": "boo"
+                      }
+                    }
+                  ]
+                }
+              }
             }
-          }
-        ]
-      }
-    }
-  }
-}"
-`);
+          }"
+        `);
     });
 
     describe("if", () => {

@@ -1,6 +1,6 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`MatrixStack transforms rotateX#should rotate the current matrix 1`] = `
+exports[`MatrixStack > transforms > rotateX#should rotate the current matrix 1`] = `
 Float32Array [
   1,
   0,
@@ -21,7 +21,7 @@ Float32Array [
 ]
 `;
 
-exports[`MatrixStack transforms rotateY#should rotate the current matrix 1`] = `
+exports[`MatrixStack > transforms > rotateY#should rotate the current matrix 1`] = `
 Float32Array [
   -0.887968897819519,
   0,
@@ -42,7 +42,7 @@ Float32Array [
 ]
 `;
 
-exports[`MatrixStack transforms rotateZ#should rotate the current matrix 1`] = `
+exports[`MatrixStack > transforms > rotateZ#should rotate the current matrix 1`] = `
 Float32Array [
   -0.887968897819519,
   -0.4599034786224365,
@@ -63,7 +63,7 @@ Float32Array [
 ]
 `;
 
-exports[`MatrixStack transforms scale#should scale the current matrix 1`] = `
+exports[`MatrixStack > transforms > scale#should scale the current matrix 1`] = `
 Float32Array [
   1,
   0,
@@ -84,7 +84,7 @@ Float32Array [
 ]
 `;
 
-exports[`MatrixStack transforms translate#should translate the current matrix 1`] = `
+exports[`MatrixStack > transforms > translate#should translate the current matrix 1`] = `
 Float32Array [
   1,
   0,

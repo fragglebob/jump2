@@ -1,3 +1,4 @@
+import { describe, it, expect } from "vitest";
 import { hslToRgb } from "../../../src/gl/utils/hsl2rgb";
 
 describe("hsl2rgb", () => {

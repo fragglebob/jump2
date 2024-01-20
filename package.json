@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "test": "jest",
+    "test": "vitest",
     "build:grammer": "nearleyc src/parser/jump.ne -o src/parser/jumpGrammer.ts"
   },
   "author": "Rob Wells",
@@ -20,14 +20,13 @@
   },
   "devDependencies": {
     "@originjs/vite-plugin-commonjs": "^1.0.3",
-    "@types/jest": "^28.1.1",
     "@types/moo": "^0.5.5",
     "@types/nearley": "^2.11.2",
-    "jest": "^28.1.1",
     "ts-jest": "^28.0.4",
     "ts-node": "^10.8.1",
     "typescript": "^4.7.3",
     "vite": "^4.5.2",
-    "vite-plugin-raw": "^1.0.3"
+    "vite-plugin-raw": "^1.0.3",
+    "vitest": "^1.2.1"
   }
 }
