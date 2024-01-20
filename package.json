@@ -6,9 +6,10 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
+    "build": "vite build",
     "preview": "vite preview",
     "test": "vitest",
+    "type-check": "tsc",
     "build:grammer": "nearleyc src/parser/jump.ne -o src/parser/jumpGrammer.ts"
   },
   "author": "Rob Wells",

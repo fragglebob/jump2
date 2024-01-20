@@ -26,7 +26,7 @@ export class GLApp {
     this.gl = gl;
     this.textarea = textarea;
 
-    this.renderer = new Renderer(gl);
+    this.renderer = new Renderer(canvas, gl);
 
     // set to a noop function
     this.renderFunc = () => {};
