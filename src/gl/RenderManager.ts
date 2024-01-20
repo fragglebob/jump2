@@ -71,8 +71,8 @@ export class RenderManager implements RenderManagerInterface {
   private setupCamera() : CameraMatrixes {
     const fov = (30 * Math.PI) / 180;
     const aspect =
-      this.renderer.gl.canvas.clientWidth /
-      this.renderer.gl.canvas.clientHeight;
+      this.renderer.canvas.clientWidth /
+      this.renderer.canvas.clientHeight;
     const zNear = 0.5;
     const zFar = 100;
     const projection = m4.perspective(fov, aspect, zNear, zFar);

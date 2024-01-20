@@ -19,6 +19,10 @@ jobs:
       - name: Build Grammer
         run: npm run build:grammer
 
+      # Type check
+      - name: Type Check
+        run: npm run type-check
+
       # Finally, run our tests
       - name: Run the tests
         run: npm test

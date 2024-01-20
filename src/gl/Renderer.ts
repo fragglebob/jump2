@@ -40,6 +40,7 @@ type Vec3 = [number, number, number];
 
 export class Renderer {
   readonly gl: WebGL2RenderingContext;
+  readonly canvas: HTMLCanvasElement;
 
   mainProgramInfo: ProgramInfo;
   passThroughProgramInfo: ProgramInfo;
@@ -92,8 +93,9 @@ export class Renderer {
 
   framebuffersPingPong: FramebufferInfo[];
 
-  constructor(gl: WebGL2RenderingContext) {
+  constructor(canvas: HTMLCanvasElement, gl: WebGL2RenderingContext) {
     this.gl = gl;
+    this.canvas = canvas;
 
     this.mainProgramInfo = this.createMainProgram();
     this.passThroughProgramInfo = this.createPassThroughProgram();
