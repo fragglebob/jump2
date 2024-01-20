@@ -16,7 +16,6 @@ import {
   VertexArrayInfo,
 } from "twgl.js";
 
-
 import basicVert from "./shaders/basic.vert.glsl";
 import basicFrag from "./shaders/basic.frag.glsl";
 import screenVert from "./shaders/screen.vert.glsl";
@@ -33,6 +32,7 @@ import { WarpPass } from "./postfx/WarpPass";
 import { RenderPass } from "./postfx/RenderPass";
 import { PxGridPass } from "./postfx/PxGridPass";
 import { TempoData } from "../audio/Analyser";
+import {AsciiPass} from "./postfx/AsciiPass";
 
 
 type Vec4 = [number, number, number, number];
@@ -82,7 +82,8 @@ export class Renderer {
     convolution: ConvolutionPass,
     bloom: BloomPass,
     feedback: FeedbackPass,
-    warp: WarpPass
+    warp: WarpPass,
+    ascii: AsciiPass,
   }
 
   screenBufferInfo: BufferInfo;
@@ -140,7 +141,8 @@ export class Renderer {
       convolution: new ConvolutionPass(this),
       bloom: new BloomPass(this),
       feedback: new FeedbackPass(this),
-      warp: new WarpPass(this)
+      warp: new WarpPass(this),
+      ascii: new AsciiPass(this),
     };
   }
 
@@ -269,9 +271,10 @@ export class Renderer {
     const currentFramebuffer = this.getCurrentFrameBuffer();
     const nextFramebuffer = this.getNextFrameBuffer();
 
-    pass.render(props, currentFramebuffer, nextFramebuffer);
-
-    this.advanceFrameBufferPingPong();
+    if(pass.render(props, currentFramebuffer, nextFramebuffer)) {
+      // only advance ping pong if render happened
+      this.advanceFrameBufferPingPong();
+    }
   }
 
   clear() {

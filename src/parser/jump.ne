@@ -101,6 +101,7 @@ FXFunctions ->
     | "fx_bloom" _ NArgs {% (d) => ({ type: "func", name: "fx_bloom", args: d[2] }) %}
     | "fx_feedback" _ NArgs {% (d) => ({ type: "func", name: "fx_feedback", args: d[2] }) %}
     | "fx_warp" _ NArgs {% (d) => ({ type: "func", name: "fx_warp", args: d[2] }) %}
+    | "fx_ascii" _ NArgs {% (d) => ({ type: "func", name: "fx_ascii", args: d[2] }) %}
 
 MathsFunctions -> 
     "sin" _ 1Args {% (d) => ({ type: "func", name: "sin", args: d[2] }) %}

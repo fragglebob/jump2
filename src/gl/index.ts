@@ -40,6 +40,7 @@ export class GLApp {
     try {
       this.renderFunc = createFunction(userInputCode);
     } catch(e) {
+      console.error(e);
       this.textarea.classList.add("error");
       return;
     }

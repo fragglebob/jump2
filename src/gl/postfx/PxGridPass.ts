@@ -1,5 +1,4 @@
 import { Renderer } from "../Renderer";
-import { RenderPass } from "./RenderPass";
 
 import vertShader from "../shaders/screen.vert.glsl";
 import fragShader from "../shaders/px-grid.frag.glsl";
@@ -17,8 +16,6 @@ export class PxGridPass extends ShaderRenderPass<Props> {
     }
 
     render(args: Props, fromFramebuffer: FramebufferInfo, toFramebuffer: FramebufferInfo) {
-        const time = this.renderer.getTime();
-
         this.renderer.gl.useProgram(this.programInfo.program);
 
         setUniforms(this.programInfo, {
@@ -27,5 +24,7 @@ export class PxGridPass extends ShaderRenderPass<Props> {
         })
 
         this.renderer.processFragmentShaderProgram(this.getProgramInfo(), fromFramebuffer, toFramebuffer);
+
+        return true;
     }
 }

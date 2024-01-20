@@ -38,6 +38,8 @@ export class BloomPass extends RenderPass<Props> {
         this.renderer.blendFramebuffer(fromFramebuffer, toFramebuffer, true);
         this.renderer.blendFunc(this.renderer.gl.ONE, this.renderer.gl.ONE);
         this.renderer.blendFramebuffer(this.frameBuffers[1], toFramebuffer, false)
+
+        return true;
     }
 
     resizeFramebuffers() {

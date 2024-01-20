@@ -122,6 +122,7 @@ const grammar: Grammar = {
     {"name": "FXFunctions", "symbols": [{"literal":"fx_bloom"}, "_", "NArgs"], "postprocess": (d) => ({ type: "func", name: "fx_bloom", args: d[2] })},
     {"name": "FXFunctions", "symbols": [{"literal":"fx_feedback"}, "_", "NArgs"], "postprocess": (d) => ({ type: "func", name: "fx_feedback", args: d[2] })},
     {"name": "FXFunctions", "symbols": [{"literal":"fx_warp"}, "_", "NArgs"], "postprocess": (d) => ({ type: "func", name: "fx_warp", args: d[2] })},
+    {"name": "FXFunctions", "symbols": [{"literal":"fx_ascii"}, "_", "NArgs"], "postprocess": (d) => ({ type: "func", name: "fx_ascii", args: d[2] })},
     {"name": "MathsFunctions", "symbols": [{"literal":"sin"}, "_", "1Args"], "postprocess": (d) => ({ type: "func", name: "sin", args: d[2] })},
     {"name": "MathsFunctions", "symbols": [{"literal":"cos"}, "_", "1Args"], "postprocess": (d) => ({ type: "func", name: "cos", args: d[2] })},
     {"name": "MathsFunctions", "symbols": [{"literal":"pow"}, "_", "2Args"], "postprocess": (d) => ({ type: "func", name: "pow", args: d[2] })},

@@ -9,5 +9,5 @@ export abstract class RenderPass<T> {
         this.renderer = renderer;
     }
 
-    abstract render(props: T, fromFramebuffer: FramebufferInfo, toFramebuffer: FramebufferInfo) : void;
+    abstract render(props: T, fromFramebuffer: FramebufferInfo, toFramebuffer: FramebufferInfo) : boolean;
 }

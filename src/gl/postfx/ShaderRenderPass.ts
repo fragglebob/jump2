@@ -16,6 +16,6 @@ export abstract class ShaderRenderPass<T> extends RenderPass<T> {
         return this.programInfo;
     }
 
-    abstract render(props: T, fromFramebuffer: FramebufferInfo, toFramebuffer: FramebufferInfo) : void;
+    abstract render(props: T, fromFramebuffer: FramebufferInfo, toFramebuffer: FramebufferInfo) : boolean;
 
 }

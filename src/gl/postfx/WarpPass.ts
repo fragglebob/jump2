@@ -30,5 +30,7 @@ export class WarpPass extends ShaderRenderPass<Props> {
         })
 
         this.renderer.processFragmentShaderProgram(this.getProgramInfo(), fromFramebuffer, toFramebuffer);
+
+        return true;
     }
 }

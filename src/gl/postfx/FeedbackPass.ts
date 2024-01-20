@@ -26,6 +26,8 @@ export class FeedbackPass extends RenderPass<Props> {
 
         this.renderer.blendFunc(this.renderer.gl.ONE, this.renderer.gl.ONE_MINUS_SRC_ALPHA);
         this.renderer.blendFramebuffer(fromFramebuffer, this.feedbackFrameBuffer, false);
+
+        return true;
     }
 
     resizeFramebuffers() {
