@@ -19,6 +19,8 @@ export class GLApp {
 
   renderFunc: UserRenderFunction;
 
+  renderFuncState: object;
+
   constructor(canvas: HTMLCanvasElement, gl: WebGL2RenderingContext, textarea: HTMLTextAreaElement) {
     this.canvas = canvas;
     this.gl = gl;
@@ -28,6 +30,9 @@ export class GLApp {
 
     // set to a noop function
     this.renderFunc = () => {};
+
+    // set state to an empty state
+    this.renderFuncState = {}
   }
 
   compileTextarea() {
@@ -97,7 +102,7 @@ export class GLApp {
     }
 
     this.renderer.render((manager) => {
-      this.renderFunc({}, manager);
+      this.renderFunc(this.renderFuncState, manager);
     })
 
     this.animationFrame = requestAnimationFrame(this._render);

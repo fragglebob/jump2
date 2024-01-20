@@ -9,6 +9,7 @@ export type Props = {
     size?: number;
     speed?: number;
     amount?: number;
+    time?: number;
 };
 
 export class WarpPass extends ShaderRenderPass<Props> {
@@ -17,7 +18,7 @@ export class WarpPass extends ShaderRenderPass<Props> {
     }
 
     render(args: Props, fromFramebuffer: FramebufferInfo, toFramebuffer: FramebufferInfo) {
-        const time = this.renderer.getTime();
+        const time = args.time ?? this.renderer.getTime();
 
         this.renderer.gl.useProgram(this.programInfo.program);
 

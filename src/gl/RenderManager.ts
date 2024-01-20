@@ -11,6 +11,10 @@ interface RenderManagerInterface {
 
   beat(): number;
   bar(): number;
+  beat_progress(): number;
+  bar_progress(): number;
+
+  beat_raw(): number;
 
   fft(index: number): number;
 
@@ -106,6 +110,18 @@ export class RenderManager implements RenderManagerInterface {
 
   bar() : number {
     return this.renderer.tempoData?.currentBar ?? 0;
+  }
+
+  beat_progress() : number {
+    return this.renderer.tempoData?.beatProgress ?? 0;
+  }
+
+  bar_progress() : number {
+    return this.renderer.tempoData?.barProgress ?? 0;
+  }
+
+  beat_raw() : number {
+    return this.renderer.tempoData?.beatTotal ?? 0;
   }
 
   fft(index: number = 0) : number {
@@ -213,10 +229,10 @@ export class RenderManager implements RenderManagerInterface {
     );
   }
 
-  fx_warp(size?: number, speed?: number, amount?: number) {
+  fx_warp(size?: number, speed?: number, amount?: number, time?: number) {
     this.renderer.doRenderPass(
       this.renderer.passes.warp,
-      { size, speed, amount }
+      { size, speed, amount, time }
     );
   }
 }
