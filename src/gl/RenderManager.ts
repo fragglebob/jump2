@@ -45,6 +45,7 @@ interface RenderManagerInterface {
   fx_bloom(): void;
   fx_feedback(): void;
   fx_warp(size?: number, speed?: number, amount?: number): void;
+  fx_ascii(scale?: number): void;
 }
 
 type CameraMatrixes = {
@@ -233,6 +234,13 @@ export class RenderManager implements RenderManagerInterface {
     this.renderer.doRenderPass(
       this.renderer.passes.warp,
       { size, speed, amount, time }
+    );
+  }
+
+  fx_ascii(scale?: number) {
+    this.renderer.doRenderPass(
+        this.renderer.passes.ascii,
+        { scale }
     );
   }
 }

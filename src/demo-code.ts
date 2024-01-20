@@ -1,30 +1,38 @@
-export const startingCode = `loop ii <- 200 times
+export const startingCode = `count = 1000
+
+loop ii <- count times
     pushMatrix()
-        hsl((time()/4+ii/13.37)%1,1.2,2)
+
+   i = 1-(((ii + time()  * 100) % count) / count)
+
+        hsl((time()/4/4)%1,0.7,0.2*fft(0))
+
         translate(
-            sin(time()/4+ii/40)*2.5 + cos(time()+ii), 
-            cos(time()/4+ii/40)*6+ sin(time()+ii), 
-            cos(time()/10+ii/7)*6  + sin(time()+ii)
+            cos(ii)*2,sin(ii)*2,
+           i * 200 - 20
         )
-        rotateX(time()+ii)
-        rotateZ(time()+ii)   
-        rotateY(time()-ii) 
-        scale(fft(7)*fft(3)*8+0.1)
+
+scale((fft(0)*fft(6)+0.1)*(1-fft(7)))
+
         box()
     popMatrix()
 endloop
+
 
 fx_feedback()
-fx_warp(4,0.4, 0.9)
 
-hsl((time()/4)%1,1.1,2)
-loop ii <- 10 times
-    pushMatrix()
-        scale(fft(ii+6)*8+1)
-        rotateY(ii+(3+fft(12)*0.5))
-        rotateX(ii/2)
-        rotateZ(ii+(2+fft(6)*5))
-        box()
-    popMatrix()
-endloop
+fx_grid(1.3)
+fx_ascii(fft(4)*20 + 10)
+fx_feedback()
+
+fx_warp(1, 0.1, 0.001)
+
+fx_feedback()
+
+fx_kale(6)
+
+fx_rgb(0.002)
+
+
+fx_bloom()
 `
