@@ -1,3 +1,4 @@
+import { describe, it, expect } from "vitest";
 import { createFunction } from "../../src/compiler/createFunction";
 describe("createFunction", () => {
     it("should return a function with two arguments", () => {

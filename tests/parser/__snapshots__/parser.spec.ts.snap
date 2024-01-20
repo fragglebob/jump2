@@ -1,20 +1,20 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`parser arrays build ast for an array with one item 1`] = `
-Object {
-  "statements": Array [
-    Object {
-      "set": Object {
-        "name": Object {
+exports[`parser > arrays > build ast for an array with one item 1`] = `
+{
+  "statements": [
+    {
+      "set": {
+        "name": {
           "type": "name",
           "value": "foo",
         },
         "type": "variable",
       },
-      "to": Object {
+      "to": {
         "type": "array",
-        "value": Array [
-          Object {
+        "value": [
+          {
             "type": "number",
             "value": "0",
           },
@@ -27,33 +27,33 @@ Object {
 }
 `;
 
-exports[`parser arrays build ast for an array with three mixed item 1`] = `
-Object {
-  "statements": Array [
-    Object {
-      "set": Object {
-        "name": Object {
+exports[`parser > arrays > build ast for an array with three mixed item 1`] = `
+{
+  "statements": [
+    {
+      "set": {
+        "name": {
           "type": "name",
           "value": "foo",
         },
         "type": "variable",
       },
-      "to": Object {
+      "to": {
         "type": "array",
-        "value": Array [
-          Object {
+        "value": [
+          {
             "type": "number",
             "value": "0",
           },
-          Object {
+          {
             "type": "string",
-            "value": "\\"foo\\"",
+            "value": ""foo"",
           },
-          Object {
-            "args": Object {
+          {
+            "args": {
               "type": "arguments",
-              "value": Array [
-                Object {
+              "value": [
+                {
                   "type": "number",
                   "value": "44",
                 },
@@ -71,20 +71,20 @@ Object {
 }
 `;
 
-exports[`parser arrays build ast for an empty array 1`] = `
-Object {
-  "statements": Array [
-    Object {
-      "set": Object {
-        "name": Object {
+exports[`parser > arrays > build ast for an empty array 1`] = `
+{
+  "statements": [
+    {
+      "set": {
+        "name": {
           "type": "name",
           "value": "foo",
         },
         "type": "variable",
       },
-      "to": Object {
+      "to": {
         "type": "array",
-        "value": Array [],
+        "value": [],
       },
       "type": "assignment",
     },
@@ -93,24 +93,24 @@ Object {
 }
 `;
 
-exports[`parser expressions should build ast for != 1`] = `
-Object {
-  "statements": Array [
-    Object {
-      "set": Object {
-        "name": Object {
+exports[`parser > expressions > should build ast for != 1`] = `
+{
+  "statements": [
+    {
+      "set": {
+        "name": {
           "type": "name",
           "value": "foo",
         },
         "type": "variable",
       },
-      "to": Object {
-        "left": Object {
+      "to": {
+        "left": {
           "type": "number",
           "value": "3",
         },
         "operation": "!=",
-        "right": Object {
+        "right": {
           "type": "number",
           "value": "2",
         },
@@ -123,24 +123,24 @@ Object {
 }
 `;
 
-exports[`parser expressions should build ast for < 1`] = `
-Object {
-  "statements": Array [
-    Object {
-      "set": Object {
-        "name": Object {
+exports[`parser > expressions > should build ast for < 1`] = `
+{
+  "statements": [
+    {
+      "set": {
+        "name": {
           "type": "name",
           "value": "foo",
         },
         "type": "variable",
       },
-      "to": Object {
-        "left": Object {
+      "to": {
+        "left": {
           "type": "number",
           "value": "3",
         },
         "operation": "<",
-        "right": Object {
+        "right": {
           "type": "number",
           "value": "2",
         },
@@ -153,24 +153,24 @@ Object {
 }
 `;
 
-exports[`parser expressions should build ast for <= 1`] = `
-Object {
-  "statements": Array [
-    Object {
-      "set": Object {
-        "name": Object {
+exports[`parser > expressions > should build ast for <= 1`] = `
+{
+  "statements": [
+    {
+      "set": {
+        "name": {
           "type": "name",
           "value": "foo",
         },
         "type": "variable",
       },
-      "to": Object {
-        "left": Object {
+      "to": {
+        "left": {
           "type": "number",
           "value": "3",
         },
         "operation": "<=",
-        "right": Object {
+        "right": {
           "type": "number",
           "value": "2",
         },
@@ -183,24 +183,24 @@ Object {
 }
 `;
 
-exports[`parser expressions should build ast for == 1`] = `
-Object {
-  "statements": Array [
-    Object {
-      "set": Object {
-        "name": Object {
+exports[`parser > expressions > should build ast for == 1`] = `
+{
+  "statements": [
+    {
+      "set": {
+        "name": {
           "type": "name",
           "value": "foo",
         },
         "type": "variable",
       },
-      "to": Object {
-        "left": Object {
+      "to": {
+        "left": {
           "type": "number",
           "value": "3",
         },
         "operation": "==",
-        "right": Object {
+        "right": {
           "type": "number",
           "value": "2",
         },
@@ -213,24 +213,24 @@ Object {
 }
 `;
 
-exports[`parser expressions should build ast for > 1`] = `
-Object {
-  "statements": Array [
-    Object {
-      "set": Object {
-        "name": Object {
+exports[`parser > expressions > should build ast for > 1`] = `
+{
+  "statements": [
+    {
+      "set": {
+        "name": {
           "type": "name",
           "value": "foo",
         },
         "type": "variable",
       },
-      "to": Object {
-        "left": Object {
+      "to": {
+        "left": {
           "type": "number",
           "value": "3",
         },
         "operation": ">",
-        "right": Object {
+        "right": {
           "type": "number",
           "value": "2",
         },
@@ -243,24 +243,24 @@ Object {
 }
 `;
 
-exports[`parser expressions should build ast for >= 1`] = `
-Object {
-  "statements": Array [
-    Object {
-      "set": Object {
-        "name": Object {
+exports[`parser > expressions > should build ast for >= 1`] = `
+{
+  "statements": [
+    {
+      "set": {
+        "name": {
           "type": "name",
           "value": "foo",
         },
         "type": "variable",
       },
-      "to": Object {
-        "left": Object {
+      "to": {
+        "left": {
           "type": "number",
           "value": "3",
         },
         "operation": ">=",
-        "right": Object {
+        "right": {
           "type": "number",
           "value": "2",
         },
@@ -273,23 +273,23 @@ Object {
 }
 `;
 
-exports[`parser expressions should build ast for a combination of boolean logic 1`] = `
-Object {
-  "statements": Array [
-    Object {
-      "set": Object {
-        "name": Object {
+exports[`parser > expressions > should build ast for a combination of boolean logic 1`] = `
+{
+  "statements": [
+    {
+      "set": {
+        "name": {
           "type": "name",
           "value": "foo",
         },
         "type": "variable",
       },
-      "to": Object {
-        "left": Object {
-          "args": Object {
+      "to": {
+        "left": {
+          "args": {
             "type": "arguments",
-            "value": Array [
-              Object {
+            "value": [
+              {
                 "type": "number",
                 "value": "224",
               },
@@ -299,20 +299,20 @@ Object {
           "type": "func",
         },
         "operation": "&&",
-        "right": Object {
+        "right": {
           "type": "parenthesized",
-          "value": Object {
-            "left": Object {
-              "left": Object {
+          "value": {
+            "left": {
+              "left": {
                 "type": "number",
                 "value": "0",
               },
               "operation": "!=",
-              "right": Object {
-                "args": Object {
+              "right": {
+                "args": {
                   "type": "arguments",
-                  "value": Array [
-                    Object {
+                  "value": [
+                    {
                       "type": "number",
                       "value": "0",
                     },
@@ -324,12 +324,12 @@ Object {
               "type": "comparison",
             },
             "operation": "||",
-            "right": Object {
-              "left": Object {
-                "args": Object {
+            "right": {
+              "left": {
+                "args": {
                   "type": "arguments",
-                  "value": Array [
-                    Object {
+                  "value": [
+                    {
                       "type": "number",
                       "value": "0",
                     },
@@ -339,7 +339,7 @@ Object {
                 "type": "func",
               },
               "operation": ">=",
-              "right": Object {
+              "right": {
                 "type": "number",
                 "value": "0",
               },
@@ -357,24 +357,24 @@ Object {
 }
 `;
 
-exports[`parser expressions should build ast for addition 1`] = `
-Object {
-  "statements": Array [
-    Object {
-      "set": Object {
-        "name": Object {
+exports[`parser > expressions > should build ast for addition 1`] = `
+{
+  "statements": [
+    {
+      "set": {
+        "name": {
           "type": "name",
           "value": "foo",
         },
         "type": "variable",
       },
-      "to": Object {
-        "left": Object {
+      "to": {
+        "left": {
           "type": "number",
           "value": "3",
         },
         "operation": "+",
-        "right": Object {
+        "right": {
           "type": "number",
           "value": "2",
         },
@@ -387,29 +387,29 @@ Object {
 }
 `;
 
-exports[`parser expressions should build ast for boolean and logic 1`] = `
-Object {
-  "statements": Array [
-    Object {
-      "set": Object {
-        "name": Object {
+exports[`parser > expressions > should build ast for boolean and logic 1`] = `
+{
+  "statements": [
+    {
+      "set": {
+        "name": {
           "type": "name",
           "value": "foo",
         },
         "type": "variable",
       },
-      "to": Object {
-        "left": Object {
-          "left": Object {
+      "to": {
+        "left": {
+          "left": {
             "type": "number",
             "value": "0.5",
           },
           "operation": ">",
-          "right": Object {
-            "args": Object {
+          "right": {
+            "args": {
               "type": "arguments",
-              "value": Array [
-                Object {
+              "value": [
+                {
                   "type": "number",
                   "value": "224",
                 },
@@ -421,17 +421,17 @@ Object {
           "type": "comparison",
         },
         "operation": "&&",
-        "right": Object {
-          "left": Object {
+        "right": {
+          "left": {
             "type": "number",
             "value": "0.5",
           },
           "operation": "<",
-          "right": Object {
-            "args": Object {
+          "right": {
+            "args": {
               "type": "arguments",
-              "value": Array [
-                Object {
+              "value": [
+                {
                   "type": "number",
                   "value": "124",
                 },
@@ -451,29 +451,29 @@ Object {
 }
 `;
 
-exports[`parser expressions should build ast for boolean or logic 1`] = `
-Object {
-  "statements": Array [
-    Object {
-      "set": Object {
-        "name": Object {
+exports[`parser > expressions > should build ast for boolean or logic 1`] = `
+{
+  "statements": [
+    {
+      "set": {
+        "name": {
           "type": "name",
           "value": "foo",
         },
         "type": "variable",
       },
-      "to": Object {
-        "left": Object {
-          "left": Object {
+      "to": {
+        "left": {
+          "left": {
             "type": "number",
             "value": "0.5",
           },
           "operation": ">",
-          "right": Object {
-            "args": Object {
+          "right": {
+            "args": {
               "type": "arguments",
-              "value": Array [
-                Object {
+              "value": [
+                {
                   "type": "number",
                   "value": "224",
                 },
@@ -485,17 +485,17 @@ Object {
           "type": "comparison",
         },
         "operation": "||",
-        "right": Object {
-          "left": Object {
+        "right": {
+          "left": {
             "type": "number",
             "value": "0.5",
           },
           "operation": "<",
-          "right": Object {
-            "args": Object {
+          "right": {
+            "args": {
               "type": "arguments",
-              "value": Array [
-                Object {
+              "value": [
+                {
                   "type": "number",
                   "value": "124",
                 },
@@ -515,36 +515,36 @@ Object {
 }
 `;
 
-exports[`parser expressions should build ast for brackets 1`] = `
-Object {
-  "statements": Array [
-    Object {
-      "set": Object {
-        "name": Object {
+exports[`parser > expressions > should build ast for brackets 1`] = `
+{
+  "statements": [
+    {
+      "set": {
+        "name": {
           "type": "name",
           "value": "foo",
         },
         "type": "variable",
       },
-      "to": Object {
+      "to": {
         "type": "parenthesized",
-        "value": Object {
-          "left": Object {
+        "value": {
+          "left": {
             "type": "number",
             "value": "234",
           },
           "operation": "*",
-          "right": Object {
+          "right": {
             "type": "parenthesized",
-            "value": Object {
-              "left": Object {
+            "value": {
+              "left": {
                 "type": "parenthesized",
-                "value": Object {
-                  "left": Object {
-                    "args": Object {
+                "value": {
+                  "left": {
+                    "args": {
                       "type": "arguments",
-                      "value": Array [
-                        Object {
+                      "value": [
+                        {
                           "type": "number",
                           "value": "5",
                         },
@@ -554,7 +554,7 @@ Object {
                     "type": "func",
                   },
                   "operation": "-",
-                  "right": Object {
+                  "right": {
                     "type": "number",
                     "value": "8",
                   },
@@ -562,19 +562,19 @@ Object {
                 },
               },
               "operation": "/",
-              "right": Object {
+              "right": {
                 "type": "parenthesized",
-                "value": Object {
-                  "left": Object {
+                "value": {
+                  "left": {
                     "type": "number",
                     "value": "988",
                   },
                   "operation": "+",
-                  "right": Object {
-                    "args": Object {
+                  "right": {
+                    "args": {
                       "type": "arguments",
-                      "value": Array [
-                        Object {
+                      "value": [
+                        {
                           "type": "number",
                           "value": "592",
                         },
@@ -599,24 +599,24 @@ Object {
 }
 `;
 
-exports[`parser expressions should build ast for divide 1`] = `
-Object {
-  "statements": Array [
-    Object {
-      "set": Object {
-        "name": Object {
+exports[`parser > expressions > should build ast for divide 1`] = `
+{
+  "statements": [
+    {
+      "set": {
+        "name": {
           "type": "name",
           "value": "foo",
         },
         "type": "variable",
       },
-      "to": Object {
-        "left": Object {
+      "to": {
+        "left": {
           "type": "number",
           "value": "3",
         },
         "operation": "/",
-        "right": Object {
+        "right": {
           "type": "number",
           "value": "2",
         },
@@ -629,24 +629,24 @@ Object {
 }
 `;
 
-exports[`parser expressions should build ast for mod 1`] = `
-Object {
-  "statements": Array [
-    Object {
-      "set": Object {
-        "name": Object {
+exports[`parser > expressions > should build ast for mod 1`] = `
+{
+  "statements": [
+    {
+      "set": {
+        "name": {
           "type": "name",
           "value": "foo",
         },
         "type": "variable",
       },
-      "to": Object {
-        "left": Object {
+      "to": {
+        "left": {
           "type": "number",
           "value": "3",
         },
         "operation": "%",
-        "right": Object {
+        "right": {
           "type": "number",
           "value": "2",
         },
@@ -659,24 +659,24 @@ Object {
 }
 `;
 
-exports[`parser expressions should build ast for subtraction 1`] = `
-Object {
-  "statements": Array [
-    Object {
-      "set": Object {
-        "name": Object {
+exports[`parser > expressions > should build ast for subtraction 1`] = `
+{
+  "statements": [
+    {
+      "set": {
+        "name": {
           "type": "name",
           "value": "foo",
         },
         "type": "variable",
       },
-      "to": Object {
-        "left": Object {
+      "to": {
+        "left": {
           "type": "number",
           "value": "3",
         },
         "operation": "-",
-        "right": Object {
+        "right": {
           "type": "number",
           "value": "2",
         },
@@ -689,24 +689,24 @@ Object {
 }
 `;
 
-exports[`parser expressions should build ast for times 1`] = `
-Object {
-  "statements": Array [
-    Object {
-      "set": Object {
-        "name": Object {
+exports[`parser > expressions > should build ast for times 1`] = `
+{
+  "statements": [
+    {
+      "set": {
+        "name": {
           "type": "name",
           "value": "foo",
         },
         "type": "variable",
       },
-      "to": Object {
-        "left": Object {
+      "to": {
+        "left": {
           "type": "number",
           "value": "3",
         },
         "operation": "*",
-        "right": Object {
+        "right": {
           "type": "number",
           "value": "2",
         },
@@ -719,14 +719,14 @@ Object {
 }
 `;
 
-exports[`parser functions should build ast for a cos call 1`] = `
-Object {
-  "statements": Array [
-    Object {
-      "args": Object {
+exports[`parser > functions > should build ast for a cos call 1`] = `
+{
+  "statements": [
+    {
+      "args": {
         "type": "arguments",
-        "value": Array [
-          Object {
+        "value": [
+          {
             "type": "number",
             "value": "3",
           },
@@ -740,14 +740,14 @@ Object {
 }
 `;
 
-exports[`parser functions should build ast for a sin call 1`] = `
-Object {
-  "statements": Array [
-    Object {
-      "args": Object {
+exports[`parser > functions > should build ast for a sin call 1`] = `
+{
+  "statements": [
+    {
+      "args": {
         "type": "arguments",
-        "value": Array [
-          Object {
+        "value": [
+          {
             "type": "number",
             "value": "3",
           },
@@ -761,30 +761,30 @@ Object {
 }
 `;
 
-exports[`parser if blocks should build ast for a if statement 1`] = `
-Object {
-  "statements": Array [
-    Object {
-      "condition": Object {
-        "left": Object {
+exports[`parser > if blocks > should build ast for a if statement 1`] = `
+{
+  "statements": [
+    {
+      "condition": {
+        "left": {
           "type": "number",
           "value": "2",
         },
         "operation": ">",
-        "right": Object {
+        "right": {
           "type": "number",
           "value": "1",
         },
         "type": "comparison",
       },
       "else": null,
-      "then": Object {
-        "statements": Array [
-          Object {
-            "args": Object {
+      "then": {
+        "statements": [
+          {
+            "args": {
               "type": "arguments",
-              "value": Array [
-                Object {
+              "value": [
+                {
                   "type": "number",
                   "value": "3",
                 },
@@ -803,29 +803,29 @@ Object {
 }
 `;
 
-exports[`parser if blocks should build ast for a if...else statement 1`] = `
-Object {
-  "statements": Array [
-    Object {
-      "condition": Object {
-        "left": Object {
+exports[`parser > if blocks > should build ast for a if...else statement 1`] = `
+{
+  "statements": [
+    {
+      "condition": {
+        "left": {
           "type": "number",
           "value": "2",
         },
         "operation": ">",
-        "right": Object {
+        "right": {
           "type": "number",
           "value": "1",
         },
         "type": "comparison",
       },
-      "else": Object {
-        "statements": Array [
-          Object {
-            "args": Object {
+      "else": {
+        "statements": [
+          {
+            "args": {
               "type": "arguments",
-              "value": Array [
-                Object {
+              "value": [
+                {
                   "type": "number",
                   "value": "2",
                 },
@@ -837,13 +837,13 @@ Object {
         ],
         "type": "block",
       },
-      "then": Object {
-        "statements": Array [
-          Object {
-            "args": Object {
+      "then": {
+        "statements": [
+          {
+            "args": {
               "type": "arguments",
-              "value": Array [
-                Object {
+              "value": [
+                {
                   "type": "number",
                   "value": "3",
                 },
@@ -862,43 +862,43 @@ Object {
 }
 `;
 
-exports[`parser if blocks should build ast for a if...elseif statement 1`] = `
-Object {
-  "statements": Array [
-    Object {
-      "condition": Object {
-        "left": Object {
+exports[`parser > if blocks > should build ast for a if...elseif statement 1`] = `
+{
+  "statements": [
+    {
+      "condition": {
+        "left": {
           "type": "number",
           "value": "2",
         },
         "operation": ">",
-        "right": Object {
+        "right": {
           "type": "number",
           "value": "1",
         },
         "type": "comparison",
       },
-      "else": Object {
-        "condition": Object {
-          "left": Object {
+      "else": {
+        "condition": {
+          "left": {
             "type": "number",
             "value": "4",
           },
           "operation": "<",
-          "right": Object {
+          "right": {
             "type": "number",
             "value": "2",
           },
           "type": "comparison",
         },
         "else": null,
-        "then": Object {
-          "statements": Array [
-            Object {
-              "args": Object {
+        "then": {
+          "statements": [
+            {
+              "args": {
                 "type": "arguments",
-                "value": Array [
-                  Object {
+                "value": [
+                  {
                     "type": "number",
                     "value": "2",
                   },
@@ -912,13 +912,13 @@ Object {
         },
         "type": "if",
       },
-      "then": Object {
-        "statements": Array [
-          Object {
-            "args": Object {
+      "then": {
+        "statements": [
+          {
+            "args": {
               "type": "arguments",
-              "value": Array [
-                Object {
+              "value": [
+                {
                   "type": "number",
                   "value": "3",
                 },
@@ -937,42 +937,42 @@ Object {
 }
 `;
 
-exports[`parser if blocks should build ast for a if...elseif...else statement 1`] = `
-Object {
-  "statements": Array [
-    Object {
-      "condition": Object {
-        "left": Object {
+exports[`parser > if blocks > should build ast for a if...elseif...else statement 1`] = `
+{
+  "statements": [
+    {
+      "condition": {
+        "left": {
           "type": "number",
           "value": "2",
         },
         "operation": ">",
-        "right": Object {
+        "right": {
           "type": "number",
           "value": "1",
         },
         "type": "comparison",
       },
-      "else": Object {
-        "condition": Object {
-          "left": Object {
+      "else": {
+        "condition": {
+          "left": {
             "type": "number",
             "value": "4",
           },
           "operation": "<",
-          "right": Object {
+          "right": {
             "type": "number",
             "value": "2",
           },
           "type": "comparison",
         },
-        "else": Object {
-          "statements": Array [
-            Object {
-              "args": Object {
+        "else": {
+          "statements": [
+            {
+              "args": {
                 "type": "arguments",
-                "value": Array [
-                  Object {
+                "value": [
+                  {
                     "type": "number",
                     "value": "2",
                   },
@@ -984,13 +984,13 @@ Object {
           ],
           "type": "block",
         },
-        "then": Object {
-          "statements": Array [
-            Object {
-              "args": Object {
+        "then": {
+          "statements": [
+            {
+              "args": {
                 "type": "arguments",
-                "value": Array [
-                  Object {
+                "value": [
+                  {
                     "type": "number",
                     "value": "5444",
                   },
@@ -1004,13 +1004,13 @@ Object {
         },
         "type": "if",
       },
-      "then": Object {
-        "statements": Array [
-          Object {
-            "args": Object {
+      "then": {
+        "statements": [
+          {
+            "args": {
               "type": "arguments",
-              "value": Array [
-                Object {
+              "value": [
+                {
                   "type": "number",
                   "value": "3",
                 },
@@ -1029,61 +1029,61 @@ Object {
 }
 `;
 
-exports[`parser if blocks should build ast for a if...elseif...elseif...elseif...else statement 1`] = `
-Object {
-  "statements": Array [
-    Object {
-      "condition": Object {
-        "left": Object {
+exports[`parser > if blocks > should build ast for a if...elseif...elseif...elseif...else statement 1`] = `
+{
+  "statements": [
+    {
+      "condition": {
+        "left": {
           "type": "number",
           "value": "2",
         },
         "operation": ">",
-        "right": Object {
+        "right": {
           "type": "number",
           "value": "1",
         },
         "type": "comparison",
       },
-      "else": Object {
-        "condition": Object {
-          "left": Object {
+      "else": {
+        "condition": {
+          "left": {
             "type": "number",
             "value": "4",
           },
           "operation": "<",
-          "right": Object {
+          "right": {
             "type": "number",
             "value": "2",
           },
           "type": "comparison",
         },
-        "else": Object {
-          "condition": Object {
-            "left": Object {
+        "else": {
+          "condition": {
+            "left": {
               "type": "number",
               "value": "545",
             },
             "operation": ">",
-            "right": Object {
+            "right": {
               "type": "number",
               "value": "89",
             },
             "type": "comparison",
           },
-          "else": Object {
-            "condition": Object {
-              "left": Object {
+          "else": {
+            "condition": {
+              "left": {
                 "type": "number",
                 "value": "234",
               },
               "operation": "<=",
-              "right": Object {
-                "left": Object {
-                  "args": Object {
+              "right": {
+                "left": {
+                  "args": {
                     "type": "arguments",
-                    "value": Array [
-                      Object {
+                    "value": [
+                      {
                         "type": "number",
                         "value": "3",
                       },
@@ -1093,7 +1093,7 @@ Object {
                   "type": "func",
                 },
                 "operation": "*",
-                "right": Object {
+                "right": {
                   "type": "number",
                   "value": "234",
                 },
@@ -1101,13 +1101,13 @@ Object {
               },
               "type": "comparison",
             },
-            "else": Object {
-              "statements": Array [
-                Object {
-                  "args": Object {
+            "else": {
+              "statements": [
+                {
+                  "args": {
                     "type": "arguments",
-                    "value": Array [
-                      Object {
+                    "value": [
+                      {
                         "type": "number",
                         "value": "2",
                       },
@@ -1119,13 +1119,13 @@ Object {
               ],
               "type": "block",
             },
-            "then": Object {
-              "statements": Array [
-                Object {
-                  "args": Object {
+            "then": {
+              "statements": [
+                {
+                  "args": {
                     "type": "arguments",
-                    "value": Array [
-                      Object {
+                    "value": [
+                      {
                         "type": "number",
                         "value": "123",
                       },
@@ -1139,13 +1139,13 @@ Object {
             },
             "type": "if",
           },
-          "then": Object {
-            "statements": Array [
-              Object {
-                "args": Object {
+          "then": {
+            "statements": [
+              {
+                "args": {
                   "type": "arguments",
-                  "value": Array [
-                    Object {
+                  "value": [
+                    {
                       "type": "number",
                       "value": "123",
                     },
@@ -1159,13 +1159,13 @@ Object {
           },
           "type": "if",
         },
-        "then": Object {
-          "statements": Array [
-            Object {
-              "args": Object {
+        "then": {
+          "statements": [
+            {
+              "args": {
                 "type": "arguments",
-                "value": Array [
-                  Object {
+                "value": [
+                  {
                     "type": "number",
                     "value": "5444",
                   },
@@ -1179,13 +1179,13 @@ Object {
         },
         "type": "if",
       },
-      "then": Object {
-        "statements": Array [
-          Object {
-            "args": Object {
+      "then": {
+        "statements": [
+          {
+            "args": {
               "type": "arguments",
-              "value": Array [
-                Object {
+              "value": [
+                {
                   "type": "number",
                   "value": "3",
                 },
@@ -1204,35 +1204,35 @@ Object {
 }
 `;
 
-exports[`parser loops should build ast for a for in statement 1`] = `
-Object {
-  "statements": Array [
-    Object {
-      "over": Object {
-        "from": Object {
+exports[`parser > loops > should build ast for a for in statement 1`] = `
+{
+  "statements": [
+    {
+      "over": {
+        "from": {
           "type": "number",
           "value": "0",
         },
-        "to": Object {
+        "to": {
           "type": "number",
           "value": "10",
         },
         "type": "range",
       },
-      "setting": Object {
-        "name": Object {
+      "setting": {
+        "name": {
           "type": "name",
           "value": "i",
         },
         "type": "variable",
       },
-      "then": Object {
-        "statements": Array [
-          Object {
-            "args": Object {
+      "then": {
+        "statements": [
+          {
+            "args": {
               "type": "arguments",
-              "value": Array [
-                Object {
+              "value": [
+                {
                   "type": "number",
                   "value": "3",
                 },
@@ -1251,25 +1251,25 @@ Object {
 }
 `;
 
-exports[`parser loops should build ast for a loop statement 1`] = `
-Object {
-  "statements": Array [
-    Object {
-      "then": Object {
-        "statements": Array [
-          Object {
-            "set": Object {
-              "name": Object {
+exports[`parser > loops > should build ast for a loop statement 1`] = `
+{
+  "statements": [
+    {
+      "then": {
+        "statements": [
+          {
+            "set": {
+              "name": {
                 "type": "name",
                 "value": "y",
               },
               "type": "variable",
             },
-            "to": Object {
-              "args": Object {
+            "to": {
+              "args": {
                 "type": "arguments",
-                "value": Array [
-                  Object {
+                "value": [
+                  {
                     "type": "number",
                     "value": "3",
                   },
@@ -1283,7 +1283,7 @@ Object {
         ],
         "type": "block",
       },
-      "times": Object {
+      "times": {
         "type": "number",
         "value": "800",
       },
@@ -1294,33 +1294,33 @@ Object {
 }
 `;
 
-exports[`parser loops should build ast for a setting loop statement 1`] = `
-Object {
-  "statements": Array [
-    Object {
-      "setting": Object {
-        "name": Object {
+exports[`parser > loops > should build ast for a setting loop statement 1`] = `
+{
+  "statements": [
+    {
+      "setting": {
+        "name": {
           "type": "name",
           "value": "x",
         },
         "type": "variable",
       },
-      "then": Object {
-        "statements": Array [
-          Object {
-            "set": Object {
-              "name": Object {
+      "then": {
+        "statements": [
+          {
+            "set": {
+              "name": {
                 "type": "name",
                 "value": "y",
               },
               "type": "variable",
             },
-            "to": Object {
-              "args": Object {
+            "to": {
+              "args": {
                 "type": "arguments",
-                "value": Array [
-                  Object {
-                    "name": Object {
+                "value": [
+                  {
+                    "name": {
                       "type": "name",
                       "value": "x",
                     },
@@ -1336,7 +1336,7 @@ Object {
         ],
         "type": "block",
       },
-      "times": Object {
+      "times": {
         "type": "number",
         "value": "800",
       },
@@ -1347,29 +1347,29 @@ Object {
 }
 `;
 
-exports[`parser loops should build ast for a while statement 1`] = `
-Object {
-  "statements": Array [
-    Object {
-      "condition": Object {
-        "left": Object {
+exports[`parser > loops > should build ast for a while statement 1`] = `
+{
+  "statements": [
+    {
+      "condition": {
+        "left": {
           "type": "number",
           "value": "2",
         },
         "operation": ">",
-        "right": Object {
+        "right": {
           "type": "number",
           "value": "1",
         },
         "type": "comparison",
       },
-      "then": Object {
-        "statements": Array [
-          Object {
-            "args": Object {
+      "then": {
+        "statements": [
+          {
+            "args": {
               "type": "arguments",
-              "value": Array [
-                Object {
+              "value": [
+                {
                   "type": "number",
                   "value": "3",
                 },
@@ -1388,18 +1388,18 @@ Object {
 }
 `;
 
-exports[`parser numbers should build ast for a negative decimal 1`] = `
-Object {
-  "statements": Array [
-    Object {
-      "set": Object {
-        "name": Object {
+exports[`parser > numbers > should build ast for a negative decimal 1`] = `
+{
+  "statements": [
+    {
+      "set": {
+        "name": {
           "type": "name",
           "value": "foo",
         },
         "type": "variable",
       },
-      "to": Object {
+      "to": {
         "type": "number",
         "value": "-13.37",
       },
@@ -1410,18 +1410,18 @@ Object {
 }
 `;
 
-exports[`parser numbers should build ast for a negative interger 1`] = `
-Object {
-  "statements": Array [
-    Object {
-      "set": Object {
-        "name": Object {
+exports[`parser > numbers > should build ast for a negative interger 1`] = `
+{
+  "statements": [
+    {
+      "set": {
+        "name": {
           "type": "name",
           "value": "foo",
         },
         "type": "variable",
       },
-      "to": Object {
+      "to": {
         "type": "number",
         "value": "-5",
       },
@@ -1432,18 +1432,18 @@ Object {
 }
 `;
 
-exports[`parser numbers should build ast for a positive interger 1`] = `
-Object {
-  "statements": Array [
-    Object {
-      "set": Object {
-        "name": Object {
+exports[`parser > numbers > should build ast for a positive interger 1`] = `
+{
+  "statements": [
+    {
+      "set": {
+        "name": {
           "type": "name",
           "value": "foo",
         },
         "type": "variable",
       },
-      "to": Object {
+      "to": {
         "type": "number",
         "value": "5",
       },
@@ -1454,18 +1454,18 @@ Object {
 }
 `;
 
-exports[`parser numbers should build ast for decimal 1`] = `
-Object {
-  "statements": Array [
-    Object {
-      "set": Object {
-        "name": Object {
+exports[`parser > numbers > should build ast for decimal 1`] = `
+{
+  "statements": [
+    {
+      "set": {
+        "name": {
           "type": "name",
           "value": "foo",
         },
         "type": "variable",
       },
-      "to": Object {
+      "to": {
         "type": "number",
         "value": "13.37",
       },
@@ -1476,18 +1476,18 @@ Object {
 }
 `;
 
-exports[`parser numbers should build ast for zero 1`] = `
-Object {
-  "statements": Array [
-    Object {
-      "set": Object {
-        "name": Object {
+exports[`parser > numbers > should build ast for zero 1`] = `
+{
+  "statements": [
+    {
+      "set": {
+        "name": {
           "type": "name",
           "value": "foo",
         },
         "type": "variable",
       },
-      "to": Object {
+      "to": {
         "type": "number",
         "value": "0",
       },
@@ -1498,19 +1498,19 @@ Object {
 }
 `;
 
-exports[`parser objects build ast for an empty object 1`] = `
-Object {
-  "statements": Array [
-    Object {
-      "set": Object {
-        "name": Object {
+exports[`parser > objects > build ast for an empty object 1`] = `
+{
+  "statements": [
+    {
+      "set": {
+        "name": {
           "type": "name",
           "value": "foo",
         },
         "type": "variable",
       },
-      "to": Object {
-        "entries": Array [],
+      "to": {
+        "entries": [],
         "type": "object",
       },
       "type": "assignment",
@@ -1520,31 +1520,31 @@ Object {
 }
 `;
 
-exports[`parser objects build ast for an object with a name key 1`] = `
-Object {
-  "statements": Array [
-    Object {
-      "set": Object {
-        "name": Object {
+exports[`parser > objects > build ast for an object with a name key 1`] = `
+{
+  "statements": [
+    {
+      "set": {
+        "name": {
           "type": "name",
           "value": "foo",
         },
         "type": "variable",
       },
-      "to": Object {
-        "entries": Array [
-          Object {
-            "key": Object {
+      "to": {
+        "entries": [
+          {
+            "key": {
               "type": "object_key",
-              "value": Object {
+              "value": {
                 "type": "name",
                 "value": "bar",
               },
             },
             "type": "object_entry",
-            "value": Object {
+            "value": {
               "type": "string",
-              "value": "\\"baz\\"",
+              "value": ""baz"",
             },
           },
         ],
@@ -1557,31 +1557,31 @@ Object {
 }
 `;
 
-exports[`parser objects build ast for an object with a string key 1`] = `
-Object {
-  "statements": Array [
-    Object {
-      "set": Object {
-        "name": Object {
+exports[`parser > objects > build ast for an object with a string key 1`] = `
+{
+  "statements": [
+    {
+      "set": {
+        "name": {
           "type": "name",
           "value": "foo",
         },
         "type": "variable",
       },
-      "to": Object {
-        "entries": Array [
-          Object {
-            "key": Object {
+      "to": {
+        "entries": [
+          {
+            "key": {
               "type": "object_key",
-              "value": Object {
+              "value": {
                 "type": "string",
-                "value": "\\"bar-bar\\"",
+                "value": ""bar-bar"",
               },
             },
             "type": "object_entry",
-            "value": Object {
+            "value": {
               "type": "string",
-              "value": "\\"baz\\"",
+              "value": ""baz"",
             },
           },
         ],
@@ -1594,27 +1594,27 @@ Object {
 }
 `;
 
-exports[`parser objects build ast for an object with an expression key 1`] = `
-Object {
-  "statements": Array [
-    Object {
-      "set": Object {
-        "name": Object {
+exports[`parser > objects > build ast for an object with an expression key 1`] = `
+{
+  "statements": [
+    {
+      "set": {
+        "name": {
           "type": "name",
           "value": "foo",
         },
         "type": "variable",
       },
-      "to": Object {
-        "entries": Array [
-          Object {
-            "key": Object {
+      "to": {
+        "entries": [
+          {
+            "key": {
               "type": "object_key",
-              "value": Object {
-                "args": Object {
+              "value": {
+                "args": {
                   "type": "arguments",
-                  "value": Array [
-                    Object {
+                  "value": [
+                    {
                       "type": "number",
                       "value": "5",
                     },
@@ -1625,9 +1625,9 @@ Object {
               },
             },
             "type": "object_entry",
-            "value": Object {
+            "value": {
               "type": "string",
-              "value": "\\"baz\\"",
+              "value": ""baz"",
             },
           },
         ],
@@ -1640,57 +1640,57 @@ Object {
 }
 `;
 
-exports[`parser objects build ast for an object with many named keys 1`] = `
-Object {
-  "statements": Array [
-    Object {
-      "set": Object {
-        "name": Object {
+exports[`parser > objects > build ast for an object with many named keys 1`] = `
+{
+  "statements": [
+    {
+      "set": {
+        "name": {
           "type": "name",
           "value": "foo",
         },
         "type": "variable",
       },
-      "to": Object {
-        "entries": Array [
-          Object {
-            "key": Object {
+      "to": {
+        "entries": [
+          {
+            "key": {
               "type": "object_key",
-              "value": Object {
+              "value": {
                 "type": "name",
                 "value": "bar",
               },
             },
             "type": "object_entry",
-            "value": Object {
+            "value": {
               "type": "number",
               "value": "1",
             },
           },
-          Object {
-            "key": Object {
+          {
+            "key": {
               "type": "object_key",
-              "value": Object {
+              "value": {
                 "type": "name",
                 "value": "baz",
               },
             },
             "type": "object_entry",
-            "value": Object {
+            "value": {
               "type": "number",
               "value": "2",
             },
           },
-          Object {
-            "key": Object {
+          {
+            "key": {
               "type": "object_key",
-              "value": Object {
+              "value": {
                 "type": "name",
                 "value": "baa",
               },
             },
             "type": "object_entry",
-            "value": Object {
+            "value": {
               "type": "number",
               "value": "3",
             },
@@ -1705,69 +1705,69 @@ Object {
 }
 `;
 
-exports[`parser objects build ast for an object with mixed keys 1`] = `
-Object {
-  "statements": Array [
-    Object {
-      "set": Object {
-        "name": Object {
+exports[`parser > objects > build ast for an object with mixed keys 1`] = `
+{
+  "statements": [
+    {
+      "set": {
+        "name": {
           "type": "name",
           "value": "foo",
         },
         "type": "variable",
       },
-      "to": Object {
-        "entries": Array [
-          Object {
-            "key": Object {
+      "to": {
+        "entries": [
+          {
+            "key": {
               "type": "object_key",
-              "value": Object {
+              "value": {
                 "type": "name",
                 "value": "bar",
               },
             },
             "type": "object_entry",
-            "value": Object {
+            "value": {
               "type": "number",
               "value": "1",
             },
           },
-          Object {
-            "key": Object {
+          {
+            "key": {
               "type": "object_key",
-              "value": Object {
+              "value": {
                 "type": "string",
-                "value": "\\"baz\\"",
+                "value": ""baz"",
               },
             },
             "type": "object_entry",
-            "value": Object {
+            "value": {
               "type": "number",
               "value": "2",
             },
           },
-          Object {
-            "key": Object {
+          {
+            "key": {
               "type": "object_key",
-              "value": Object {
+              "value": {
                 "type": "string",
-                "value": "\\"baa\\"",
+                "value": ""baa"",
               },
             },
             "type": "object_entry",
-            "value": Object {
+            "value": {
               "type": "number",
               "value": "3",
             },
           },
-          Object {
-            "key": Object {
+          {
+            "key": {
               "type": "object_key",
-              "value": Object {
-                "args": Object {
+              "value": {
+                "args": {
                   "type": "arguments",
-                  "value": Array [
-                    Object {
+                  "value": [
+                    {
                       "type": "number",
                       "value": "4",
                     },
@@ -1778,23 +1778,23 @@ Object {
               },
             },
             "type": "object_entry",
-            "value": Object {
+            "value": {
               "type": "number",
               "value": "4",
             },
           },
-          Object {
-            "key": Object {
+          {
+            "key": {
               "type": "object_key",
-              "value": Object {
+              "value": {
                 "type": "name",
                 "value": "something",
               },
             },
             "type": "object_entry",
-            "value": Object {
+            "value": {
               "type": "string",
-              "value": "\\"else\\"",
+              "value": ""else"",
             },
           },
         ],
@@ -1807,93 +1807,93 @@ Object {
 }
 `;
 
-exports[`parser objects build ast for an object with nested objects 1`] = `
-Object {
-  "statements": Array [
-    Object {
-      "set": Object {
-        "name": Object {
+exports[`parser > objects > build ast for an object with nested objects 1`] = `
+{
+  "statements": [
+    {
+      "set": {
+        "name": {
           "type": "name",
           "value": "foo",
         },
         "type": "variable",
       },
-      "to": Object {
-        "entries": Array [
-          Object {
-            "key": Object {
+      "to": {
+        "entries": [
+          {
+            "key": {
               "type": "object_key",
-              "value": Object {
+              "value": {
                 "type": "name",
                 "value": "bar",
               },
             },
             "type": "object_entry",
-            "value": Object {
-              "entries": Array [
-                Object {
-                  "key": Object {
+            "value": {
+              "entries": [
+                {
+                  "key": {
                     "type": "object_key",
-                    "value": Object {
+                    "value": {
                       "type": "name",
                       "value": "baz",
                     },
                   },
                   "type": "object_entry",
-                  "value": Object {
-                    "entries": Array [
-                      Object {
-                        "key": Object {
+                  "value": {
+                    "entries": [
+                      {
+                        "key": {
                           "type": "object_key",
-                          "value": Object {
+                          "value": {
                             "type": "name",
                             "value": "nested",
                           },
                         },
                         "type": "object_entry",
-                        "value": Object {
-                          "entries": Array [
-                            Object {
-                              "key": Object {
+                        "value": {
+                          "entries": [
+                            {
+                              "key": {
                                 "type": "object_key",
-                                "value": Object {
+                                "value": {
                                   "type": "name",
                                   "value": "array",
                                 },
                               },
                               "type": "object_entry",
-                              "value": Object {
+                              "value": {
                                 "type": "array",
-                                "value": Array [
-                                  Object {
+                                "value": [
+                                  {
                                     "type": "number",
                                     "value": "234",
                                   },
-                                  Object {
-                                    "entries": Array [
-                                      Object {
-                                        "key": Object {
+                                  {
+                                    "entries": [
+                                      {
+                                        "key": {
                                           "type": "object_key",
-                                          "value": Object {
+                                          "value": {
                                             "type": "string",
-                                            "value": "\\"with-an-object\\"",
+                                            "value": ""with-an-object"",
                                           },
                                         },
                                         "type": "object_entry",
-                                        "value": Object {
-                                          "entries": Array [
-                                            Object {
-                                              "key": Object {
+                                        "value": {
+                                          "entries": [
+                                            {
+                                              "key": {
                                                 "type": "object_key",
-                                                "value": Object {
+                                                "value": {
                                                   "type": "string",
-                                                  "value": "\\"inside\\"",
+                                                  "value": ""inside"",
                                                 },
                                               },
                                               "type": "object_entry",
-                                              "value": Object {
+                                              "value": {
                                                 "type": "string",
-                                                "value": "\\"boo\\"",
+                                                "value": ""boo"",
                                               },
                                             },
                                           ],
@@ -1928,20 +1928,20 @@ Object {
 }
 `;
 
-exports[`parser stings should build ast for a string 1`] = `
-Object {
-  "statements": Array [
-    Object {
-      "set": Object {
-        "name": Object {
+exports[`parser > stings > should build ast for a string 1`] = `
+{
+  "statements": [
+    {
+      "set": {
+        "name": {
           "type": "name",
           "value": "foo",
         },
         "type": "variable",
       },
-      "to": Object {
+      "to": {
         "type": "string",
-        "value": "\\"super string\\"",
+        "value": ""super string"",
       },
       "type": "assignment",
     },
@@ -1950,20 +1950,20 @@ Object {
 }
 `;
 
-exports[`parser variables assignment should build ast for assignment of varaible 1`] = `
-Object {
-  "statements": Array [
-    Object {
-      "set": Object {
-        "name": Object {
+exports[`parser > variables > assignment > should build ast for assignment of varaible 1`] = `
+{
+  "statements": [
+    {
+      "set": {
+        "name": {
           "type": "name",
           "value": "foo",
         },
         "type": "variable",
       },
-      "to": Object {
+      "to": {
         "type": "string",
-        "value": "\\"bar\\"",
+        "value": ""bar"",
       },
       "type": "assignment",
     },
@@ -1972,27 +1972,27 @@ Object {
 }
 `;
 
-exports[`parser variables assignment should build ast for key assignment of variable 1`] = `
-Object {
-  "statements": Array [
-    Object {
-      "set": Object {
-        "from": Object {
-          "name": Object {
+exports[`parser > variables > assignment > should build ast for key assignment of variable 1`] = `
+{
+  "statements": [
+    {
+      "set": {
+        "from": {
+          "name": {
             "type": "name",
             "value": "foo",
           },
           "type": "variable",
         },
-        "key": Object {
+        "key": {
           "type": "name",
           "value": "bar",
         },
         "type": "key_access",
       },
-      "to": Object {
+      "to": {
         "type": "string",
-        "value": "\\"baz\\"",
+        "value": ""baz"",
       },
       "type": "assignment",
     },
@@ -2001,34 +2001,34 @@ Object {
 }
 `;
 
-exports[`parser variables assignment should build ast for key then square bracket assignment of variable 1`] = `
-Object {
-  "statements": Array [
-    Object {
-      "set": Object {
-        "from": Object {
-          "from": Object {
-            "name": Object {
+exports[`parser > variables > assignment > should build ast for key then square bracket assignment of variable 1`] = `
+{
+  "statements": [
+    {
+      "set": {
+        "from": {
+          "from": {
+            "name": {
               "type": "name",
               "value": "foo",
             },
             "type": "variable",
           },
-          "key": Object {
+          "key": {
             "type": "name",
             "value": "bar",
           },
           "type": "key_access",
         },
-        "key": Object {
+        "key": {
           "type": "string",
-          "value": "\\"foo\\"",
+          "value": ""foo"",
         },
         "type": "key_access",
       },
-      "to": Object {
+      "to": {
         "type": "string",
-        "value": "\\"baz\\"",
+        "value": ""baz"",
       },
       "type": "assignment",
     },
@@ -2037,27 +2037,27 @@ Object {
 }
 `;
 
-exports[`parser variables assignment should build ast for square bracket assignment of variable 1`] = `
-Object {
-  "statements": Array [
-    Object {
-      "set": Object {
-        "from": Object {
-          "name": Object {
+exports[`parser > variables > assignment > should build ast for square bracket assignment of variable 1`] = `
+{
+  "statements": [
+    {
+      "set": {
+        "from": {
+          "name": {
             "type": "name",
             "value": "foo",
           },
           "type": "variable",
         },
-        "key": Object {
+        "key": {
           "type": "string",
-          "value": "\\"bar\\"",
+          "value": ""bar"",
         },
         "type": "key_access",
       },
-      "to": Object {
+      "to": {
         "type": "string",
-        "value": "\\"baz\\"",
+        "value": ""baz"",
       },
       "type": "assignment",
     },
@@ -2066,34 +2066,34 @@ Object {
 }
 `;
 
-exports[`parser variables assignment should build ast for square bracket then key assignment of variable 1`] = `
-Object {
-  "statements": Array [
-    Object {
-      "set": Object {
-        "from": Object {
-          "from": Object {
-            "name": Object {
+exports[`parser > variables > assignment > should build ast for square bracket then key assignment of variable 1`] = `
+{
+  "statements": [
+    {
+      "set": {
+        "from": {
+          "from": {
+            "name": {
               "type": "name",
               "value": "foo",
             },
             "type": "variable",
           },
-          "key": Object {
+          "key": {
             "type": "string",
-            "value": "\\"bar\\"",
+            "value": ""bar"",
           },
           "type": "key_access",
         },
-        "key": Object {
+        "key": {
           "type": "name",
           "value": "foo",
         },
         "type": "key_access",
       },
-      "to": Object {
+      "to": {
         "type": "string",
-        "value": "\\"baz\\"",
+        "value": ""baz"",
       },
       "type": "assignment",
     },
@@ -2102,28 +2102,28 @@ Object {
 }
 `;
 
-exports[`parser variables usage should build ast for using a index of variable 1`] = `
-Object {
-  "statements": Array [
-    Object {
-      "set": Object {
-        "name": Object {
+exports[`parser > variables > usage > should build ast for using a index of variable 1`] = `
+{
+  "statements": [
+    {
+      "set": {
+        "name": {
           "type": "name",
           "value": "foo",
         },
         "type": "variable",
       },
-      "to": Object {
-        "from": Object {
-          "name": Object {
+      "to": {
+        "from": {
+          "name": {
             "type": "name",
             "value": "bar",
           },
           "type": "variable",
         },
-        "key": Object {
+        "key": {
           "type": "string",
-          "value": "\\"baz\\"",
+          "value": ""baz"",
         },
         "type": "key_access",
       },
@@ -2134,26 +2134,26 @@ Object {
 }
 `;
 
-exports[`parser variables usage should build ast for using a key of variable 1`] = `
-Object {
-  "statements": Array [
-    Object {
-      "set": Object {
-        "name": Object {
+exports[`parser > variables > usage > should build ast for using a key of variable 1`] = `
+{
+  "statements": [
+    {
+      "set": {
+        "name": {
           "type": "name",
           "value": "foo",
         },
         "type": "variable",
       },
-      "to": Object {
-        "from": Object {
-          "name": Object {
+      "to": {
+        "from": {
+          "name": {
             "type": "name",
             "value": "bar",
           },
           "type": "variable",
         },
-        "key": Object {
+        "key": {
           "type": "name",
           "value": "baz",
         },
@@ -2166,19 +2166,19 @@ Object {
 }
 `;
 
-exports[`parser variables usage should build ast for using a variable 1`] = `
-Object {
-  "statements": Array [
-    Object {
-      "set": Object {
-        "name": Object {
+exports[`parser > variables > usage > should build ast for using a variable 1`] = `
+{
+  "statements": [
+    {
+      "set": {
+        "name": {
           "type": "name",
           "value": "foo",
         },
         "type": "variable",
       },
-      "to": Object {
-        "name": Object {
+      "to": {
+        "name": {
           "type": "name",
           "value": "bar",
         },

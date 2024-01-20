@@ -1,3 +1,4 @@
+import { describe, it, expect } from "vitest";
 import { Parser } from "nearley";
 import { createParser, parse } from "../../src/parser/parser"
 
