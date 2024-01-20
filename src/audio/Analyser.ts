@@ -6,6 +6,7 @@ export interface TempoData {
     currentBeat: number;
     beatProgress: number;
     barProgress:number;
+    beatTotal: number;
 }
 
 export class Analyser {
@@ -70,6 +71,7 @@ export class Analyser {
     private barProgress: number = 0;
 
     private handleBeat(beat: BeatData) {
+        console.log(beat)
         this.tempoSetTime = beat.timestamp / 1000;
         this.tempo = beat.bpm;
         this.beatsCounted++;
@@ -89,14 +91,15 @@ export class Analyser {
         this.currentBar = Math.floor(totalBeats / 4);
         this.currentBeat = totalBeats % 4;
 
-        this.beatProgress = beatsElapsedSinceSet;
-        this.barProgress = beatsElapsedSinceSet / 4;
+        this.beatProgress = beatsElapsedSinceSet % 1;
+        this.barProgress = beatsElapsedSinceSet % 4;
 
         return {
             currentBar: this.currentBar,
             currentBeat: this.currentBeat,
             beatProgress: this.beatProgress,
-            barProgress: this.barProgress
+            barProgress: this.barProgress,
+            beatTotal: beatsElapsedSinceSet,
         }
     }
 
