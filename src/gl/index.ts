@@ -1,17 +1,156 @@
 import { Analyser } from "../audio/Analyser";
 import { createFunction, UserRenderFunction } from "../compiler/createFunction";
 import { Renderer } from "./Renderer";
-import {startingCode} from "../demo-code";
+import { CursorSelection, getCursorSelection, isCursorSelection } from "./utils/getCursorSelection";
+import { getStartingCode } from "./utils/getStartingCode";
+import { codeStorageKey, updateCodeInLocalStorage } from "./utils/localStorage";
 
+export type AppMode = "editor" | "demo" | "normal";
 
-const localStorageKey = 'JUMP2_SCRIPT'
+interface CodeDisplay {
+  setIsError(isError: boolean): void;
+  setSelection(selection: CursorSelection): void;
+  init(): void;
+  destory(): void;
+  displayCode(code: string): void;
+}
 
-export class GLApp {
-  readonly canvas: HTMLCanvasElement;
-  readonly gl: WebGL2RenderingContext;
+class TextareaCodeDisplay implements CodeDisplay {
+
   readonly textarea: HTMLTextAreaElement;
 
-  readonly renderer: Renderer;
+  app: GLApp;
+
+  constructor(app: GLApp) {
+    this.app = app;
+    this.textarea = document.createElement("textarea");
+  }
+
+  setIsError(isError: boolean): void {
+    if(isError) {
+      this.textarea.classList.add("error")
+    } else {
+      this.textarea.classList.remove("error")
+    }
+  }
+
+  handleTextareaUpdate = () => {
+    const code = this.textarea.value;
+    this.app.updateCode(code);
+    this.sendSelectionUpdate();
+  }
+
+  displayCode(code: string) {
+    this.textarea.value = code;
+  }
+
+  sendSelectionUpdate() {
+    const selection = getCursorSelection(this.textarea);
+    if(selection) {
+      this.app.updateSelection(selection)
+    }
+  }
+
+  handleTextareaSelectionChannge = () => {
+    if(!document.hasFocus()) {
+      return;
+    }
+    this.sendSelectionUpdate()
+  }
+
+  init = () => {
+    this.app.root.appendChild(this.textarea);
+    this.textarea.addEventListener("input", this.handleTextareaUpdate);
+    this.textarea.addEventListener("selectionchange", this.handleTextareaSelectionChannge);
+  }
+
+  destory = () => {
+    this.app.root.removeChild(this.textarea);
+    this.textarea.removeEventListener("input", this.handleTextareaUpdate);
+    this.textarea.removeEventListener("selectionchange", this.handleTextareaSelectionChannge)
+  }
+
+  setSelection(selection: CursorSelection): void {
+    this.textarea.selectionStart = selection.start;
+    this.textarea.selectionEnd = selection.end;
+  }
+}
+
+class DemoCodeDisplay implements CodeDisplay {
+
+  readonly pre: HTMLPreElement;
+
+  app: GLApp;
+
+  code: string;
+
+  selection?: CursorSelection
+
+  constructor(app: GLApp) {
+    this.app = app;
+    this.pre = document.createElement("pre");
+    this.code = "";
+  }
+  setIsError(isError: boolean): void {
+    if(isError) {
+      this.pre.classList.add("error")
+    } else {
+      this.pre.classList.remove("error")
+    }
+  }
+  setSelection(selection: CursorSelection): void {
+    this.selection = selection;
+    this._render();
+  }
+  init(): void {
+    this.app.root.appendChild(this.pre);
+  }
+  destory(): void {
+    this.app.root.removeChild(this.pre);
+  }
+  displayCode(code: string): void {
+    this.code = code;
+    this._render();
+  }
+
+  _render = () => {
+    if(!this.selection) {
+      this.pre.textContent = this.code;
+      return;
+    }
+
+    const codeBeforeSelection = this.code.slice(0, this.selection.start);
+    const codeSelected = this.code.slice(this.selection.start, this.selection.end);
+    const codeAfterSelection = this.code.slice(this.selection.end);
+
+    const beforeEl = document.createElement("span");
+    const selEl = document.createElement("mark")
+    const afterEl = document.createElement("span");
+
+    beforeEl.textContent = codeBeforeSelection;
+    selEl.textContent = codeSelected;
+    afterEl.textContent = codeAfterSelection;
+
+    this.pre.replaceChildren(
+      beforeEl,
+      selEl,
+      afterEl
+    );
+    selEl.scrollIntoView({
+      block: "center"
+    });
+  }
+
+} 
+
+export class GLApp {
+
+  readonly mode: AppMode;
+  readonly root: HTMLElement;
+
+  readonly codeDisplay: CodeDisplay;
+
+  renderer?: Renderer;
 
   audioAnalyser?: Analyser;
 
@@ -21,12 +160,22 @@ export class GLApp {
 
   renderFuncState: object;
 
-  constructor(canvas: HTMLCanvasElement, gl: WebGL2RenderingContext, textarea: HTMLTextAreaElement) {
-    this.canvas = canvas;
-    this.gl = gl;
-    this.textarea = textarea;
+  selectionBC: BroadcastChannel;
 
-    this.renderer = new Renderer(canvas, gl);
+  constructor(mode: AppMode, root: HTMLElement) {
+
+    this.mode = mode;
+    this.root = root;
+
+    if(this.mode !== "demo") {
+      this.codeDisplay = new TextareaCodeDisplay(this);
+    } else {
+      this.codeDisplay = new DemoCodeDisplay(this);
+    }
+
+    this.selectionBC = new BroadcastChannel("jump2_textarea_selection");
+
+    this.selectionBC.addEventListener("message", this.handleSelectionBroadcast)
 
     // set to a noop function
     this.renderFunc = () => {};
@@ -35,49 +184,70 @@ export class GLApp {
     this.renderFuncState = {}
   }
 
-  compileTextarea() {
-    const userInputCode = this.textarea.value;
+  updateCode = (code: string) => {
+    this.compileCode(code);
+    updateCodeInLocalStorage(code);
+  }
+
+  updateSelection = (selection: CursorSelection) => {
+    this.selectionBC.postMessage(selection);
+  }
+
+  handleSelectionBroadcast = (e: MessageEvent) => {
+    const { data } = e;
+    if(!isCursorSelection(data)) {
+      return;
+    }
+    this.codeDisplay.setSelection(data);
+  }
+
+  compileCode(code: string) {
     try {
-      this.renderFunc = createFunction(userInputCode);
+      this.renderFunc = createFunction(code);
     } catch(e) {
       console.error(e);
-      this.textarea.classList.add("error");
+      this.codeDisplay.setIsError(true);
       return;
     }
 
-    this.textarea.classList.remove("error");
-    this.updateLocalStorageWithCode(userInputCode);
+    this.codeDisplay.setIsError(false);
   }
 
-  updateLocalStorageWithCode(code: string) {
-    try {
-      window.localStorage.setItem(localStorageKey, code)
-    } catch (e) {
-      console.error('Failed to save code to local storage', e);
+  handleStorageEvent = (e: StorageEvent) => {
+    if(e.storageArea !== window.localStorage) {
+      return;
     }
-  }
-
-  getStartingCode(): string {
-    try {
-      return window.localStorage.getItem(localStorageKey) ?? startingCode;
-    } catch (e) {
-      console.error('Failed to fetch code from locale storage', e);
-      return startingCode;
+    if(e.key !== codeStorageKey) {
+      return;
     }
+    const newCode = e.newValue;
+
+    if(!newCode) {
+      console.error("Where is the new code bruv?")
+      return;
+    }
+
+    this.codeDisplay.displayCode(newCode);
+    this.compileCode(newCode);
+
   }
 
-  handleTextareaUpdate = () => {
-    this.compileTextarea();
+  initializeLocalStoreageSync = () => {
+    window.addEventListener("storage", this.handleStorageEvent)
   }
 
-  initializeTextarea = () => {
-    this.textarea.value = this.getStartingCode();
-    this.compileTextarea();
-    this.textarea.addEventListener("input", this.handleTextareaUpdate)
+  setupRenderer(canvas: HTMLCanvasElement, gl: WebGL2RenderingContext) {
+    this.renderer = new Renderer(canvas, gl);
   }
 
   start() {
-    this.initializeTextarea();
+    const code = getStartingCode();
+    this.codeDisplay.init();
+    this.codeDisplay.displayCode(code)
+    this.compileCode(code);
+
+    this.initializeLocalStoreageSync();
+
     this.animationFrame = requestAnimationFrame(this._render);
   }
 
@@ -85,6 +255,13 @@ export class GLApp {
     if(this.animationFrame) {
       cancelAnimationFrame(this.animationFrame);
     }
+
+    this.codeDisplay.destory();
+
+    // clean up event listeners
+    window.removeEventListener("storage", this.handleStorageEvent);
+    this.selectionBC.removeEventListener("message", this.handleSelectionBroadcast)
+    this.selectionBC.close();
   }
 
   setAudioAnalyser(audioAnalyser: Analyser) {
@@ -92,6 +269,10 @@ export class GLApp {
   }
 
   _render = (time: number) => {
+
+    if(!this.renderer) {
+      return;
+    }
 
     time *= 0.001;
 
