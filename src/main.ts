@@ -1,6 +1,6 @@
 import './style.css';
 
-import { GLApp } from "./gl";
+import { AppMode, GLApp } from "./gl";
 import { Analyser } from './audio/Analyser';
 
 function findElementOrThrow<THTMLElement extends HTMLElement>(selector: string) : THTMLElement {
@@ -21,10 +21,6 @@ function createWebGLContext(canvas: HTMLCanvasElement): WebGL2RenderingContext {
         throw new Error("Can't start webgl 2context. :(");
     }
     return gl;
-}
-
-function findTextarea(): HTMLTextAreaElement {
-    return findElementOrThrow<HTMLTextAreaElement>("#code");
 }
 
 async function getUserMedia(constraits: MediaStreamConstraints): Promise<MediaStream> {
@@ -85,15 +81,42 @@ function setupUserAudio() : Promise<Analyser> {
     });
 }
 
+function getAppMode(): AppMode {
+
+    if (window.location.pathname.startsWith("/editor")) {
+        return "editor";
+    }
+    if(window.location.pathname.startsWith("/demo")) {
+        return "demo";
+    }
+
+    return "normal";
+}
+
 async function start() {
-    const canvas = findCanvas();
-    const gl = createWebGLContext(canvas);
+    let canvas: HTMLCanvasElement | undefined;
+    let gl: WebGL2RenderingContext | undefined;
 
-    const textarea = findTextarea();
+    const codeRoot = findElementOrThrow<HTMLDivElement>("#code");
 
-    let glapp = new GLApp(canvas, gl, textarea);
+
+    const mode = getAppMode();
+
+    let glapp = new GLApp(mode, codeRoot);
 
     let analyser: Analyser;
+
+    if(mode !== "editor") {
+        canvas = findCanvas();
+        gl = createWebGLContext(canvas);
+        glapp.setupRenderer(canvas, gl);
+    } else {
+        document.body.classList.add("editor");
+    }
+
+    if (mode === "demo") {
+        document.body.classList.add("demo");
+    }
 
     glapp.start();
 
@@ -107,13 +130,15 @@ async function start() {
             if(newGLModule) {
                 glapp.stop();
                 // the callback receives the updated './foo.js' module
-                glapp = new newGLModule.GLApp(canvas, gl, textarea);
+                glapp = new newGLModule.GLApp(mode, codeRoot);
                 if(analyser) {
                     glapp.setAudioAnalyser(analyser);
                 }
+                if(canvas && gl) {
+                    glapp.setupRenderer(canvas, gl);
+                }
                 glapp.start();
             }
-
         })
     }
 }

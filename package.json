@@ -17,16 +17,16 @@
   "dependencies": {
     "aubiojs": "^0.2.1",
     "nearley": "^2.20.1",
-    "twgl.js": "^5.5.3"
+    "twgl.js": "^5.5.4"
   },
   "devDependencies": {
-    "@types/audioworklet": "^0.0.50",
-    "@types/moo": "^0.5.5",
-    "@types/nearley": "^2.11.2",
+    "@types/audioworklet": "^0.0.68",
+    "@types/moo": "^0.5.10",
+    "@types/nearley": "^2.11.5",
     "ts-node": "^10.9.2",
-    "typescript": "^5.3.3",
-    "vite": "^5.0.13",
+    "typescript": "^5.7.3",
+    "vite": "^6.0.11",
     "vite-plugin-raw": "^1.0.3",
-    "vitest": "^1.2.1"
+    "vitest": "^3.0.4"
   }
 }
