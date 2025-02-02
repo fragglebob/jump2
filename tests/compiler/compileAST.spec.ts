@@ -35,6 +35,26 @@ describe("compileAST", () => {
         expect(result).toMatchInlineSnapshot(`"state['foo']['bing'][state['bar'][Math.sin(34) * (4 - 13.37)]] = "baz""`);
     });
 
+    it("should handle subtractions without spaces - just numbers", () => {
+        const result = compileAST(buildASTFromString(`foo = 3-2`));
+        expect(result).toMatchInlineSnapshot(`"state['foo'] = 3 - 2"`);
+    });
+
+    it("should handle subtractions without spaces - func before", () => {
+        const result = compileAST(buildASTFromString(`foo = time()-2`));
+        expect(result).toMatchInlineSnapshot(`"state['foo'] = manager.time() - 2"`);
+    });
+
+    it("should handle subtractions without spaces - func after", () => {
+        const result = compileAST(buildASTFromString(`foo = 3-time()`));
+        expect(result).toMatchInlineSnapshot(`"state['foo'] = 3 - manager.time()"`);
+    });
+
+    it("should handle subtractions without spaces - func both", () => {
+        const result = compileAST(buildASTFromString(`foo = time()-time()`));
+        expect(result).toMatchInlineSnapshot(`"state['foo'] = manager.time() - manager.time()"`);
+    });
+
     it("should handle a variable set to an empty array", () => {
         const result = compileAST(buildASTFromString(`foo = []`));
         expect(result).toMatchInlineSnapshot(`"state['foo'] = []"`);
