@@ -10,7 +10,7 @@
     "preview": "vite preview",
     "test": "vitest",
     "type-check": "tsc",
-    "build:grammer": "nearleyc src/parser/jump.ne -o src/parser/jumpGrammer.ts"
+    "build:grammer": "nearleyc src/parser/jump.ne -o src/parser/jumpGrammer.gen.ts"
   },
   "author": "Rob Wells",
   "license": "ISC",

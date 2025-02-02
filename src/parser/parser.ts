@@ -1,6 +1,6 @@
 import nearley from "nearley";
 import type { Block } from "./ast";
-import jumpGrammer from "./jumpGrammer";
+import jumpGrammer from "./jumpGrammer.gen";
 
 const grammer = nearley.Grammar.fromCompiled(jumpGrammer);
 
