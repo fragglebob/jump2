@@ -1,43 +1,5 @@
 @preprocessor typescript
 
-@{%
-    // Moo lexer documention is here:
-    // https://github.com/no-context/moo
-
-    import moo from "moo";
-    const lexer = moo.compile({
-        ws:     /[ \t]+/,
-        number:  [
-            { match: /(?:-?(?:0|[1-9][0-9]*)\.[0-9]+)/ },   // 123.[123]
-            { match: /(?:0|-?[1-9][0-9]*)/ },               // 123
-        ],
-        doubledot: '..',
-		setting: '<-',
-        binops: ["&&", "||"],
-        comparison: ["<", ">", "<=", ">=", "==", "!="],
-        sum: ["+", "-"],
-        product: ["*", "/", "%"],
-        string:  /"(?:\\["\\]|[^\n"\\])*"/,
-        lparen:  '(',
-        rparen:  ')',
-        lqb:  '[',
-        rqb:  ']',
-		lcb:  '{',
-        rcb:  '}',
-        dot: '.',
-        eq: '=',
-        comma: ',',
-		colon: ':',
-        nl: { match: /\r|\r\n|\n/, lineBreaks: true },
-        variableName: /[\w_][\w\d_]*/,
-        keywords: ["if", "else", "then", "elseif", "endif"]
-        
-    });
-%}
-
-# Pass your lexer with @lexer:
-@lexer lexer
-
 main -> _ Block _ {% (d) => d[1] %}
 
 Block -> _Block {% id %}
@@ -75,7 +37,7 @@ Iterable -> Range {% id %}
     | FunctionCalls {% id %}
     | Array {% id %}
     
-Range -> Number %doubledot Number {% (d) => ({ type: "range", from: d[0], to: d[2] }) %}
+Range -> Number ".." Number {% (d) => ({ type: "range", from: d[0], to: d[2] }) %}
 
 
 # Variables
@@ -168,15 +130,23 @@ ExpAnd -> ExpAnd _ "&&" _ ExpComparison {% (d) => ({ type: "binary", left: d[0],
     | ExpComparison {% id %}
 
 ExpComparison ->
-      ExpComparison _ %comparison _ ExpSum {% (d) => ({ type: "comparison", left: d[0], right: d[4], operation: d[2].text }) %}
+      ExpComparison _ "<" _ ExpSum {% (d) => ({ type: "comparison", left: d[0], right: d[4], operation: d[2] }) %}
+    | ExpComparison _ ">" _ ExpSum {% (d) => ({ type: "comparison", left: d[0], right: d[4], operation: d[2] }) %}
+    | ExpComparison _ "<=" _ ExpSum {% (d) => ({ type: "comparison", left: d[0], right: d[4], operation: d[2] }) %}
+    | ExpComparison _ ">=" _ ExpSum {% (d) => ({ type: "comparison", left: d[0], right: d[4], operation: d[2] }) %}
+    | ExpComparison _ "==" _ ExpSum {% (d) => ({ type: "comparison", left: d[0], right: d[4], operation: d[2] }) %}
+    | ExpComparison _ "!=" _ ExpSum {% (d) => ({ type: "comparison", left: d[0], right: d[4], operation: d[2] }) %}
     | ExpSum {% id %}
-    
+
 ExpSum ->
-      ExpSum _ %sum _ ExpProduct {% (d) => ({ type: "sum", left: d[0], right: d[4], operation: d[2].text }) %}
+      ExpSum _ "+"  _ ExpProduct {% (d) => ({ type: "sum", left: d[0], right: d[4], operation: d[2] }) %}
+    | ExpSum _ "-"  _ ExpProduct {% (d) => ({ type: "sum", left: d[0], right: d[4], operation: d[2] }) %}
     | ExpProduct {% id %}
- 
+
 ExpProduct ->
-      ExpProduct _ %product _ Atom {% (d) => ({ type: "product", left: d[0], right: d[4], operation: d[2].text }) %}
+      ExpProduct _ "*" _ Atom {% (d) => ({ type: "product", left: d[0], right: d[4], operation: d[2] }) %}
+    | ExpProduct _ "/" _ Atom {% (d) => ({ type: "product", left: d[0], right: d[4], operation: d[2] }) %}
+    | ExpProduct _ "%" _ Atom {% (d) => ({ type: "product", left: d[0], right: d[4], operation: d[2] }) %}
     | Atom {% id %}
 
 Atom -> Number {% id %}
@@ -204,18 +174,42 @@ ObjectKey -> Name {% (d) => ({ type: "object_key", value: d[0] }) %}
    | String {% (d) => ({ type: "object_key", value: d[0] }) %}
    | "[" _ Expression _ "]" {% (d) => ({ type: "object_key", value: d[2] }) %}
 
-Number -> %number {% (d) => ({ type: "number", value: d[0].value }) %}
-String -> %string {% (d) => ({ type: "string", value: d[0].value }) %}
+
+Number -> _number {% (d) => ({ type:'number', value: d[0] }) %}
+
+_posint ->
+	[0-9] {% id %}
+	| _posint [0-9] {% function(d) {return d[0] + d[1]} %}
+
+_int ->
+	"-" _posint {% function(d) {return d[0] + d[1]; }%}
+	| _posint {% id %}
+
+_float ->
+	_int {% id %}
+	| _int "." _posint {% function(d) {return d[0] + d[1] + d[2]; }%}
+
+_number ->
+	_float {% id %}
+	| _float "e" _int {% function(d){return d[0] + d[1] + d[2]; } %}
+
+String -> "\"" _string "\"" {% (d) => ({type:'string', value: '"' + d[1] + '"'}) %}
+
+_string ->
+	null {% function() {return ""; } %}
+	| _string _stringchar {% function(d) {return d[0] + d[1];} %}
+
+_stringchar ->
+	[^\\"] {% id %}
+	| "\\" [^] {% function(d) {return JSON.parse("\"" + d[0] + d[1] + "\""); } %}
+
 
 Name -> _name {% (d) => ({ type: "name", value: d[0] }) %}
  
-_name -> %variableName {% (d) => d[0].value %}
+_name ->
+    [a-zA-Z_] {% id %}
+    | _name [\w_] {% (d) => d[0] + d[1] %}
+   
 
-_ -> null {% () => null %}
-    | _ %ws  {% () => null %}
-    | _ %nl  {% () => null %}
-
-__ -> %ws            {% () => null %}
-    | %nl            {% () => null %}
-    | __ %ws        {% () => null %}
-    | __ %nl        {% () => null %}
+_ -> null | _ [\s] {% function() {} %}
+__ -> [\s] | __ [\s] {% function() {} %}

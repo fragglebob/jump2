@@ -21,7 +21,6 @@
   },
   "devDependencies": {
     "@types/audioworklet": "^0.0.68",
-    "@types/moo": "^0.5.10",
     "@types/nearley": "^2.11.5",
     "ts-node": "^10.9.2",
     "typescript": "^5.7.3",
