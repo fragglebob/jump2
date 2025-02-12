@@ -1,30 +1,38 @@
-import { Renderer } from "../Renderer";
+import type { Renderer } from "../Renderer";
 import { RenderPass } from "./RenderPass";
 
-import vertShader from "../shaders/conv.vert.glsl";
+import { type FramebufferInfo, setUniforms } from "twgl.js";
 import fragShader from "../shaders/conv.frag.glsl";
-import { FramebufferInfo, setUniforms } from "twgl.js";
+import vertShader from "../shaders/conv.vert.glsl";
 import { ShaderRenderPass } from "./ShaderRenderPass";
 
 export type Props = {
-    imageIncrement: [number, number];
+	imageIncrement: [number, number];
 };
 
 export class ConvolutionPass extends ShaderRenderPass<Props> {
-    constructor(renderer: Renderer) {
-        super(renderer, vertShader, fragShader)
-    }
+	constructor(renderer: Renderer) {
+		super(renderer, vertShader, fragShader);
+	}
 
-    render(args: Props, fromFramebuffer: FramebufferInfo, toFramebuffer: FramebufferInfo) {
-        this.renderer.gl.useProgram(this.programInfo.program);
+	render(
+		args: Props,
+		fromFramebuffer: FramebufferInfo,
+		toFramebuffer: FramebufferInfo,
+	) {
+		this.renderer.gl.useProgram(this.programInfo.program);
 
-        setUniforms(this.programInfo, {
-            u_imageIncrement: args.imageIncrement,
-            u_resolution: [1, 1],
-        });
+		setUniforms(this.programInfo, {
+			u_imageIncrement: args.imageIncrement,
+			u_resolution: [1, 1],
+		});
 
-        this.renderer.processFragmentShaderProgram(this.getProgramInfo(), fromFramebuffer, toFramebuffer);
+		this.renderer.processFragmentShaderProgram(
+			this.getProgramInfo(),
+			fromFramebuffer,
+			toFramebuffer,
+		);
 
-        return true;
-    }
+		return true;
+	}
 }
