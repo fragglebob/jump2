@@ -1,22 +1,22 @@
 import type {
-  Statement,
-  Block,
-  FunctionCall,
-  Arguments,
-  Expression,
-  Assignment,
-  Var,
-  Operation,
-  IfStatement,
-  NamedVariable,
   ASTItem,
-  LoopStatement,
-  WhileStatement,
+  Arguments,
   ArrayASTItem,
+  Assignment,
+  Block,
+  Expression,
+  ForinStatement,
+  FunctionCall,
+  IfStatement,
+  LoopStatement,
+  NamedVariable,
   ObjectASTItem,
   ObjectKeyASTItem,
-  ForinStatement,
+  Operation,
   Range,
+  Statement,
+  Var,
+  WhileStatement,
 } from "../parser/ast";
 
 function unhandledError(type: string, item: ASTItem): never {
@@ -65,12 +65,15 @@ function compileStatement(ctx: Context, statement: Statement): string {
     case "while":
       return compileWhileStatment(ctx, statement);
     case "forin":
-        return compileForinStatement(ctx, statement);
+      return compileForinStatement(ctx, statement);
   }
   unhandledError("statement", statement);
 }
 
-function compileForinStatement(ctx: Context, statement: ForinStatement): string {
+function compileForinStatement(
+  ctx: Context,
+  statement: ForinStatement,
+): string {
   const block = `{\n${compileBlock(ctx.indent(), statement.then)}\n${ctx.whitespace}}`;
   switch (statement.over.type) {
     case "range":
@@ -86,26 +89,42 @@ function compileForinStatement(ctx: Context, statement: ForinStatement): string 
   unhandledError("forin over", statement.over);
 }
 
-function complieRangeFor(ctx: Context, range: Range, settingVariable: NamedVariable): string {
+function complieRangeFor(
+  ctx: Context,
+  range: Range,
+  settingVariable: NamedVariable,
+): string {
   const varName = compileVar(ctx, settingVariable);
-  const startingValue = parseFloat(range.from.value);
-  const endingValue = parseFloat(range.to.value);
+  const startingValue = Number.parseFloat(range.from.value);
+  const endingValue = Number.parseFloat(range.to.value);
   const operator = startingValue <= endingValue ? "<" : ">";
   const direction = startingValue <= endingValue ? "++" : "--";
-  return `for (${varName} = ${startingValue}; ${varName} ${operator} ${endingValue}; ${varName}${direction})`
+  return `for (${varName} = ${startingValue}; ${varName} ${operator} ${endingValue}; ${varName}${direction})`;
 }
 
-function complieArrayForof(ctx: Context, array: ArrayASTItem, settingVariable: NamedVariable): string {
+function complieArrayForof(
+  ctx: Context,
+  array: ArrayASTItem,
+  settingVariable: NamedVariable,
+): string {
   const varName = compileVar(ctx, settingVariable);
   return `for (${varName} of ${compileArray(ctx, array)})`;
 }
 
-function complieFunctionForof(ctx: Context, func: FunctionCall, settingVariable: NamedVariable): string {
+function complieFunctionForof(
+  ctx: Context,
+  func: FunctionCall,
+  settingVariable: NamedVariable,
+): string {
   const varName = compileVar(ctx, settingVariable);
   return `for (${varName} of ${compileFunctionCall(ctx, func)})`;
 }
 
-function complieVarForof(ctx: Context, variable: Var, settingVariable: NamedVariable): string {
+function complieVarForof(
+  ctx: Context,
+  variable: Var,
+  settingVariable: NamedVariable,
+): string {
   const varName = compileVar(ctx, settingVariable);
   return `for (${varName} of ${compileVar(ctx, variable)})`;
 }
@@ -114,45 +133,42 @@ function compileLoopStatment(ctx: Context, statement: LoopStatement): string {
   if (!statement.setting) {
     return `for (let i = 0; i < ${compileExpression(
       ctx,
-      statement.times
+      statement.times,
     )}; i++) {\n${compileBlock(ctx.indent(), statement.then)}\n${
       ctx.whitespace
     }}`;
   }
   return `for (${compileVar(ctx, statement.setting)} = 0; ${compileVar(
     ctx,
-    statement.setting
+    statement.setting,
   )} < ${compileExpression(ctx, statement.times)}; ${compileVar(
     ctx,
-    statement.setting
+    statement.setting,
   )}++) {\n${compileBlock(ctx.indent(), statement.then)}\n${ctx.whitespace}}`;
 }
 
 function compileWhileStatment(ctx: Context, statement: WhileStatement): string {
   return `while (${compileExpression(
     ctx,
-    statement.condition
+    statement.condition,
   )} {\n${compileBlock(ctx.indent(), statement.then)}\n${ctx.whitespace}}`;
 }
 
 function compileIfStatment(ctx: Context, ifStatement: IfStatement): string {
   const start = `if (${compileExpression(
     ctx,
-    ifStatement.condition
+    ifStatement.condition,
   )}) {\n${compileBlock(ctx.indent(), ifStatement.then)}\n${ctx.whitespace}}`;
   if (!ifStatement.else) {
     return start;
   }
   if (ifStatement.else.type === "block") {
-    return (
-      start +
-      ` else {\n${compileBlock(ctx.indent(), ifStatement.else)}\n${
-        ctx.whitespace
-      }}`
-    );
-  } else {
-    return start + ` else${compileIfStatment(ctx, ifStatement.else)}`;
+    return `${start} else {\n${compileBlock(ctx.indent(), ifStatement.else)}\n${
+      ctx.whitespace
+    }}`;
   }
+
+  return `${start} else${compileIfStatment(ctx, ifStatement.else)}`;
 }
 
 function compileFunctionCall(ctx: Context, functionCall: FunctionCall): string {
@@ -191,6 +207,8 @@ function compileFunctionCall(ctx: Context, functionCall: FunctionCall): string {
     case "bar_progress":
     case "beat_raw":
     case "fft":
+    case "slider":
+    case "knob":
     case "fx_kale":
     case "fx_grid":
     case "fx_px":
@@ -212,7 +230,7 @@ function compileArguments(ctx: Context, args: Arguments): string {
 function compileAssignment(ctx: Context, assignment: Assignment): string {
   return `${compileVar(ctx, assignment.set)} = ${compileExpression(
     ctx,
-    assignment.to
+    assignment.to,
   )}`;
 }
 
@@ -247,12 +265,11 @@ function compileVar(ctx: Context, variable: Var): string {
       }
       if (variable.key.type === "name") {
         return `${compileVar(ctx, variable.from)}['${variable.key.value}']`;
-      } else {
-        return `${compileVar(ctx, variable.from)}[${compileExpression(
-          ctx,
-          variable.key
-        )}]`;
       }
+      return `${compileVar(ctx, variable.from)}[${compileExpression(
+        ctx,
+        variable.key,
+      )}]`;
   }
   unhandledError("var", variable);
 }
@@ -285,7 +302,7 @@ function compileExpression(ctx: Context, expression: Expression): string {
 function compileOperation<
   Op extends string,
   Left extends Expression,
-  Right extends Expression
+  Right extends Expression,
 >(ctx: Context, operation: Operation<Op, Left, Right>): string {
   return `${compileExpression(ctx, operation.left)} ${
     operation.operation
@@ -311,7 +328,7 @@ function compileObject(ctx: Context, object: ObjectASTItem): string {
     .map((entry) => {
       return `${indented.whitespace}${complieObjectKey(
         ctx,
-        entry.key
+        entry.key,
       )}: ${compileExpression(indented, entry.value)}`;
     })
     .join(",\n");

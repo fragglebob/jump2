@@ -1,32 +1,40 @@
-import { Renderer } from "../Renderer";
+import type { Renderer } from "../Renderer";
 import { RenderPass } from "./RenderPass";
 
-import vertShader from "../shaders/screen.vert.glsl";
+import { type FramebufferInfo, setUniforms } from "twgl.js";
 import fragShader from "../shaders/grid-shift.frag.glsl";
-import { FramebufferInfo, setUniforms } from "twgl.js";
+import vertShader from "../shaders/screen.vert.glsl";
 import { ShaderRenderPass } from "./ShaderRenderPass";
 
 export type Props = {
-    rows: number;
+  rows: number;
 };
 
 export class GridShiftPass extends ShaderRenderPass<Props> {
-    constructor(renderer: Renderer) {
-        super(renderer, vertShader, fragShader)
-    }
+  constructor(renderer: Renderer) {
+    super(renderer, vertShader, fragShader);
+  }
 
-    render(args: Props, fromFramebuffer: FramebufferInfo, toFramebuffer: FramebufferInfo) {
-        const time = this.renderer.getTime();
+  render(
+    args: Props,
+    fromFramebuffer: FramebufferInfo,
+    toFramebuffer: FramebufferInfo,
+  ) {
+    const time = this.renderer.getTime();
 
-        this.renderer.gl.useProgram(this.programInfo.program);
+    this.renderer.gl.useProgram(this.programInfo.program);
 
-        setUniforms(this.programInfo, {
-            u_rows: args.rows,
-            u_time: time,
-        })
+    setUniforms(this.programInfo, {
+      u_rows: args.rows,
+      u_time: time,
+    });
 
-        this.renderer.processFragmentShaderProgram(this.getProgramInfo(), fromFramebuffer, toFramebuffer);
+    this.renderer.processFragmentShaderProgram(
+      this.getProgramInfo(),
+      fromFramebuffer,
+      toFramebuffer,
+    );
 
-        return true;
-    }
+    return true;
+  }
 }

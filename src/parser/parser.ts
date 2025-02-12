@@ -5,17 +5,18 @@ import jumpGrammer from "./jumpGrammer.gen";
 const grammer = nearley.Grammar.fromCompiled(jumpGrammer);
 
 export function createParser() {
-    return new nearley.Parser(grammer);
+  return new nearley.Parser(grammer);
 }
 
 export function parse(text: string): Block {
-    const parser = createParser();
-    parser.feed(text);
-    const result = parser.finish();
-    if (result.length > 1) {
-        throw new Error("Ambiguous input text, something wrong with grammer");
-    } else if (result.length === 0) {
-        throw new Error("Grammer gave no result for input");
-    }
-    return result[0];
+  const parser = createParser();
+  parser.feed(text);
+  const result = parser.finish();
+  if (result.length > 1) {
+    throw new Error("Ambiguous input text, something wrong with grammer");
+  }
+  if (result.length === 0) {
+    throw new Error("Grammer gave no result for input");
+  }
+  return result[0];
 }

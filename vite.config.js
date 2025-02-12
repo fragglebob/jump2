@@ -1,11 +1,11 @@
-import vitePluginRaw from 'vite-plugin-raw';
-import { defineConfig } from 'vite'
+import { defineConfig } from "vite";
+import vitePluginRaw from "vite-plugin-raw";
 
 export default defineConfig({
-  base: '',
+  base: "",
   plugins: [
     vitePluginRaw({
-        match: /\.(glsl)$/
-    })
+      match: /\.(glsl)$/,
+    }),
   ],
-})
+});

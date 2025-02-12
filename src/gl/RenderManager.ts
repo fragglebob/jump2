@@ -1,11 +1,10 @@
 import { m4 } from "twgl.js";
 import { MatrixStack } from "./MatrixStack";
-import { Renderer } from "./Renderer";
-import { RenderContext } from "./types";
+import type { Renderer } from "./Renderer";
+import type { RenderContext } from "./types";
 import { hslToRgb } from "./utils/hsl2rgb";
 
 interface RenderManagerInterface {
-
   time(): number;
   frame(): number;
 
@@ -17,6 +16,9 @@ interface RenderManagerInterface {
   beat_raw(): number;
 
   fft(index: number): number;
+
+  knob(index: number): number;
+  slider(index: number): number;
 
   pushMatrix(): void;
   popMatrix(): void;
@@ -57,7 +59,7 @@ type CameraMatrixes = {
 export class RenderManager implements RenderManagerInterface {
   private worldMatrix: MatrixStack;
   private renderer: Renderer;
-  private cameraDetails: CameraMatrixes
+  private cameraDetails: CameraMatrixes;
 
   constructor(renderer: Renderer) {
     this.renderer = renderer;
@@ -68,11 +70,10 @@ export class RenderManager implements RenderManagerInterface {
     this.renderer.globalUniforms.u_projection = this.cameraDetails.projection;
   }
 
-  private setupCamera() : CameraMatrixes {
+  private setupCamera(): CameraMatrixes {
     const fov = (30 * Math.PI) / 180;
     const aspect =
-      this.renderer.canvas.clientWidth /
-      this.renderer.canvas.clientHeight;
+      this.renderer.canvas.clientWidth / this.renderer.canvas.clientHeight;
     const zNear = 0.5;
     const zFar = 100;
     const projection = m4.perspective(fov, aspect, zNear, zFar);
@@ -91,10 +92,10 @@ export class RenderManager implements RenderManagerInterface {
     };
   }
 
-  private createRenderContext() : RenderContext {
+  private createRenderContext(): RenderContext {
     return {
-        world: this.worldMatrix.current
-    }
+      world: this.worldMatrix.current,
+    };
   }
 
   time() {
@@ -105,31 +106,42 @@ export class RenderManager implements RenderManagerInterface {
     return this.renderer.getFrame();
   }
 
-  beat() : number {
+  beat(): number {
     return this.renderer.tempoData?.currentBeat ?? 0;
   }
 
-  bar() : number {
+  bar(): number {
     return this.renderer.tempoData?.currentBar ?? 0;
   }
 
-  beat_progress() : number {
+  beat_progress(): number {
     return this.renderer.tempoData?.beatProgress ?? 0;
   }
 
-  bar_progress() : number {
+  bar_progress(): number {
     return this.renderer.tempoData?.barProgress ?? 0;
   }
 
-  beat_raw() : number {
+  beat_raw(): number {
     return this.renderer.tempoData?.beatTotal ?? 0;
   }
 
-  fft(index: number = 0) : number {
-    if(!this.renderer.fftData || typeof this.renderer.fftData[index] === "undefined") {
+  fft(index = 0): number {
+    if (
+      !this.renderer.fftData ||
+      typeof this.renderer.fftData[index] === "undefined"
+    ) {
       return 0;
     }
     return this.renderer.fftData[index];
+  }
+
+  knob(index: number): number {
+    return this.renderer.midiMix.knobs[index] ?? 0;
+  }
+
+  slider(index: number): number {
+    return this.renderer.midiMix.sliders[index] ?? 0;
   }
 
   rgb(r: number, g: number, b: number) {
@@ -189,58 +201,48 @@ export class RenderManager implements RenderManagerInterface {
   }
 
   fx_kale(segments?: number, time?: number) {
-    this.renderer.doRenderPass(
-      this.renderer.passes.kaleidoscope,
-      { segments: segments ?? 2, time }
-    );
+    this.renderer.doRenderPass(this.renderer.passes.kaleidoscope, {
+      segments: segments ?? 2,
+      time,
+    });
   }
 
   fx_grid(rows: number) {
-    this.renderer.doRenderPass(
-      this.renderer.passes.grid,
-      { rows: rows ?? 2 }
-    );
+    this.renderer.doRenderPass(this.renderer.passes.grid, { rows: rows ?? 2 });
   }
 
   fx_px(x: number, y?: number) {
-    this.renderer.doRenderPass(
-        this.renderer.passes.px,
-        { x: x ?? 100, y: y ?? x ?? 100 }
-    );
+    this.renderer.doRenderPass(this.renderer.passes.px, {
+      x: x ?? 100,
+      y: y ?? x ?? 100,
+    });
   }
 
   fx_rgb(amount: number, angle?: number) {
-    this.renderer.doRenderPass(
-      this.renderer.passes.rgb,
-      { amount: amount ?? 0.01, angle }
-    );
+    this.renderer.doRenderPass(this.renderer.passes.rgb, {
+      amount: amount ?? 0.01,
+      angle,
+    });
   }
 
   fx_bloom() {
-    this.renderer.doRenderPass(
-      this.renderer.passes.bloom,
-      {}
-    );
+    this.renderer.doRenderPass(this.renderer.passes.bloom, {});
   }
 
   fx_feedback() {
-    this.renderer.doRenderPass(
-      this.renderer.passes.feedback,
-      {}
-    );
+    this.renderer.doRenderPass(this.renderer.passes.feedback, {});
   }
 
   fx_warp(size?: number, speed?: number, amount?: number, time?: number) {
-    this.renderer.doRenderPass(
-      this.renderer.passes.warp,
-      { size, speed, amount, time }
-    );
+    this.renderer.doRenderPass(this.renderer.passes.warp, {
+      size,
+      speed,
+      amount,
+      time,
+    });
   }
 
   fx_ascii(scale?: number) {
-    this.renderer.doRenderPass(
-        this.renderer.passes.ascii,
-        { scale }
-    );
+    this.renderer.doRenderPass(this.renderer.passes.ascii, { scale });
   }
 }

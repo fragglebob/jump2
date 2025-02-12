@@ -1,7 +1,15 @@
-import { Analyser } from "../audio/Analyser";
-import { createFunction, UserRenderFunction } from "../compiler/createFunction";
+import type { Analyser } from "../audio/Analyser";
+import {
+  type UserRenderFunction,
+  createFunction,
+} from "../compiler/createFunction";
+import type { MIDIMix } from "../midi/MIDIMix";
 import { Renderer } from "./Renderer";
-import { CursorSelection, getCursorSelection, isCursorSelection } from "./utils/getCursorSelection";
+import {
+  type CursorSelection,
+  getCursorSelection,
+  isCursorSelection,
+} from "./utils/getCursorSelection";
 import { getStartingCode } from "./utils/getStartingCode";
 import { codeStorageKey, updateCodeInLocalStorage } from "./utils/localStorage";
 
@@ -16,7 +24,6 @@ interface CodeDisplay {
 }
 
 class TextareaCodeDisplay implements CodeDisplay {
-
   readonly textarea: HTMLTextAreaElement;
 
   app: GLApp;
@@ -27,10 +34,10 @@ class TextareaCodeDisplay implements CodeDisplay {
   }
 
   setIsError(isError: boolean): void {
-    if(isError) {
-      this.textarea.classList.add("error")
+    if (isError) {
+      this.textarea.classList.add("error");
     } else {
-      this.textarea.classList.remove("error")
+      this.textarea.classList.remove("error");
     }
   }
 
@@ -38,7 +45,7 @@ class TextareaCodeDisplay implements CodeDisplay {
     const code = this.textarea.value;
     this.app.updateCode(code);
     this.sendSelectionUpdate();
-  }
+  };
 
   displayCode(code: string) {
     this.textarea.value = code;
@@ -46,29 +53,35 @@ class TextareaCodeDisplay implements CodeDisplay {
 
   sendSelectionUpdate() {
     const selection = getCursorSelection(this.textarea);
-    if(selection) {
-      this.app.updateSelection(selection)
+    if (selection) {
+      this.app.updateSelection(selection);
     }
   }
 
   handleTextareaSelectionChannge = () => {
-    if(!document.hasFocus()) {
+    if (!document.hasFocus()) {
       return;
     }
-    this.sendSelectionUpdate()
-  }
+    this.sendSelectionUpdate();
+  };
 
   init = () => {
     this.app.root.appendChild(this.textarea);
     this.textarea.addEventListener("input", this.handleTextareaUpdate);
-    this.textarea.addEventListener("selectionchange", this.handleTextareaSelectionChannge);
-  }
+    this.textarea.addEventListener(
+      "selectionchange",
+      this.handleTextareaSelectionChannge,
+    );
+  };
 
   destory = () => {
     this.app.root.removeChild(this.textarea);
     this.textarea.removeEventListener("input", this.handleTextareaUpdate);
-    this.textarea.removeEventListener("selectionchange", this.handleTextareaSelectionChannge)
-  }
+    this.textarea.removeEventListener(
+      "selectionchange",
+      this.handleTextareaSelectionChannge,
+    );
+  };
 
   setSelection(selection: CursorSelection): void {
     this.textarea.selectionStart = selection.start;
@@ -77,14 +90,13 @@ class TextareaCodeDisplay implements CodeDisplay {
 }
 
 class DemoCodeDisplay implements CodeDisplay {
-
   readonly pre: HTMLPreElement;
 
   app: GLApp;
 
   code: string;
 
-  selection?: CursorSelection
+  selection?: CursorSelection;
 
   constructor(app: GLApp) {
     this.app = app;
@@ -92,10 +104,10 @@ class DemoCodeDisplay implements CodeDisplay {
     this.code = "";
   }
   setIsError(isError: boolean): void {
-    if(isError) {
-      this.pre.classList.add("error")
+    if (isError) {
+      this.pre.classList.add("error");
     } else {
-      this.pre.classList.remove("error")
+      this.pre.classList.remove("error");
     }
   }
   setSelection(selection: CursorSelection): void {
@@ -114,37 +126,34 @@ class DemoCodeDisplay implements CodeDisplay {
   }
 
   _render = () => {
-    if(!this.selection) {
+    if (!this.selection) {
       this.pre.textContent = this.code;
       return;
     }
 
     const codeBeforeSelection = this.code.slice(0, this.selection.start);
-    const codeSelected = this.code.slice(this.selection.start, this.selection.end);
+    const codeSelected = this.code.slice(
+      this.selection.start,
+      this.selection.end,
+    );
     const codeAfterSelection = this.code.slice(this.selection.end);
 
     const beforeEl = document.createElement("span");
-    const selEl = document.createElement("mark")
+    const selEl = document.createElement("mark");
     const afterEl = document.createElement("span");
 
     beforeEl.textContent = codeBeforeSelection;
     selEl.textContent = codeSelected;
     afterEl.textContent = codeAfterSelection;
 
-    this.pre.replaceChildren(
-      beforeEl,
-      selEl,
-      afterEl
-    );
+    this.pre.replaceChildren(beforeEl, selEl, afterEl);
     selEl.scrollIntoView({
-      block: "center"
+      block: "center",
     });
-  }
-
-} 
+  };
+}
 
 export class GLApp {
-
   readonly mode: AppMode;
   readonly root: HTMLElement;
 
@@ -162,12 +171,15 @@ export class GLApp {
 
   selectionBC: BroadcastChannel;
 
-  constructor(mode: AppMode, root: HTMLElement) {
+  midiMix: MIDIMix;
 
+  constructor(mode: AppMode, root: HTMLElement, midiMix: MIDIMix) {
     this.mode = mode;
     this.root = root;
 
-    if(this.mode !== "demo") {
+    this.midiMix = midiMix;
+
+    if (this.mode !== "demo") {
       this.codeDisplay = new TextareaCodeDisplay(this);
     } else {
       this.codeDisplay = new DemoCodeDisplay(this);
@@ -175,36 +187,36 @@ export class GLApp {
 
     this.selectionBC = new BroadcastChannel("jump2_textarea_selection");
 
-    this.selectionBC.addEventListener("message", this.handleSelectionBroadcast)
+    this.selectionBC.addEventListener("message", this.handleSelectionBroadcast);
 
     // set to a noop function
     this.renderFunc = () => {};
 
     // set state to an empty state
-    this.renderFuncState = {}
+    this.renderFuncState = {};
   }
 
   updateCode = (code: string) => {
     this.compileCode(code);
     updateCodeInLocalStorage(code);
-  }
+  };
 
   updateSelection = (selection: CursorSelection) => {
     this.selectionBC.postMessage(selection);
-  }
+  };
 
   handleSelectionBroadcast = (e: MessageEvent) => {
     const { data } = e;
-    if(!isCursorSelection(data)) {
+    if (!isCursorSelection(data)) {
       return;
     }
     this.codeDisplay.setSelection(data);
-  }
+  };
 
   compileCode(code: string) {
     try {
       this.renderFunc = createFunction(code);
-    } catch(e) {
+    } catch (e) {
       console.error(e);
       this.codeDisplay.setIsError(true);
       return;
@@ -214,36 +226,35 @@ export class GLApp {
   }
 
   handleStorageEvent = (e: StorageEvent) => {
-    if(e.storageArea !== window.localStorage) {
+    if (e.storageArea !== window.localStorage) {
       return;
     }
-    if(e.key !== codeStorageKey) {
+    if (e.key !== codeStorageKey) {
       return;
     }
     const newCode = e.newValue;
 
-    if(!newCode) {
-      console.error("Where is the new code bruv?")
+    if (!newCode) {
+      console.error("Where is the new code bruv?");
       return;
     }
 
     this.codeDisplay.displayCode(newCode);
     this.compileCode(newCode);
-
-  }
+  };
 
   initializeLocalStoreageSync = () => {
-    window.addEventListener("storage", this.handleStorageEvent)
-  }
+    window.addEventListener("storage", this.handleStorageEvent);
+  };
 
   setupRenderer(canvas: HTMLCanvasElement, gl: WebGL2RenderingContext) {
-    this.renderer = new Renderer(canvas, gl);
+    this.renderer = new Renderer(canvas, gl, this.midiMix);
   }
 
   start() {
     const code = getStartingCode();
     this.codeDisplay.init();
-    this.codeDisplay.displayCode(code)
+    this.codeDisplay.displayCode(code);
     this.compileCode(code);
 
     this.initializeLocalStoreageSync();
@@ -252,7 +263,7 @@ export class GLApp {
   }
 
   stop() {
-    if(this.animationFrame) {
+    if (this.animationFrame) {
       cancelAnimationFrame(this.animationFrame);
     }
 
@@ -260,7 +271,10 @@ export class GLApp {
 
     // clean up event listeners
     window.removeEventListener("storage", this.handleStorageEvent);
-    this.selectionBC.removeEventListener("message", this.handleSelectionBroadcast)
+    this.selectionBC.removeEventListener(
+      "message",
+      this.handleSelectionBroadcast,
+    );
     this.selectionBC.close();
   }
 
@@ -269,26 +283,21 @@ export class GLApp {
   }
 
   _render = (time: number) => {
-
-    if(!this.renderer) {
+    if (!this.renderer) {
       return;
     }
 
-    time *= 0.001;
+    this.renderer.update(time * 0.001);
 
-    this.renderer.update(time);
-
-    if(this.audioAnalyser) {
+    if (this.audioAnalyser) {
       this.renderer.updateFFTData(this.audioAnalyser.getFFTData());
       this.renderer.updateTempoData(this.audioAnalyser.updateBeat());
     }
 
     this.renderer.render((manager) => {
       this.renderFunc(this.renderFuncState, manager);
-    })
+    });
 
     this.animationFrame = requestAnimationFrame(this._render);
   };
-
-
 }

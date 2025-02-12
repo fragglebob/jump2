@@ -1,39 +1,39 @@
 import {
+  type BufferInfo,
+  type FramebufferInfo,
+  type ProgramInfo,
+  type VertexArrayInfo,
   bindFramebufferInfo,
-  BufferInfo,
   createFramebufferInfo,
   createProgramInfo,
   createVertexArrayInfo,
   drawBufferInfo,
-  FramebufferInfo,
   m4,
   primitives,
-  ProgramInfo,
   resizeCanvasToDisplaySize,
   resizeFramebufferInfo,
   setBuffersAndAttributes,
   setUniforms,
-  VertexArrayInfo,
 } from "twgl.js";
 
-import basicVert from "./shaders/basic.vert.glsl";
-import basicFrag from "./shaders/basic.frag.glsl";
-import screenVert from "./shaders/screen.vert.glsl";
-import screenFrag from "./shaders/screen.frag.glsl";
-import { RenderContext } from "./types";
+import type { TempoData } from "../audio/Analyser";
+import type { MIDIMix } from "../midi/MIDIMix";
 import { RenderManager } from "./RenderManager";
-import { KaleidoscopePass } from "./postfx/KaleidoscopePass";
-import { GridShiftPass } from "./postfx/GridShiftPass";
-import { RGBShiftPass } from "./postfx/RGBShiftPass";
-import { ConvolutionPass } from "./postfx/ConvolutionPass";
+import { AsciiPass } from "./postfx/AsciiPass";
 import { BloomPass } from "./postfx/BloomPass";
+import { ConvolutionPass } from "./postfx/ConvolutionPass";
 import { FeedbackPass } from "./postfx/FeedbackPass";
-import { WarpPass } from "./postfx/WarpPass";
-import { RenderPass } from "./postfx/RenderPass";
+import { GridShiftPass } from "./postfx/GridShiftPass";
+import { KaleidoscopePass } from "./postfx/KaleidoscopePass";
 import { PxGridPass } from "./postfx/PxGridPass";
-import { TempoData } from "../audio/Analyser";
-import {AsciiPass} from "./postfx/AsciiPass";
-
+import { RGBShiftPass } from "./postfx/RGBShiftPass";
+import type { RenderPass } from "./postfx/RenderPass";
+import { WarpPass } from "./postfx/WarpPass";
+import basicFrag from "./shaders/basic.frag.glsl";
+import basicVert from "./shaders/basic.vert.glsl";
+import screenFrag from "./shaders/screen.frag.glsl";
+import screenVert from "./shaders/screen.vert.glsl";
+import type { RenderContext } from "./types";
 
 type Vec4 = [number, number, number, number];
 type Vec3 = [number, number, number];
@@ -46,46 +46,48 @@ export class Renderer {
   passThroughProgramInfo: ProgramInfo;
 
   globalUniforms: {
-    u_lightWorldPos: Vec3,
-    u_lightColor: Vec4,
-    u_ambient: Vec4,
-    u_specular: Vec4,
-    u_shininess: number,
-    u_specularFactor: number,
-    u_view: m4.Mat4,
-    u_projection: m4.Mat4
+    u_lightWorldPos: Vec3;
+    u_lightColor: Vec4;
+    u_ambient: Vec4;
+    u_specular: Vec4;
+    u_shininess: number;
+    u_specularFactor: number;
+    u_view: m4.Mat4;
+    u_projection: m4.Mat4;
   };
   styleUniforms: {
-    u_colorMult: Vec4
+    u_colorMult: Vec4;
   };
 
   objectUniforms: {
-    u_world: m4.Mat4
+    u_world: m4.Mat4;
   };
 
   primatives: {
-    rect: VertexArrayInfo,
-    ball: VertexArrayInfo,
-    box: VertexArrayInfo
-  }
+    rect: VertexArrayInfo;
+    ball: VertexArrayInfo;
+    box: VertexArrayInfo;
+  };
 
-  frame: number = 0;
-  time: number = 0;
+  frame = 0;
+  time = 0;
 
   fftData?: Float32Array;
   tempoData?: TempoData;
 
+  midiMix: MIDIMix;
+
   passes: {
-    kaleidoscope: KaleidoscopePass,
-    grid: GridShiftPass,
-    px: PxGridPass,
-    rgb: RGBShiftPass,
-    convolution: ConvolutionPass,
-    bloom: BloomPass,
-    feedback: FeedbackPass,
-    warp: WarpPass,
-    ascii: AsciiPass,
-  }
+    kaleidoscope: KaleidoscopePass;
+    grid: GridShiftPass;
+    px: PxGridPass;
+    rgb: RGBShiftPass;
+    convolution: ConvolutionPass;
+    bloom: BloomPass;
+    feedback: FeedbackPass;
+    warp: WarpPass;
+    ascii: AsciiPass;
+  };
 
   screenBufferInfo: BufferInfo;
 
@@ -93,9 +95,14 @@ export class Renderer {
 
   framebuffersPingPong: FramebufferInfo[];
 
-  constructor(canvas: HTMLCanvasElement, gl: WebGL2RenderingContext) {
+  constructor(
+    canvas: HTMLCanvasElement,
+    gl: WebGL2RenderingContext,
+    midiMix: MIDIMix,
+  ) {
     this.gl = gl;
     this.canvas = canvas;
+    this.midiMix = midiMix;
 
     this.mainProgramInfo = this.createMainProgram();
     this.passThroughProgramInfo = this.createPassThroughProgram();
@@ -113,24 +120,23 @@ export class Renderer {
 
     this.styleUniforms = {
       u_colorMult: [1, 1, 1, 1],
-    }
+    };
 
     this.objectUniforms = {
       u_world: m4.identity(),
     };
 
     this.primatives = {
-        box: this.createCube(),
-        ball: this.createBall(),
-        rect: this.createRect()
-    }
+      box: this.createCube(),
+      ball: this.createBall(),
+      rect: this.createRect(),
+    };
 
     this.screenBufferInfo = primitives.createXYQuadBufferInfo(this.gl, 2);
 
-
     this.framebuffersPingPong = [
       this.createStandardFramebuffer(),
-      this.createStandardFramebuffer()
+      this.createStandardFramebuffer(),
     ];
 
     this.currentFramebufferPingPongIndex = 0;
@@ -165,15 +171,27 @@ export class Renderer {
   }
 
   createRect(): VertexArrayInfo {
-    return createVertexArrayInfo(this.gl, this.mainProgramInfo, primitives.createPlaneBufferInfo(this.gl, 1, 1));
+    return createVertexArrayInfo(
+      this.gl,
+      this.mainProgramInfo,
+      primitives.createPlaneBufferInfo(this.gl, 1, 1),
+    );
   }
 
   createCube(): VertexArrayInfo {
-    return createVertexArrayInfo(this.gl, this.mainProgramInfo, primitives.createCubeBufferInfo(this.gl, 1));
+    return createVertexArrayInfo(
+      this.gl,
+      this.mainProgramInfo,
+      primitives.createCubeBufferInfo(this.gl, 1),
+    );
   }
 
-  createBall() : VertexArrayInfo {
-    return createVertexArrayInfo(this.gl, this.mainProgramInfo, primitives.createSphereBufferInfo(this.gl, 1, 10, 10));
+  createBall(): VertexArrayInfo {
+    return createVertexArrayInfo(
+      this.gl,
+      this.mainProgramInfo,
+      primitives.createSphereBufferInfo(this.gl, 1, 10, 10),
+    );
   }
 
   renderVertexArrayInfo(ctx: RenderContext, vertexArrayInfo: VertexArrayInfo) {
@@ -192,7 +210,7 @@ export class Renderer {
     this.renderVertexArrayInfo(ctx, this.primatives.ball);
   }
 
-  update(time: number) : void {
+  update(time: number): void {
     this.time = time;
     this.frame++;
   }
@@ -205,42 +223,46 @@ export class Renderer {
     this.tempoData = tempoData;
   }
 
-  getTime() : number {
+  getTime(): number {
     return this.time;
   }
 
-  getFrame() : number {
+  getFrame(): number {
     return this.frame;
   }
 
   useMainProgram() {
-    this.gl.enable(this.gl.BLEND)
+    this.gl.enable(this.gl.BLEND);
     this.gl.enable(this.gl.DEPTH_TEST);
     this.gl.enable(this.gl.CULL_FACE);
     this.gl.useProgram(this.mainProgramInfo.program);
     this.gl.clear(this.gl.DEPTH_BUFFER_BIT);
-    this.gl.blendFunc(this.gl.SRC_ALPHA, this.gl.ONE_MINUS_SRC_ALPHA)
-    this.gl.blendEquation(this.gl.FUNC_ADD)
+    this.gl.blendFunc(this.gl.SRC_ALPHA, this.gl.ONE_MINUS_SRC_ALPHA);
+    this.gl.blendEquation(this.gl.FUNC_ADD);
   }
 
-  getCurrentFrameBuffer() : FramebufferInfo {
+  getCurrentFrameBuffer(): FramebufferInfo {
     return this.framebuffersPingPong[this.currentFramebufferPingPongIndex];
   }
 
-  getNextFrameBuffer() : FramebufferInfo {
-    return this.framebuffersPingPong[(this.currentFramebufferPingPongIndex+1)%this.framebuffersPingPong.length];
+  getNextFrameBuffer(): FramebufferInfo {
+    return this.framebuffersPingPong[
+      (this.currentFramebufferPingPongIndex + 1) %
+        this.framebuffersPingPong.length
+    ];
   }
 
-  advanceFrameBufferPingPong() : void {
-    this.currentFramebufferPingPongIndex = (this.currentFramebufferPingPongIndex+1)%this.framebuffersPingPong.length
+  advanceFrameBufferPingPong(): void {
+    this.currentFramebufferPingPongIndex =
+      (this.currentFramebufferPingPongIndex + 1) %
+      this.framebuffersPingPong.length;
   }
 
   render(callback: (ctx: RenderManager) => void) {
-
-    if(resizeCanvasToDisplaySize(this.gl.canvas as HTMLCanvasElement)) {
-      this.framebuffersPingPong.forEach(framebuffer => {
+    if (resizeCanvasToDisplaySize(this.gl.canvas as HTMLCanvasElement)) {
+      for (const framebuffer of this.framebuffersPingPong) {
         this.resizeStandardFramebuffer(framebuffer);
-      })
+      }
       this.passes.bloom.resizeFramebuffers();
       this.passes.feedback.resizeFramebuffers();
     }
@@ -258,22 +280,36 @@ export class Renderer {
 
     callback(manager);
 
-    // renders the render buffer to the canvas with antialisaing 
-    bindFramebufferInfo(this.gl, this.getCurrentFrameBuffer(), this.gl.READ_FRAMEBUFFER);
+    // renders the render buffer to the canvas with antialisaing
+    bindFramebufferInfo(
+      this.gl,
+      this.getCurrentFrameBuffer(),
+      this.gl.READ_FRAMEBUFFER,
+    );
     bindFramebufferInfo(this.gl, null, this.gl.DRAW_FRAMEBUFFER);
     this.clear();
     this.gl.blitFramebuffer(
-      0, 0, this.gl.drawingBufferWidth, this.gl.drawingBufferHeight,
-      0, 0, this.gl.drawingBufferWidth, this.gl.drawingBufferHeight,
-      this.gl.COLOR_BUFFER_BIT, this.gl.LINEAR
+      0,
+      0,
+      this.gl.drawingBufferWidth,
+      this.gl.drawingBufferHeight,
+      0,
+      0,
+      this.gl.drawingBufferWidth,
+      this.gl.drawingBufferHeight,
+      this.gl.COLOR_BUFFER_BIT,
+      this.gl.LINEAR,
     );
   }
 
-  doRenderPass<TRenderPassProps>(pass: RenderPass<TRenderPassProps>, props: TRenderPassProps) {
+  doRenderPass<TRenderPassProps>(
+    pass: RenderPass<TRenderPassProps>,
+    props: TRenderPassProps,
+  ) {
     const currentFramebuffer = this.getCurrentFrameBuffer();
     const nextFramebuffer = this.getNextFrameBuffer();
 
-    if(pass.render(props, currentFramebuffer, nextFramebuffer)) {
+    if (pass.render(props, currentFramebuffer, nextFramebuffer)) {
       // only advance ping pong if render happened
       this.advanceFrameBufferPingPong();
     }
@@ -284,8 +320,11 @@ export class Renderer {
     this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
   }
 
-  processFragmentShaderProgram(program: ProgramInfo, fromFramebuffer: FramebufferInfo, toFramebuffer: FramebufferInfo) {
-
+  processFragmentShaderProgram(
+    program: ProgramInfo,
+    fromFramebuffer: FramebufferInfo,
+    toFramebuffer: FramebufferInfo,
+  ) {
     // switch back to the render framebuffer
     bindFramebufferInfo(this.gl, toFramebuffer);
 
@@ -294,12 +333,12 @@ export class Renderer {
 
     // set the color framebuffer attachment as a uniform for the shader
     setUniforms(program, {
-      u_texture: fromFramebuffer.attachments[0]
+      u_texture: fromFramebuffer.attachments[0],
     });
 
     // reset after the VAO drawing
     this.gl.bindVertexArray(null);
-    
+
     // draw a quad for the size of the screen
     setBuffersAndAttributes(this.gl, program, this.screenBufferInfo);
     drawBufferInfo(this.gl, this.screenBufferInfo);
@@ -308,12 +347,14 @@ export class Renderer {
     this.useMainProgram();
   }
 
-  blendFramebuffer(fromFramebuffer: FramebufferInfo, onFramebuffer: FramebufferInfo, clear: boolean = false) {
-
-
+  blendFramebuffer(
+    fromFramebuffer: FramebufferInfo,
+    onFramebuffer: FramebufferInfo,
+    clear = false,
+  ) {
     bindFramebufferInfo(this.gl, onFramebuffer);
 
-    if(clear) {
+    if (clear) {
       this.clear();
     }
 
@@ -321,14 +362,18 @@ export class Renderer {
 
     // set the color framebuffer attachment as a uniform for the shader
     setUniforms(this.passThroughProgramInfo, {
-      u_texture: fromFramebuffer.attachments[0]
+      u_texture: fromFramebuffer.attachments[0],
     });
 
     // reset after the VAO drawing
     this.gl.bindVertexArray(null);
-    
+
     // draw a quad for the size of the screen
-    setBuffersAndAttributes(this.gl, this.passThroughProgramInfo, this.screenBufferInfo);
+    setBuffersAndAttributes(
+      this.gl,
+      this.passThroughProgramInfo,
+      this.screenBufferInfo,
+    );
     drawBufferInfo(this.gl, this.screenBufferInfo);
 
     // switch back to the main program
@@ -343,5 +388,4 @@ export class Renderer {
   blendFunc(sfactor: number, dfactor: number) {
     this.gl.blendFunc(sfactor, dfactor);
   }
-
 }
