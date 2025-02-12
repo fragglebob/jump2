@@ -8,52 +8,52 @@ import { ShaderRenderPass } from "./ShaderRenderPass";
 import textUrl from "../../assets/text.png?url";
 
 export type Props = {
-	scale: number;
+  scale: number;
 };
 
 export class AsciiPass extends ShaderRenderPass<Props> {
-	textTexture: WebGLTexture;
+  textTexture: WebGLTexture;
 
-	ready = false;
+  ready = false;
 
-	constructor(renderer: Renderer) {
-		super(renderer, vertShader, fragShader);
+  constructor(renderer: Renderer) {
+    super(renderer, vertShader, fragShader);
 
-		this.textTexture = createTexture(
-			renderer.gl,
-			{
-				src: textUrl,
-			},
-			() => {
-				this.ready = true;
-			},
-		);
-	}
+    this.textTexture = createTexture(
+      renderer.gl,
+      {
+        src: textUrl,
+      },
+      () => {
+        this.ready = true;
+      },
+    );
+  }
 
-	render(
-		args: Props,
-		fromFramebuffer: FramebufferInfo,
-		toFramebuffer: FramebufferInfo,
-	) {
-		if (!this.ready) {
-			return false;
-		}
+  render(
+    args: Props,
+    fromFramebuffer: FramebufferInfo,
+    toFramebuffer: FramebufferInfo,
+  ) {
+    if (!this.ready) {
+      return false;
+    }
 
-		this.renderer.gl.useProgram(this.programInfo.program);
+    this.renderer.gl.useProgram(this.programInfo.program);
 
-		setUniforms(this.programInfo, {
-			u_text: this.textTexture,
-			u_resolution: [fromFramebuffer.width, fromFramebuffer.height],
-			u_scale: args.scale,
-			u_chars: 9,
-		});
+    setUniforms(this.programInfo, {
+      u_text: this.textTexture,
+      u_resolution: [fromFramebuffer.width, fromFramebuffer.height],
+      u_scale: args.scale,
+      u_chars: 9,
+    });
 
-		this.renderer.processFragmentShaderProgram(
-			this.getProgramInfo(),
-			fromFramebuffer,
-			toFramebuffer,
-		);
+    this.renderer.processFragmentShaderProgram(
+      this.getProgramInfo(),
+      fromFramebuffer,
+      toFramebuffer,
+    );
 
-		return true;
-	}
+    return true;
+  }
 }
