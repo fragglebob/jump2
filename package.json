@@ -22,6 +22,7 @@
   "devDependencies": {
     "@types/audioworklet": "^0.0.68",
     "@types/nearley": "^2.11.5",
+    "@vitest/coverage-v8": "^3.0.4",
     "ts-node": "^10.9.2",
     "typescript": "^5.7.3",
     "vite": "^6.0.11",

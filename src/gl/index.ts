@@ -1,5 +1,6 @@
 import { Analyser } from "../audio/Analyser";
 import { createFunction, UserRenderFunction } from "../compiler/createFunction";
+import { MIDIMix } from "../midi/MIDIMix";
 import { Renderer } from "./Renderer";
 import { CursorSelection, getCursorSelection, isCursorSelection } from "./utils/getCursorSelection";
 import { getStartingCode } from "./utils/getStartingCode";
@@ -162,7 +163,9 @@ export class GLApp {
 
   selectionBC: BroadcastChannel;
 
-  constructor(mode: AppMode, root: HTMLElement) {
+  midiMix: MIDIMix;
+
+  constructor(mode: AppMode, root: HTMLElement, midiMix: MIDIMix) {
 
     this.mode = mode;
     this.root = root;

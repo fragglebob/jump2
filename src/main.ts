@@ -2,6 +2,8 @@ import './style.css';
 
 import { AppMode, GLApp } from "./gl";
 import { Analyser } from './audio/Analyser';
+import { MIDIManager } from './midi/MIDIManager';
+import { MIDIMix } from './midi/MIDIMix';
 
 function findElementOrThrow<THTMLElement extends HTMLElement>(selector: string) : THTMLElement {
     const elemet = document.querySelector<THTMLElement>(selector);
@@ -93,6 +95,20 @@ function getAppMode(): AppMode {
     return "normal";
 }
 
+function setupMIDI() : MIDIMix {
+    const midiMIX = new MIDIMix();
+
+    MIDIManager.make()
+        .then(manager => {
+            manager.subscribe(midiMIX.receiveMessageEvent.bind(midiMIX))
+        })
+        .catch((err) => {
+            console.log("Issue setting up midi mix", err);
+        })
+
+    return midiMIX
+}
+
 async function start() {
     let canvas: HTMLCanvasElement | undefined;
     let gl: WebGL2RenderingContext | undefined;
@@ -102,9 +118,12 @@ async function start() {
 
     const mode = getAppMode();
 
-    let glapp = new GLApp(mode, codeRoot);
+    const midiMix = setupMIDI();
+
+    let glapp = new GLApp(mode, codeRoot, midiMix);
 
     let analyser: Analyser;
+  
 
     if(mode !== "editor") {
         canvas = findCanvas();
@@ -124,6 +143,8 @@ async function start() {
         analyser = instance;
         glapp.setAudioAnalyser(analyser);
     });
+
+   
 
     if (import.meta.hot) {
         import.meta.hot.accept('./gl/index.ts', (newGLModule) => {
