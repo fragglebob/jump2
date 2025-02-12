@@ -17,6 +17,9 @@ interface RenderManagerInterface {
 
 	fft(index: number): number;
 
+	knob(index: number): number;
+	slider(index: number): number;
+
 	pushMatrix(): void;
 	popMatrix(): void;
 
@@ -131,6 +134,14 @@ export class RenderManager implements RenderManagerInterface {
 			return 0;
 		}
 		return this.renderer.fftData[index];
+	}
+
+	knob(index: number): number {
+		return this.renderer.midiMix.knobs[index] ?? 0;
+	}
+
+	slider(index: number): number {
+		return this.renderer.midiMix.sliders[index] ?? 0;
 	}
 
 	rgb(r: number, g: number, b: number) {

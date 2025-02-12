@@ -566,5 +566,15 @@ while (state['something'] < 10 {
 			const result = compileAST(buildASTFromString(`frame()`));
 			expect(result).toMatchInlineSnapshot(`"manager.frame()"`);
 		});
+
+		it("should handle a knob call", () => {
+			const result = compileAST(buildASTFromString(`knob(1)`));
+			expect(result).toMatchInlineSnapshot(`"manager.knob(1)"`);
+		});
+
+		it("should handle a slider call", () => {
+			const result = compileAST(buildASTFromString(`slider(4)`));
+			expect(result).toMatchInlineSnapshot(`"manager.slider(4)"`);
+		});
 	});
 });

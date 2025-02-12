@@ -12,9 +12,9 @@ Statement ->
       FunctionCalls {% id %}
     | Var _ "=" _ Expression {% (d) => ({ type: "assignment", set: d[0], to: d[4] }) %}
     | "if" __ Expression __ "then" __ Block __ Else {% (d) => ({ type: "if", condition: d[2], then: d[6], else: d[8] }) %}
-	| "while" __ Expression __ "then" __ Block __ "endwhile" {% (d) => ({ type: "while", condition: d[2], then: d[6] }) %}
-	| "loop" __ NamedVariable __ "<-" __ Expression __ "times" __ Block __ "endloop" {% (d) => ({ type: "loop", times: d[6], then: d[10], setting: d[2] }) %}
-	| "loop" __ Expression __ "times" __ Block __ "endloop" {% (d) => ({ type: "loop", times: d[2], then: d[6] }) %}
+    | "while" __ Expression __ "then" __ Block __ "endwhile" {% (d) => ({ type: "while", condition: d[2], then: d[6] }) %}
+    | "loop" __ NamedVariable __ "<-" __ Expression __ "times" __ Block __ "endloop" {% (d) => ({ type: "loop", times: d[6], then: d[10], setting: d[2] }) %}
+    | "loop" __ Expression __ "times" __ Block __ "endloop" {% (d) => ({ type: "loop", times: d[2], then: d[6] }) %}
     | "for" __ NamedVariable __ "in" __ Iterable __ "then" __ Block __ "endfor" {% (d) => ({ type: "forin", setting: d[2], over: d[6], then: d[10] }) %}
     
     
@@ -58,7 +58,7 @@ FunctionCalls ->
     | WorldFunctions {% id %}
     | ShapeFunctions {% id %}
     | UtilFunctions {% id %}
-	| StyleFunctions {% id %}
+	  | StyleFunctions {% id %}
     | FXFunctions {% id %}
 
 FXFunctions -> 
@@ -92,6 +92,8 @@ UtilFunctions ->
     | "bar_progress" _ 0Args {% (d) => ({ type: "func", name: "bar_progress", args: d[2] }) %}
     | "beat_raw" _ 0Args {% (d) => ({ type: "func", name: "beat_raw", args: d[2] }) %}
     | "fft" _ 1Args {% (d) => ({ type: "func", name: "fft", args: d[2] }) %}
+    | "slider" _ 1Args {% (d) => ({ type: "func", name: "slider", args: d[2] }) %}
+    | "knob" _ 1Args {% (d) => ({ type: "func", name: "knob", args: d[2] }) %}
 
 WorldFunctions -> 
       "pushMatrix" _ 0Args {% (d) => ({ type: "func", name: "pushMatrix", args: d[2] }) %}

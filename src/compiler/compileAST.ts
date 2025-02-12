@@ -207,6 +207,8 @@ function compileFunctionCall(ctx: Context, functionCall: FunctionCall): string {
 		case "bar_progress":
 		case "beat_raw":
 		case "fft":
+		case "slider":
+		case "knob":
 		case "fx_kale":
 		case "fx_grid":
 		case "fx_px":
