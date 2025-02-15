@@ -98,6 +98,8 @@ UtilFunctions ->
 WorldFunctions -> 
       "pushMatrix" _ 0Args {% (d) => ({ type: "func", name: "pushMatrix", args: d[2] }) %}
     | "popMatrix" _ 0Args {% (d) => ({ type: "func", name: "popMatrix", args: d[2] }) %}
+    | "push" _ 0Args {% (d) => ({ type: "func", name: "pushMatrix", args: d[2] }) %}
+    | "pop" _ 0Args {% (d) => ({ type: "func", name: "popMatrix", args: d[2] }) %}
     | "translate" _ 3Args {% (d) => ({ type: "func", name: "translate", args: d[2] }) %}
     | "rotateX" _ 1Args {% (d) => ({ type: "func", name: "rotateX", args: d[2] }) %}
     | "rotateY" _ 1Args {% (d) => ({ type: "func", name: "rotateY", args: d[2] }) %}
