@@ -209,6 +209,8 @@ function compileFunctionCall(ctx: Context, functionCall: FunctionCall): string {
     case "fft":
     case "slider":
     case "knob":
+		case "button":
+		case "axis":
     case "fx_kale":
     case "fx_grid":
     case "fx_px":

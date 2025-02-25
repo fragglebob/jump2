@@ -144,6 +144,14 @@ export class RenderManager implements RenderManagerInterface {
     return this.renderer.midiMix.sliders[index] ?? 0;
   }
 
+	button(name: string): number {
+		return this.renderer.gamepad.getButton(name);
+	}
+
+	axis(name: string): number {
+		return this.renderer.gamepad.getAxis(name);
+	}
+
   rgb(r: number, g: number, b: number) {
     this.rgba(r, g, b, 1);
   }

@@ -94,6 +94,8 @@ UtilFunctions ->
     | "fft" _ 1Args {% (d) => ({ type: "func", name: "fft", args: d[2] }) %}
     | "slider" _ 1Args {% (d) => ({ type: "func", name: "slider", args: d[2] }) %}
     | "knob" _ 1Args {% (d) => ({ type: "func", name: "knob", args: d[2] }) %}
+    | "button" _ 1Args {% (d) => ({ type: "func", name: "button", args: d[2] }) %}
+    | "axis" _ 1Args {% (d) => ({ type: "func", name: "axis", args: d[2] }) %}
 
 WorldFunctions -> 
       "pushMatrix" _ 0Args {% (d) => ({ type: "func", name: "pushMatrix", args: d[2] }) %}

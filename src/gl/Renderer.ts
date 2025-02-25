@@ -34,6 +34,7 @@ import basicVert from "./shaders/basic.vert.glsl";
 import screenFrag from "./shaders/screen.frag.glsl";
 import screenVert from "./shaders/screen.vert.glsl";
 import type { RenderContext } from "./types";
+import type { GamepadManager } from "../gamepad/gamepad";
 
 type Vec4 = [number, number, number, number];
 type Vec3 = [number, number, number];
@@ -41,6 +42,9 @@ type Vec3 = [number, number, number];
 export class Renderer {
   readonly gl: WebGL2RenderingContext;
   readonly canvas: HTMLCanvasElement;
+
+  readonly midiMix: MIDIMix;
+  readonly gamepad: GamepadManager;
 
   mainProgramInfo: ProgramInfo;
   passThroughProgramInfo: ProgramInfo;
@@ -75,8 +79,6 @@ export class Renderer {
   fftData?: Float32Array;
   tempoData?: TempoData;
 
-  midiMix: MIDIMix;
-
   passes: {
     kaleidoscope: KaleidoscopePass;
     grid: GridShiftPass;
@@ -99,10 +101,12 @@ export class Renderer {
     canvas: HTMLCanvasElement,
     gl: WebGL2RenderingContext,
     midiMix: MIDIMix,
+    gamepad: GamepadManager,
   ) {
     this.gl = gl;
     this.canvas = canvas;
     this.midiMix = midiMix;
+    this.gamepad = gamepad;
 
     this.mainProgramInfo = this.createMainProgram();
     this.passThroughProgramInfo = this.createPassThroughProgram();
@@ -190,7 +194,7 @@ export class Renderer {
     return createVertexArrayInfo(
       this.gl,
       this.mainProgramInfo,
-      primitives.createSphereBufferInfo(this.gl, 1, 10, 10),
+      primitives.createSphereBufferInfo(this.gl, 1, 20, 20),
     );
   }
 

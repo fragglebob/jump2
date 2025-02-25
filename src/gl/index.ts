@@ -3,6 +3,7 @@ import {
   type UserRenderFunction,
   createFunction,
 } from "../compiler/createFunction";
+import type { GamepadManager } from "../gamepad/gamepad";
 import type { MIDIMix } from "../midi/MIDIMix";
 import { Renderer } from "./Renderer";
 import {
@@ -172,12 +173,14 @@ export class GLApp {
   selectionBC: BroadcastChannel;
 
   midiMix: MIDIMix;
+  gamepad: GamepadManager;
 
-  constructor(mode: AppMode, root: HTMLElement, midiMix: MIDIMix) {
+  constructor(mode: AppMode, root: HTMLElement, midiMix: MIDIMix, gamepad: GamepadManager) {
     this.mode = mode;
     this.root = root;
 
     this.midiMix = midiMix;
+    this.gamepad = gamepad;
 
     if (this.mode !== "demo") {
       this.codeDisplay = new TextareaCodeDisplay(this);
@@ -248,7 +251,7 @@ export class GLApp {
   };
 
   setupRenderer(canvas: HTMLCanvasElement, gl: WebGL2RenderingContext) {
-    this.renderer = new Renderer(canvas, gl, this.midiMix);
+    this.renderer = new Renderer(canvas, gl, this.midiMix, this.gamepad);
   }
 
   start() {
@@ -288,6 +291,8 @@ export class GLApp {
     }
 
     this.renderer.update(time * 0.001);
+
+    this.gamepad.pollGamepadState();
 
     if (this.audioAnalyser) {
       this.renderer.updateFFTData(this.audioAnalyser.getFFTData());
